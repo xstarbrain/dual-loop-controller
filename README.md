@@ -56,7 +56,10 @@
 In contemporary Large Language Models (LLMs)—ranging from standard autoregressive transformers to reasoning models (such as OpenAI o1/o3 or DeepSeek-R1)—a fundamental category mistake is universally made: **treating sequential text tokens as the thought process itself**.
 
 In standard autoregressive architectures:
-$$\text{Thought}_t \equiv \text{Token}_t \sim \text{softmax}\!\left(\mathbf{W}_{\text{vocab}}\,\mathbf{h}_t\right)$$
+
+$$
+\text{Thought}_t \equiv \text{Token}_t \sim \operatorname{softmax}\left(\mathbf{W}_{\text{vocab}}\,\mathbf{h}_t\right)
+$$
 
 This equates thinking with vocalization. In humans, internal cognition does not proceed via sequential verbal speech; rather, cognition is a continuous, high-dimensional dynamical attractor process involving parallel lateral associations, spatial-kinematic modeling, and veracity verification. Language is merely a low-bandwidth **peripheral communication codec** used to project internal state manifolds into discrete surface symbols for inter-agent transmission.
 
@@ -87,6 +90,10 @@ Output  <--- [Frozen Language Codec] <--- [Layer 28 Final Hidden State]
 ---
 
 ## 2. System Architecture & Mathematical Formulations
+
+<p align="center">
+  <img src="paper/figures/hadl_v58_architecture_blueprint.png" alt="X-Star HADL v5.8 Architecture Blueprint" width="100%">
+</p>
 
 ```
 +---------------------------------------------------------------------------------------------------+
@@ -141,15 +148,25 @@ Implemented in [`LatentThoughtMatrixEngine`](file:///c:/Users/Matthew%20Chen/Doc
 $$\mathbf{M}(\mathbf{h}) = \begin{bmatrix} \mathbf{M}_0 \\ \mathbf{M}_1 \\ \mathbf{M}_2 \\ \mathbf{M}_3 \end{bmatrix} \in \mathbb{R}^{B \times S \times 4 \times D}$$
 
 The four cognitive subparts serve distinct roles:
+
 1. **$\mathbf{M}_0 = \mathbf{h}$ (Invariant Factual & Syntactic Anchor)**: Retains the exact unperturbed representation of the frozen foundation model.
-2. **$\mathbf{M}_1 = \mathcal{P}_{\perp \mathbf{M}_0}\!\left(\mathbf{W}_{\text{up}}^{(1)}\,\sigma\!\left(\mathbf{W}_{\text{down}}^{(1)}\,\text{LN}(\mathbf{h})\right)\right)$ (Wild / Lateral Exploration Subspace)**: Provides unconstrained, high-entropy representation exploration without altering surface token generation.
-3. **$\mathbf{M}_2 = \mathcal{P}_{\perp \mathbf{M}_0}\!\left(\mathbf{W}_{\text{up}}^{(2)}\,\tanh\!\left(\mathbf{W}_{\text{mid}}^{(2)}\,\text{SiLU}\!\left(\mathbf{W}_{\text{down}}^{(2)}\,\text{LN}(\mathbf{h})\right)\right)\right)$ (Epistemic Veracity Subspace)**: Projects representations into a learned metric space that quantifies internal epistemic conflict:
-   $$s_{\text{veracity}}(\mathbf{h}) = \tanh\!\left(\mathbf{w}_v^\top \mathbf{z}_{\text{prop}} + b_v\right) \in [-1, +1]$$
+2. **$\mathbf{M}_1$ (Wild / Lateral Exploration Subspace)**:
+   $$\mathbf{M}_1 = \mathcal{P}_{\perp \mathbf{M}_0}\left(\mathbf{W}_{\text{up}}^{(1)}\,\sigma\left(\mathbf{W}_{\text{down}}^{(1)}\,\operatorname{LN}(\mathbf{h})\right)\right)$$
+   Provides unconstrained, high-entropy representation exploration without altering surface token generation.
+3. **$\mathbf{M}_2$ (Epistemic Veracity Subspace)**:
+   $$\mathbf{M}_2 = \mathcal{P}_{\perp \mathbf{M}_0}\left(\mathbf{W}_{\text{up}}^{(2)}\,\tanh\left(\mathbf{W}_{\text{mid}}^{(2)}\,\operatorname{SiLU}\left(\mathbf{W}_{\text{down}}^{(2)}\,\operatorname{LN}(\mathbf{h})\right)\right)\right)$$
+   Projects representations into a learned metric space quantifying internal epistemic conflict:
+   $$s_{\text{veracity}}(\mathbf{h}) = \tanh\left(\mathbf{w}_v^\top \mathbf{z}_{\text{prop}} + b_v\right) \in [-1, +1]$$
    where $s_{\text{veracity}} > +0.25$ indicates an ungrounded myth or false premise, and $s_{\text{veracity}} \le +0.20$ denotes grounded factual truth.
-4. **$\mathbf{M}_3 = \mathcal{P}_{\perp \mathbf{M}_0}\!\left(\mathbf{W}_{\text{up}}^{(3)}\,\tanh\!\left(\mathbf{W}_{\text{contract}}^{(3)}\,\mathbf{z}_0 + \mathbf{z}_0\right)\right)$ (Banach Structural Deduction Subspace)**: Implements contractive fixed-point dynamics for formal syllogistic deductions.
+4. **$\mathbf{M}_3$ (Banach Structural Deduction Subspace)**:
+   $$\mathbf{M}_3 = \mathcal{P}_{\perp \mathbf{M}_0}\left(\mathbf{W}_{\text{up}}^{(3)}\,\tanh\left(\mathbf{W}_{\text{contract}}^{(3)}\,\mathbf{z}_0 + \mathbf{z}_0\right)\right)$$
+   Implements contractive fixed-point dynamics for formal syllogistic deductions.
 
 Strict Gram-Schmidt orthogonal projection guarantees that lateral thinking never degrades the base factual anchor:
-$$\mathcal{P}_{\perp \mathbf{M}_0}(\mathbf{v}) = \mathbf{v} - \frac{\langle \mathbf{v}, \mathbf{M}_0 \rangle}{\|\mathbf{M}_0\|_2^2 + \epsilon}\,\mathbf{M}_0, \qquad \langle \mathbf{M}_k, \mathbf{M}_0 \rangle \equiv 0 \quad \forall k \in \{1, 2, 3\}$$
+
+$$
+\mathcal{P}_{\perp \mathbf{M}_0}(\mathbf{v}) = \mathbf{v} - \frac{\langle \mathbf{v}, \mathbf{M}_0 \rangle}{\|\mathbf{M}_0\|_2^2 + \epsilon}\,\mathbf{M}_0, \qquad \langle \mathbf{M}_k, \mathbf{M}_0 \rangle \equiv 0 \quad \forall k \in \{1, 2, 3\}
+$$
 
 ---
 
@@ -157,34 +174,58 @@ $$\mathcal{P}_{\perp \mathbf{M}_0}(\mathbf{v}) = \mathbf{v} - \frac{\langle \mat
 
 Implemented in [`CentralCognitiveRouter`](file:///c:/Users/Matthew%20Chen/Documents/X-Star/dual_loop/neuromorphic/pacemaker_router.py#L710-L965), the subparts are interconnected via a recurrent toroidal attention graph with learnable cyclic adjacency bias $\mathbf{B}_{\text{torus}} \in \mathbb{R}^{4 \times 4}$:
 
-$$\mathbf{B}_{\text{torus}}[r, c] = \begin{cases} 0.50 & \text{if } r = c \\ 0.35 & \text{if } c = (r + 1) \bmod 4 \\ 0.00 & \text{otherwise} \end{cases}$$
+$$
+\mathbf{B}_{\text{torus}}[r, c] = \begin{cases} 0.50 & \text{if } r = c \\ 0.35 & \text{if } c = (r + 1) \bmod 4 \\ 0.00 & \text{otherwise} \end{cases}
+$$
 
 For each recurrent cycle $c \in \{1, \dots, C\}$ (default $C = 2$, verified stable up to $C = 12$):
-$$\mathbf{A}^{(c)} = \text{softmax}\!\left(\frac{\mathbf{Q}(M^{(c-1)})\,\mathbf{K}(M^{(c-1)})^\top}{\sqrt{d_r}} + \mathbf{B}_{\text{torus}}\right)$$
-$$\Delta \mathbf{M}_r^{(c)} = \mathbf{W}_{\text{out}}\!\left(\mathbf{A}_{r,:}^{(c)}\,\mathbf{V}(M^{(c-1)})\right)$$
-$$\mathbf{M}_r^{(c)} = \mathcal{P}_{\perp \mathbf{M}_0}\!\left(\mathbf{M}_r^{(c-1)} + \alpha\,\Delta \mathbf{M}_r^{(c)}\right) \quad \forall r \in \{1, 2, 3\}$$
+
+$$
+\begin{aligned}
+\mathbf{A}^{(c)} &= \operatorname{softmax}\left(\frac{\mathbf{Q}(M^{(c-1)})\,\mathbf{K}(M^{(c-1)})^\top}{\sqrt{d_r}} + \mathbf{B}_{\text{torus}}\right) \\
+\Delta \mathbf{M}_r^{(c)} &= \mathbf{W}_{\text{out}}\left(\mathbf{A}_{r,:}^{(c)}\,\mathbf{V}(M^{(c-1)})\right) \\
+\mathbf{M}_r^{(c)} &= \mathcal{P}_{\perp \mathbf{M}_0}\left(\mathbf{M}_r^{(c-1)} + \alpha\,\Delta \mathbf{M}_r^{(c)}\right) \quad \forall r \in \{1, 2, 3\}
+\end{aligned}
+$$
 
 Dynamic subpart routing weights $\mathbf{w} \in \Delta^3$ are modulated by the live veracity conflict score $s_{\text{veracity}}$:
-$$\mathbf{w} = \text{softmax}\!\left(\mathbf{W}_{\text{gate}}\left[\mathbf{q}_{\text{pool}} \,\|\, \bar{u}_{\text{drive}} \,\|\, s_{\text{veracity}}\right] + \boldsymbol{\beta}_v\right)$$
+
+$$
+\mathbf{w} = \operatorname{softmax}\left(\mathbf{W}_{\text{gate}}\left[\mathbf{q}_{\text{pool}} \,\|\, \bar{u}_{\text{drive}} \,\|\, s_{\text{veracity}}\right] + \boldsymbol{\beta}_v\right)
+$$
 
 The routed residual state is projected with a strict relative norm bound $\eta_{\max} = 0.0150$:
-$$\Delta \mathbf{h}_{\perp} = \sum_{r=1}^{3} w_r \mathbf{M}_r^{(C)}, \qquad \mathbf{h}_{\text{routed}} = \mathbf{M}_0 + \min\!\left(1.0,\, \frac{0.0150\,\|\mathbf{M}_0\|_2}{\|\Delta \mathbf{h}_{\perp}\|_2}\right)\Delta \mathbf{h}_{\perp}$$
+
+$$
+\Delta \mathbf{h}_{\perp} = \sum_{r=1}^{3} w_r \mathbf{M}_r^{(C)}, \qquad \mathbf{h}_{\text{routed}} = \mathbf{M}_0 + \min\left(1.0,\, \frac{0.0150\,\|\mathbf{M}_0\|_2}{\|\Delta \mathbf{h}_{\perp}\|_2}\right)\Delta \mathbf{h}_{\perp}
+$$
 
 ---
 
 ### 2.3 Neuromorphic Leaky Integrate-and-Fire (LIF) Spiking Gate
 
 Located at the Layer 7 $\to$ 8 transition in [`LeakyIntegrateAndFireGate`](file:///c:/Users/Matthew%20Chen/Documents/X-Star/dual_loop/neuromorphic/spiking_gate.py#L133-L250), this module modulates epistemic representation flow via continuous membrane potentials:
-$$I(t) = \|\mathbf{W}_{\text{sensor}}\,\text{LN}(\mathbf{h}_t)\|_1$$
-$$V_m(t) = \beta\,V_m(t-1) + I(t)$$
-$$S(t) = \Theta\!\left(V_m(t) - V_{\text{th}}(t)\right)$$
-$$V_m(t) \leftarrow V_m(t)\left(1 - S(t)\right) \quad \text{(Refractory Reset)}$$
+
+$$
+\begin{aligned}
+I(t) &= \|\mathbf{W}_{\text{sensor}}\,\operatorname{LN}(\mathbf{h}_t)\|_1 \\
+V_m(t) &= \beta\,V_m(t-1) + I(t) \\
+S(t) &= \Theta\left(V_m(t) - V_{\text{th}}(t)\right) \\
+V_m(t) &\leftarrow V_m(t)\left(1 - S(t)\right) \quad \text{(Refractory Reset)}
+\end{aligned}
+$$
 
 Differentiable training is enabled via the Fast Sigmoid surrogate gradient:
-$$\frac{\partial \Theta(x)}{\partial x} = \frac{1}{\left(1 + \gamma |x|\right)^2}$$
+
+$$
+\frac{\partial \Theta(x)}{\partial x} = \frac{1}{\left(1 + \gamma |x|\right)^2}
+$$
 
 The firing threshold adapts homeostatically:
-$$V_{\text{th}}(t+1) = V_{\text{th}}(t) + \alpha_{\text{homeo}}\left(\bar{S} - r_{\text{target}}\right)$$
+
+$$
+V_{\text{th}}(t+1) = V_{\text{th}}(t) + \alpha_{\text{homeo}}\left(\bar{S} - r_{\text{target}}\right)
+$$
 
 ---
 

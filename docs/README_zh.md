@@ -51,19 +51,38 @@ HADL v5.8 彻底贯彻这一范式：
 
 ## 2. 系统架构与数学公式
 
+<p align="center">
+  <img src="../paper/figures/hadl_v58_architecture_blueprint.png" alt="X-Star HADL v5.8 架构蓝图" width="100%">
+</p>
+
 ### 2.1 Rank-4 隐空间思维矩阵 ($\mathbf{M} \in \mathbb{R}^{B \times S \times 4 \times D}$)
+
 在 Layer 7 隐藏状态 $\mathbf{h} \in \mathbb{R}^{B \times S \times D}$ 上展开：
-$$\mathbf{M}_0 = \mathbf{h} \quad \text{(事实锚点)}$$
-$$\mathbf{M}_1 = \mathcal{P}_{\perp \mathbf{M}_0}\!\left(\text{WildExploration}(\mathbf{h})\right) \quad \text{(狂野发散)}$$
-$$\mathbf{M}_2 = \mathcal{P}_{\perp \mathbf{M}_0}\!\left(\text{VeracitySubspace}(\mathbf{h})\right), \quad s_{\text{veracity}} = \tanh(\mathbf{w}_v^\top \mathbf{z}_{\text{prop}} + b_v) \quad \text{(认知真伪)}$$
-$$\mathbf{M}_3 = \mathcal{P}_{\perp \mathbf{M}_0}\!\left(\text{BanachDeduction}(\mathbf{h})\right) \quad \text{(结构化演绎)}$$
+
+$$
+\begin{aligned}
+\mathbf{M}_0 &= \mathbf{h} \quad \text{(事实锚点)} \\
+\mathbf{M}_1 &= \mathcal{P}_{\perp \mathbf{M}_0}\left(\text{WildExploration}(\mathbf{h})\right) \quad \text{(狂野发散)} \\
+\mathbf{M}_2 &= \mathcal{P}_{\perp \mathbf{M}_0}\left(\text{VeracitySubspace}(\mathbf{h})\right) \quad \text{(认知真伪)} \\
+\mathbf{M}_3 &= \mathcal{P}_{\perp \mathbf{M}_0}\left(\text{BanachDeduction}(\mathbf{h})\right) \quad \text{(结构化演绎)}
+\end{aligned}
+$$
+
+其中认知真伪子空间计算矛盾冲突度量：$s_{\text{veracity}} = \tanh(\mathbf{w}_v^\top \mathbf{z}_{\text{prop}} + b_v) \in [-1, +1]$。
 
 格拉姆-施密特严格正交投影保证：$\langle \mathbf{M}_k, \mathbf{M}_0 \rangle \equiv 0 \quad \forall k \in \{1, 2, 3\}$。
 
 ### 2.2 循环环面中心认知路由器（“旋转大脑”）
+
 利用环面邻接偏置 $\mathbf{B}_{\text{torus}}$ 在 $C$ 个微循环中传递信息：
-$$\mathbf{A}^{(c)} = \text{softmax}\!\left(\frac{\mathbf{Q}\,\mathbf{K}^\top}{\sqrt{d_r}} + \mathbf{B}_{\text{torus}}\right), \qquad \Delta \mathbf{h}_{\perp} = \sum_{r=1}^3 w_r \mathbf{M}_r^{(C)}$$
-$$\mathbf{h}_{\text{routed}} = \mathbf{M}_0 + \min\!\left(1.0,\, \frac{0.0150\,\|\mathbf{M}_0\|_2}{\|\Delta \mathbf{h}_\perp\|_2}\right)\Delta \mathbf{h}_\perp$$
+
+$$
+\begin{aligned}
+\mathbf{A}^{(c)} &= \operatorname{softmax}\left(\frac{\mathbf{Q}\,\mathbf{K}^\top}{\sqrt{d_r}} + \mathbf{B}_{\text{torus}}\right) \\
+\Delta \mathbf{h}_{\perp} &= \sum_{r=1}^3 w_r \mathbf{M}_r^{(C)} \\
+\mathbf{h}_{\text{routed}} &= \mathbf{M}_0 + \min\left(1.0,\, \frac{0.0150\,\|\mathbf{M}_0\|_2}{\|\Delta \mathbf{h}_\perp\|_2}\right)\Delta \mathbf{h}_\perp
+\end{aligned}
+$$
 
 ---
 

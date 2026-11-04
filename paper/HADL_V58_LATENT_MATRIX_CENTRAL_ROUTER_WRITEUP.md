@@ -14,6 +14,10 @@ In HADL v5.8, we eliminate the static `myth_keywords` list completely. Instead, 
 
 ## 1. Architectural Formulation
 
+<p align="center">
+  <img src="figures/hadl_v58_architecture_blueprint.png" alt="X-Star HADL v5.8 Architecture Blueprint" width="100%">
+</p>
+
 ### 1.1 The 4-Subpart Non-Token Latent Thought Matrix ($\mathbf{M} \in \mathbb{R}^{B \times S \times 4 \times D}$)
 
 Implemented in [`LatentThoughtMatrixEngine`](file:///c:/Users/Matthew%20Chen/Documents/X-Star/dual_loop/neuromorphic/latent_matrix_router.py#L22-L162) and re-exported through [`pacemaker_router.py`](file:///c:/Users/Matthew%20Chen/Documents/X-Star/dual_loop/neuromorphic/pacemaker_router.py#L466-L473), the incoming Layer 7 hidden state $\mathbf{h} \in \mathbb{R}^{B \times S \times D}$ is mapped into a rank-4 latent thought tensor:

@@ -56,7 +56,10 @@
 Pada model bahasa besar (LLM) konvensional saat ini—baik transformer autoregresif murni maupun model bernalar seperti OpenAI o1/o3 atau DeepSeek-R1—terdapat satu kekeliruan paradigma yang mendasar: **menganggap urutan token kata sebagai proses berpikir itu sendiri**.
 
 Pada arsitektur autoregresif standar:
-$$\text{Pikiran}_t \equiv \text{Token}_t \sim \text{softmax}\!\left(\mathbf{W}_{\text{vocab}}\,\mathbf{h}_t\right)$$
+
+$$
+\text{Pikiran}_t \equiv \text{Token}_t \sim \operatorname{softmax}\left(\mathbf{W}_{\text{vocab}}\,\mathbf{h}_t\right)
+$$
 
 Ini sama saja dengan memaksa otak manusia hanya bisa berpikir jika pita suaranya bergetar mengeluarkan kata-kata. Padahal pada kecerdasan biologis, proses berpikir internal adalah dinamika atraktor berdimensi tinggi yang kontinu, non-linear, dan beroperasi di ruang laten abstrak (spasial, visual, verisitas, verifikasi kontradiksi). Bahasa manusia hanyalah **alat komunikasi periferal (codec)** berkecepatan rendah yang bertugas memproyeksikan manifold keadaan internal menjadi simbol-simbol diskret agar bisa dipahami pihak luar.
 
@@ -87,6 +90,10 @@ Output  <--- [Codec Bahasa Beku]   <--- [Layer 28 Keadaan Tersembunyi Akhir]
 ---
 
 ## 2. Arsitektur Sistem & Formulasi Matematis Terperinci
+
+<p align="center">
+  <img src="paper/figures/hadl_v58_architecture_blueprint.png" alt="Arsitektur X-Star HADL v5.8 Blueprint" width="100%">
+</p>
 
 ```
 +---------------------------------------------------------------------------------------------------+
@@ -141,15 +148,25 @@ Diterapkan dalam kelas [`LatentThoughtMatrixEngine`](file:///c:/Users/Matthew%20
 $$\mathbf{M}(\mathbf{h}) = \begin{bmatrix} \mathbf{M}_0 \\ \mathbf{M}_1 \\ \mathbf{M}_2 \\ \mathbf{M}_3 \end{bmatrix} \in \mathbb{R}^{B \times S \times 4 \times D}$$
 
 Setiap sub-bagian mengemban fungsi kognitif terpisah:
+
 1. **$\mathbf{M}_0 = \mathbf{h}$ (Jangkar Faktual & Sintaksis Murni)**: Menyimpan keadaan asli model dasar tanpa distorsi sedikit pun.
-2. **$\mathbf{M}_1 = \mathcal{P}_{\perp \mathbf{M}_0}\!\left(\mathbf{W}_{\text{up}}^{(1)}\,\sigma\!\left(\mathbf{W}_{\text{down}}^{(1)}\,\text{LN}(\mathbf{h})\right)\right)$ (Sub-Ruang Eksplorasi Lateral Liar)**: Memungkinkan penjelajahan asosiasi berentropi tinggi secara leluasa tanpa merusak kata-kata pada token output.
-3. **$\mathbf{M}_2 = \mathcal{P}_{\perp \mathbf{M}_0}\!\left(\mathbf{W}_{\text{up}}^{(2)}\,\tanh\!\left(\mathbf{W}_{\text{mid}}^{(2)}\,\text{SiLU}\!\left(\mathbf{W}_{\text{down}}^{(2)}\,\text{LN}(\mathbf{h})\right)\right)\right)$ (Sub-Ruang Verisitas Epistemik)**: Memproyeksikan aktivasi ke dalam manifold verisitas terlatih untuk mendeteksi kontradiksi atau mitos keliru:
-   $$s_{\text{veracity}}(\mathbf{h}) = \tanh\!\left(\mathbf{w}_v^\top \mathbf{z}_{\text{prop}} + b_v\right) \in [-1, +1]$$
+2. **$\mathbf{M}_1$ (Sub-Ruang Eksplorasi Lateral Liar)**:
+   $$\mathbf{M}_1 = \mathcal{P}_{\perp \mathbf{M}_0}\left(\mathbf{W}_{\text{up}}^{(1)}\,\sigma\left(\mathbf{W}_{\text{down}}^{(1)}\,\operatorname{LN}(\mathbf{h})\right)\right)$$
+   Memungkinkan penjelajahan asosiasi berentropi tinggi secara leluasa tanpa merusak kata-kata pada token output.
+3. **$\mathbf{M}_2$ (Sub-Ruang Verisitas Epistemik)**:
+   $$\mathbf{M}_2 = \mathcal{P}_{\perp \mathbf{M}_0}\left(\mathbf{W}_{\text{up}}^{(2)}\,\tanh\left(\mathbf{W}_{\text{mid}}^{(2)}\,\operatorname{SiLU}\left(\mathbf{W}_{\text{down}}^{(2)}\,\operatorname{LN}(\mathbf{h})\right)\right)\right)$$
+   Memproyeksikan aktivasi ke dalam manifold verisitas terlatih untuk mendeteksi kontradiksi atau mitos keliru:
+   $$s_{\text{veracity}}(\mathbf{h}) = \tanh\left(\mathbf{w}_v^\top \mathbf{z}_{\text{prop}} + b_v\right) \in [-1, +1]$$
    di mana nilai $s_{\text{veracity}} > +0.25$ mendeteksi premis palsu/mitos populer, sedangkan $s_{\text{veracity}} \le +0.20$ mengonfirmasi fakta ilmiah yang valid.
-4. **$\mathbf{M}_3 = \mathcal{P}_{\perp \mathbf{M}_0}\!\left(\mathbf{W}_{\text{up}}^{(3)}\,\tanh\!\left(\mathbf{W}_{\text{contract}}^{(3)}\,\mathbf{z}_0 + \mathbf{z}_0\right)\right)$ (Sub-Ruang Deduksi Struktural Banach)**: Menerapkan pemetaan kontraktif Banach untuk penalaran silogisme deduktif.
+4. **$\mathbf{M}_3$ (Sub-Ruang Deduksi Struktural Banach)**:
+   $$\mathbf{M}_3 = \mathcal{P}_{\perp \mathbf{M}_0}\left(\mathbf{W}_{\text{up}}^{(3)}\,\tanh\left(\mathbf{W}_{\text{contract}}^{(3)}\,\mathbf{z}_0 + \mathbf{z}_0\right)\right)$$
+   Menerapkan pemetaan kontraktif Banach untuk penalaran silogisme deduktif.
 
 Melalui proyeksi ortogonal Gram-Schmidt, sub-bagian $\mathbf{M}_{1,2,3}$ dijamin tegak lurus sempurna terhadap $\mathbf{M}_0$:
-$$\mathcal{P}_{\perp \mathbf{M}_0}(\mathbf{v}) = \mathbf{v} - \frac{\langle \mathbf{v}, \mathbf{M}_0 \rangle}{\|\mathbf{M}_0\|_2^2 + \epsilon}\,\mathbf{M}_0, \qquad \langle \mathbf{M}_k, \mathbf{M}_0 \rangle \equiv 0 \quad \forall k \in \{1, 2, 3\}$$
+
+$$
+\mathcal{P}_{\perp \mathbf{M}_0}(\mathbf{v}) = \mathbf{v} - \frac{\langle \mathbf{v}, \mathbf{M}_0 \rangle}{\|\mathbf{M}_0\|_2^2 + \epsilon}\,\mathbf{M}_0, \qquad \langle \mathbf{M}_k, \mathbf{M}_0 \rangle \equiv 0 \quad \forall k \in \{1, 2, 3\}
+$$
 
 ---
 
@@ -157,31 +174,58 @@ $$\mathcal{P}_{\perp \mathbf{M}_0}(\mathbf{v}) = \mathbf{v} - \frac{\langle \mat
 
 Diterapkan dalam kelas [`CentralCognitiveRouter`](file:///c:/Users/Matthew%20Chen/Documents/X-Star/dual_loop/neuromorphic/pacemaker_router.py#L710-L965), keempat sub-bagian dihubungkan melalui graf atensi sirkular toroidal dengan matriks bias keterhubungan $\mathbf{B}_{\text{torus}} \in \mathbb{R}^{4 \times 4}$:
 
-$$\mathbf{B}_{\text{torus}}[r, c] = \begin{cases} 0.50 & \text{jika } r = c \\ 0.35 & \text{jika } c = (r + 1) \bmod 4 \\ 0.00 & \text{lainnya} \end{cases}$$
+$$
+\mathbf{B}_{\text{torus}}[r, c] = \begin{cases} 0.50 & \text{jika } r = c \\ 0.35 & \text{jika } c = (r + 1) \bmod 4 \\ 0.00 & \text{lainnya} \end{cases}
+$$
 
 Pada setiap putaran mikro-siklus $c \in \{1, \dots, C\}$ (bawaan $C = 2$, terbukti stabil hingga $C = 12$):
-$$\mathbf{A}^{(c)} = \text{softmax}\!\left(\frac{\mathbf{Q}(M^{(c-1)})\,\mathbf{K}(M^{(c-1)})^\top}{\sqrt{d_r}} + \mathbf{B}_{\text{torus}}\right)$$
-$$\Delta \mathbf{M}_r^{(c)} = \mathbf{W}_{\text{out}}\!\left(\mathbf{A}_{r,:}^{(c)}\,\mathbf{V}(M^{(c-1)})\right)$$
-$$\mathbf{M}_r^{(c)} = \mathcal{P}_{\perp \mathbf{M}_0}\!\left(\mathbf{M}_r^{(c-1)} + \alpha\,\Delta \mathbf{M}_r^{(c)}\right) \quad \forall r \in \{1, 2, 3\}$$
+
+$$
+\begin{aligned}
+\mathbf{A}^{(c)} &= \operatorname{softmax}\left(\frac{\mathbf{Q}(M^{(c-1)})\,\mathbf{K}(M^{(c-1)})^\top}{\sqrt{d_r}} + \mathbf{B}_{\text{torus}}\right) \\
+\Delta \mathbf{M}_r^{(c)} &= \mathbf{W}_{\text{out}}\left(\mathbf{A}_{r,:}^{(c)}\,\mathbf{V}(M^{(c-1)})\right) \\
+\mathbf{M}_r^{(c)} &= \mathcal{P}_{\perp \mathbf{M}_0}\left(\mathbf{M}_r^{(c-1)} + \alpha\,\Delta \mathbf{M}_r^{(c)}\right) \quad \forall r \in \{1, 2, 3\}
+\end{aligned}
+$$
 
 Bobot penyeimbang dinamis $\mathbf{w} \in \Delta^3$ diatur langsung oleh sinyal konflik verisitas $s_{\text{veracity}}$:
-$$\mathbf{w} = \text{softmax}\!\left(\mathbf{W}_{\text{gate}}\left[\mathbf{q}_{\text{pool}} \,\|\, \bar{u}_{\text{drive}} \,\|\, s_{\text{veracity}}\right] + \boldsymbol{\beta}_v\right)$$
+
+$$
+\mathbf{w} = \operatorname{softmax}\left(\mathbf{W}_{\text{gate}}\left[\mathbf{q}_{\text{pool}} \,\|\, \bar{u}_{\text{drive}} \,\|\, s_{\text{veracity}}\right] + \boldsymbol{\beta}_v\right)
+$$
 
 Injeksi residu kembali ke residual stream Layer 7 dijaga dengan batas rasio norma homeostatis $\eta_{\max} = 0.0150$:
-$$\Delta \mathbf{h}_{\perp} = \sum_{r=1}^{3} w_r \mathbf{M}_r^{(C)}, \qquad \mathbf{h}_{\text{routed}} = \mathbf{M}_0 + \min\!\left(1.0,\, \frac{0.0150\,\|\mathbf{M}_0\|_2}{\|\Delta \mathbf{h}_{\perp}\|_2}\right)\Delta \mathbf{h}_{\perp}$$
+
+$$
+\Delta \mathbf{h}_{\perp} = \sum_{r=1}^{3} w_r \mathbf{M}_r^{(C)}, \qquad \mathbf{h}_{\text{routed}} = \mathbf{M}_0 + \min\left(1.0,\, \frac{0.0150\,\|\mathbf{M}_0\|_2}{\|\Delta \mathbf{h}_{\perp}\|_2}\right)\Delta \mathbf{h}_{\perp}
+$$
 
 ---
 
 ### 2.3 Gerbang Neuromorfik Leaky Integrate-and-Fire (LIF)
 
 Berada di transisi Layer 7 $\to$ 8 pada [`LeakyIntegrateAndFireGate`](file:///c:/Users/Matthew%20Chen/Documents/X-Star/dual_loop/neuromorphic/spiking_gate.py#L133-L250), gerbang ini mengatur transmisi representasi secara biologis:
-$$I(t) = \|\mathbf{W}_{\text{sensor}}\,\text{LN}(\mathbf{h}_t)\|_1$$
-$$V_m(t) = \beta\,V_m(t-1) + I(t)$$
-$$S(t) = \Theta\!\left(V_m(t) - V_{\text{th}}(t)\right)$$
-$$V_m(t) \leftarrow V_m(t)\left(1 - S(t)\right) \quad \text{(Reset Refraktori)}$$
+
+$$
+\begin{aligned}
+I(t) &= \|\mathbf{W}_{\text{sensor}}\,\operatorname{LN}(\mathbf{h}_t)\|_1 \\
+V_m(t) &= \beta\,V_m(t-1) + I(t) \\
+S(t) &= \Theta\left(V_m(t) - V_{\text{th}}(t)\right) \\
+V_m(t) &\leftarrow V_m(t)\left(1 - S(t)\right) \quad \text{(Reset Refraktori)}
+\end{aligned}
+$$
 
 Diferensiasi balik dilatih menggunakan gradien pengganti Fast Sigmoid:
-$$\frac{\partial \Theta(x)}{\partial x} = \frac{1}{\left(1 + \gamma |x|\right)^2}$$
+
+$$
+\frac{\partial \Theta(x)}{\partial x} = \frac{1}{\left(1 + \gamma |x|\right)^2}
+$$
+
+Ambang pembakaran beradaptasi secara homeostatis:
+
+$$
+V_{\text{th}}(t+1) = V_{\text{th}}(t) + \alpha_{\text{homeo}}\left(\bar{S} - r_{\text{target}}\right)
+$$
 
 Ambang tembakan beradaptasi secara homeostatis:
 $$V_{\text{th}}(t+1) = V_{\text{th}}(t) + \alpha_{\text{homeo}}\left(\bar{S} - r_{\text{target}}\right)$$
