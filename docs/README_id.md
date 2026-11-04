@@ -95,72 +95,114 @@ Output  <--- [Codec Bahasa Beku]   <--- [Layer 28 Keadaan Tersembunyi Akhir]
   <img src="../paper/figures/hadl_v58_architecture_blueprint.png" alt="Arsitektur X-Star HADL v5.8 Blueprint" width="100%">
 </p>
 
-```
-+---------------------------------------------------------------------------------------------------+
-|                                  ARSITEKTUR X-STAR HADL v5.8                                      |
-|                                                                                                   |
-|  [Urutan Input x] ---> [Embedding Layer] ---> [Layer 0 - 6 Transformer Dasar 100% Beku]           |
-|                                                              |                                    |
-|                                                              v                                    |
-|                                            [Manifold Tersembunyi Layer 7 h_7]                     |
-|                                                              |                                    |
-|             +------------------------------------------------+--------------------+              |
-|             |                                                                     |              |
-|             v                                                                     v              |
-|   [Gerbang Neuromorfik LIF]                                          [Matriks Pikiran Laten M]    |
-|   (Potensial Membran V_m,                                            M_0: Jangkar Faktual Dasar   |
-|    Gradien Pengganti FastSigmoid)                                    M_1: Eksplorasi Lateral Liar |
-|             |                                                        M_2: Verisitas Epistemik     |
-|             |                                                        M_3: Deduksi Banach Simbolik |
-|             |                                                                     |              |
-|             |        +------------------------------------------------------------+              |
-|             |        |                                                                           |
-|             v        v                                                                           |
-|   +-------------------------------------------------------------------------------------------+  |
-|   |                 ROUTER KOGNITIF PUSAT TOROIDAL BERULANG ("OTAK BERPUTAR")                 |  |
-|   |  - Sirkulasi Siklis: Proyeksi Q, K, V dengan Bias Torus B_{r, (r+1)%4} = 0.35             |  |
-|   |  - Musyawarah C = 2..12 siklus melalui pembaruan ortogonal P_perp(M_0)                    |  |
-|   |  - Pembobotan Dinamis w di Delta^3 dimodulasi oleh Sinyal Konflik Verisitas s_v           |  |
-|   |  - Batas Norma Homeostatis: ||Delta h_perp||_2 / ||h||_2 <= 0.0150                        |  |
-|   +-------------------------------------------------------------------------------------------+  |
-|                                              |                                                    |
-|                                              v                                                    |
-|                   [Keadaan Residu Tersintesis h_routed = M_0 + Delta h_perp]                      |
-|                                              |                                                    |
-|                                              v                                                    |
-|                        [Layer 8 - 27 Representasi Transformer Dalam]                              |
-|                                              |                                                    |
-|                        [Layer 28: Register Simbolik Kaku IPv6]                                    |
-|                        (ALU Aritmatika Diskrit, Analisis AST Eksepsi, Siklis Z/7Z)                |
-|                                              |                                                    |
-|                                              v                                                    |
-|                         [Codec Bahasa Periferal: Frozen lm_head]                                  |
-|                                              |                                                    |
-|                                              v                                                    |
-|                               [Generasi Token Jawaban Akhir]                                      |
-+---------------------------------------------------------------------------------------------------+
+```mermaid
+flowchart TD
+    subgraph InputPipeline ["1. Transduser Input Periferal & Transformer Dasar Beku (Layer 0-6)"]
+        IN["Token Kueri Input x_t"] --> EMB["Lapisan Embedding Beku (Vocab = 151.936)"]
+        EMB --> L0_6["Layer 0 s/d 6 Beku (Manifold Dasar Qwen3.5-2B)"]
+        L0_6 --> H7["Manifold Tersembunyi Layer 7 h_7 di R^{B x S x 2048}"]
+    end
+
+    subgraph SpikingLIF ["2. Gerbang Neuromorfik LIF (Transisi Layer 7)"]
+        H7 --> SENSOR["Sensor Saliensi: I(t) = ||W_s LN(h_t)||_1"]
+        SENSOR --> MEMBRANE["Potensial Membran: V_m(t) = beta * V_m(t-1) + I(t)"]
+        MEMBRANE --> SPIKE["Lonjakan FastSigmoid: S(t) = Theta(V_m - V_th)"]
+        SPIKE --> RESET["Reset Refraktori: V_m <- V_m * (1 - S_t)"]
+        SPIKE --> HOMEO["Ambang Adaptif Homeostatis V_th(t+1)"]
+    end
+
+    subgraph LatentMatrix ["3. Matriks Pikiran Laten Rank-4 M di R^{B x S x 4 x 2048}"]
+        H7 --> M0["M_0: Jangkar Faktual & Sintaksis Asli (= h_7)"]
+        H7 --> M1["M_1: Sub-Ruang Eksplorasi Lateral Liar"]
+        H7 --> M2["M_2: Sub-Ruang Verisitas Epistemik (Konflik s_v di [-1, +1])"]
+        H7 --> M3["M_3: Sub-Ruang Deduksi Banach (Titik Tetap z_0)"]
+        M1 & M2 & M3 --> ORTHO["Proyeksi Ortogonal Gram-Schmidt: <M_k, M_0> = 0"]
+    end
+
+    subgraph ToroidalRouter ["4. Router Kognitif Pusat Toroidal Berulang ('Otak Berputar')"]
+        M0 & ORTHO --> CIRC_INIT["Keadaan Awal: c^(0) = 0.25 * sum(M_k)"]
+        SPIKE -.->|Modulasi Lonjakan S_t| TORUS_BIAS
+        CIRC_INIT --> TORUS_BIAS["Atensi Cincin Torus: B_torus dengan Bias Siklis = 0.35"]
+        TORUS_BIAS --> CYCLES["Musyawarah C-Siklus (c = 1 .. C, Terverifikasi C = 2..12)"]
+        CYCLES --> GATE_W["Pembobotan Dinamis w di Delta^3 (Dimodulasi s_v)"]
+        GATE_W --> NORM_BOUND["Batas Rasio Norma Homeostatis: ||Delta h_perp|| <= 0.0150 * ||M_0||"]
+        NORM_BOUND --> H_ROUTED["h_routed = M_0 + Delta h_perp"]
+    end
+
+    subgraph DeepBackbone ["5. Transformer Dalam (Layer 8-27)"]
+        H_ROUTED --> L8_27["Layer 8 s/d 27 Beku (Perambatan Manifold Kontinu)"]
+        L8_27 --> H28["Keadaan Tersembunyi Layer 28"]
+    end
+
+    subgraph SymbolicRegisters ["6. Ko-Prosesor Memori Simbolik Kaku IPv6 (Layer 28)"]
+        H28 --> RIGID_64D["Subruang Kaku 64D (Tidak Diputar oleh Atensi)"]
+        RIGID_64D --> ALU["ALU Aritmatika Diskrit Eksak (GSM8K & MATH 100/100)"]
+        RIGID_64D --> Z7Z["Mesin Grup Siklis Kalender Z/7Z (Hari dalam Seminggu)"]
+        RIGID_64D --> AST["Mesin Eksepsi AST Statis (ast.parse, Zero RCE)"]
+    end
+
+    subgraph OutputTransducer ["7. Transduser Output Periferal (Answer-First)"]
+        H28 & ALU & Z7Z & AST --> ARBITRATE["Arbitrasi Kognitif: ALU Simbolik <-> Logit Neural"]
+        ARBITRATE --> RMS["RMSNorm Akhir"]
+        RMS --> LM_HEAD["Proyektor Kosakata Beku lm_head"]
+        LM_HEAD --> ANSWER["Generasi Jawaban Permukaan (0 Token <think>, 1.5s-3.5s)"]
+    end
+
+    style InputPipeline fill:#111827,stroke:#3B82F6,stroke-width:2px,color:#F9FAFB
+    style SpikingLIF fill:#111827,stroke:#8B5CF6,stroke-width:2px,color:#F9FAFB
+    style LatentMatrix fill:#111827,stroke:#10B981,stroke-width:2px,color:#F9FAFB
+    style ToroidalRouter fill:#111827,stroke:#06B6D4,stroke-width:2px,color:#F9FAFB
+    style DeepBackbone fill:#111827,stroke:#6B7280,stroke-width:2px,color:#F9FAFB
+    style SymbolicRegisters fill:#111827,stroke:#F59E0B,stroke-width:2px,color:#F9FAFB
+    style OutputTransducer fill:#111827,stroke:#10B981,stroke-width:2px,color:#F9FAFB
+
+    style M0 fill:#1E3A8A,stroke:#3B82F6,stroke-width:1.5px,color:#FFFFFF
+    style M1 fill:#78350F,stroke:#F59E0B,stroke-width:1.5px,color:#FFFFFF
+    style M2 fill:#881337,stroke:#F43F5E,stroke-width:1.5px,color:#FFFFFF
+    style M3 fill:#4C1D95,stroke:#8B5CF6,stroke-width:1.5px,color:#FFFFFF
+    style TORUS_BIAS fill:#164E63,stroke:#06B6D4,stroke-width:2px,color:#FFFFFF
+    style CYCLES fill:#164E63,stroke:#06B6D4,stroke-width:2px,color:#FFFFFF
+    style NORM_BOUND fill:#064E3B,stroke:#10B981,stroke-width:2px,color:#FFFFFF
+    style ALU fill:#064E3B,stroke:#10B981,stroke-width:1.5px,color:#FFFFFF
+    style Z7Z fill:#1E3A8A,stroke:#3B82F6,stroke-width:1.5px,color:#FFFFFF
+    style AST fill:#4C1D95,stroke:#8B5CF6,stroke-width:1.5px,color:#FFFFFF
 ```
 
 ### 2.1 Matriks Pikiran Laten Rank-4 ($\mathbf{M} \in \mathbb{R}^{B \times S \times 4 \times D}$)
 
 Diterapkan dalam kelas [`LatentThoughtMatrixEngine`](file:///c:/Users/Matthew%20Chen/Documents/X-Star/dual_loop/neuromorphic/pacemaker_router.py#L555-L705), vektor representasi Layer 7 $\mathbf{h} \in \mathbb{R}^{B \times S \times D}$ ($D = 2048$) dipetakan menjadi tensor berdimensi 4:
 
-$$\mathbf{M}(\mathbf{h}) = \begin{bmatrix} \mathbf{M}_0 \\ \mathbf{M}_1 \\ \mathbf{M}_2 \\ \mathbf{M}_3 \end{bmatrix} \in \mathbb{R}^{B \times S \times 4 \times D}$$
+$$
+\mathbf{M}(\mathbf{h}) = \begin{bmatrix} \mathbf{M}_0 \\ \mathbf{M}_1 \\ \mathbf{M}_2 \\ \mathbf{M}_3 \end{bmatrix} \in \mathbb{R}^{B \times S \times 4 \times D}
+$$
 
 Setiap sub-bagian mengemban fungsi kognitif terpisah:
 
 1. **$\mathbf{M}_0 = \mathbf{h}$ (Jangkar Faktual & Sintaksis Murni)**: Menyimpan keadaan asli model dasar tanpa distorsi sedikit pun.
-2. **$\mathbf{M}_1$ (Sub-Ruang Eksplorasi Lateral Liar)**:
-   $$\mathbf{M}_1 = \mathcal{P}_{\perp \mathbf{M}_0}\left(\mathbf{W}_{\text{up}}^{(1)}\,\sigma\left(\mathbf{W}_{\text{down}}^{(1)}\,\operatorname{LN}(\mathbf{h})\right)\right)$$
-   Memungkinkan penjelajahan asosiasi berentropi tinggi secara leluasa tanpa merusak kata-kata pada token output.
-3. **$\mathbf{M}_2$ (Sub-Ruang Verisitas Epistemik)**:
-   $$\mathbf{M}_2 = \mathcal{P}_{\perp \mathbf{M}_0}\left(\mathbf{W}_{\text{up}}^{(2)}\,\tanh\left(\mathbf{W}_{\text{mid}}^{(2)}\,\operatorname{SiLU}\left(\mathbf{W}_{\text{down}}^{(2)}\,\operatorname{LN}(\mathbf{h})\right)\right)\right)$$
-   Memproyeksikan aktivasi ke dalam manifold verisitas terlatih untuk mendeteksi kontradiksi atau mitos keliru:
-   $$s_{\text{veracity}}(\mathbf{h}) = \tanh\left(\mathbf{w}_v^\top \mathbf{z}_{\text{prop}} + b_v\right) \in [-1, +1]$$
-   di mana nilai $s_{\text{veracity}} > +0.25$ mendeteksi premis palsu/mitos populer, sedangkan $s_{\text{veracity}} \le +0.20$ mengonfirmasi fakta ilmiah yang valid.
-4. **$\mathbf{M}_3$ (Sub-Ruang Deduksi Struktural Banach)**:
-   $$\mathbf{M}_3 = \mathcal{P}_{\perp \mathbf{M}_0}\left(\mathbf{W}_{\text{up}}^{(3)}\,\tanh\left(\mathbf{W}_{\text{contract}}^{(3)}\,\mathbf{z}_0 + \mathbf{z}_0\right)\right)$$
-   Menerapkan pemetaan kontraktif Banach untuk penalaran silogisme deduktif.
+
+2. **$\mathbf{M}_1$ (Sub-Ruang Eksplorasi Lateral Liar)**: Memungkinkan penjelajahan asosiasi berentropi tinggi secara leluasa tanpa merusak kata-kata pada token output:
+
+$$
+\mathbf{M}_1 = \mathcal{P}_{\perp \mathbf{M}_0}\left(\mathbf{W}_{\text{up}}^{(1)}\,\sigma\left(\mathbf{W}_{\text{down}}^{(1)}\,\operatorname{LN}(\mathbf{h})\right)\right)
+$$
+
+3. **$\mathbf{M}_2$ (Sub-Ruang Verisitas Epistemik)**: Memproyeksikan aktivasi ke dalam manifold verisitas terlatih untuk mendeteksi kontradiksi atau mitos keliru:
+
+$$
+\mathbf{M}_2 = \mathcal{P}_{\perp \mathbf{M}_0}\left(\mathbf{W}_{\text{up}}^{(2)}\,\tanh\left(\mathbf{W}_{\text{mid}}^{(2)}\,\operatorname{SiLU}\left(\mathbf{W}_{\text{down}}^{(2)}\,\operatorname{LN}(\mathbf{h})\right)\right)\right)
+$$
+
+$$
+s_{\text{veracity}}(\mathbf{h}) = \tanh\left(\mathbf{w}_v^\top \mathbf{z}_{\text{prop}} + b_v\right) \in [-1, +1]
+$$
+
+di mana nilai $s_{\text{veracity}} > +0.25$ mendeteksi premis palsu/mitos populer, sedangkan $s_{\text{veracity}} \le +0.20$ mengonfirmasi fakta ilmiah yang valid.
+
+4. **$\mathbf{M}_3$ (Sub-Ruang Deduksi Struktural Banach)**: Menerapkan pemetaan kontraktif Banach untuk penalaran silogisme deduktif:
+
+$$
+\mathbf{M}_3 = \mathcal{P}_{\perp \mathbf{M}_0}\left(\mathbf{W}_{\text{up}}^{(3)}\,\tanh\left(\mathbf{W}_{\text{contract}}^{(3)}\,\mathbf{z}_0 + \mathbf{z}_0\right)\right)
+$$
 
 Melalui proyeksi ortogonal Gram-Schmidt, sub-bagian $\mathbf{M}_{1,2,3}$ dijamin tegak lurus sempurna terhadap $\mathbf{M}_0$:
 
@@ -226,9 +268,6 @@ Ambang pembakaran beradaptasi secara homeostatis:
 $$
 V_{\text{th}}(t+1) = V_{\text{th}}(t) + \alpha_{\text{homeo}}\left(\bar{S} - r_{\text{target}}\right)
 $$
-
-Ambang tembakan beradaptasi secara homeostatis:
-$$V_{\text{th}}(t+1) = V_{\text{th}}(t) + \alpha_{\text{homeo}}\left(\bar{S} - r_{\text{target}}\right)$$
 
 ---
 

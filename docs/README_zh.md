@@ -55,6 +55,79 @@ HADL v5.8 彻底贯彻这一范式：
   <img src="../paper/figures/hadl_v58_architecture_blueprint.png" alt="X-Star HADL v5.8 架构蓝图" width="100%">
 </p>
 
+```mermaid
+flowchart TD
+    subgraph InputPipeline ["1. 外设输入换能器与冻结主干 (Layers 0-6)"]
+        IN["输入查询 Token x_t"] --> EMB["冻结词嵌入层 (Vocab = 151,936)"]
+        EMB --> L0_6["冻结层 0 至 6 (Qwen3.5-2B 基础流形)"]
+        L0_6 --> H7["Layer 7 隐藏流形 h_7 in R^{B x S x 2048}"]
+    end
+
+    subgraph SpikingLIF ["2. 神经拟态 LIF 脉冲门控 (Layer 7 转换层)"]
+        H7 --> SENSOR["显著性传感器: I(t) = ||W_s LN(h_t)||_1"]
+        SENSOR --> MEMBRANE["膜电位: V_m(t) = beta * V_m(t-1) + I(t)"]
+        MEMBRANE --> SPIKE["FastSigmoid 发放脉冲: S(t) = Theta(V_m - V_th)"]
+        SPIKE --> RESET["不应期重置: V_m <- V_m * (1 - S_t)"]
+        SPIKE --> HOMEO["稳态自适应阈值 V_th(t+1)"]
+    end
+
+    subgraph LatentMatrix ["3. Rank-4 隐空间思维矩阵 M in R^{B x S x 4 x 2048}"]
+        H7 --> M0["M_0: 事实与语法不变量锚点 (= h_7)"]
+        H7 --> M1["M_1: 狂野横向发散子空间"]
+        H7 --> M2["M_2: 认知真伪子空间 (冲突度量 s_v in [-1, +1])"]
+        H7 --> M3["M_3: Banach 结构演绎子空间 (不动点 z_0)"]
+        M1 & M2 & M3 --> ORTHO["格拉姆-施密特严格正交投影: <M_k, M_0> = 0"]
+    end
+
+    subgraph ToroidalRouter ["4. 循环环面中心认知路由器 ('旋转大脑' C-Cycles)"]
+        M0 & ORTHO --> CIRC_INIT["初始状态: c^(0) = 0.25 * sum(M_k)"]
+        SPIKE -.->|脉冲调制信号 S_t| TORUS_BIAS
+        CIRC_INIT --> TORUS_BIAS["环面自注意力: B_torus 循环偏置 = 0.35"]
+        TORUS_BIAS --> CYCLES["C-Cycle 循环迭代流转 (c = 1 .. C, 实测 C = 2..12)"]
+        CYCLES --> GATE_W["动态子空间门控权重 w in Delta^3 (受 s_v 调制)"]
+        GATE_W --> NORM_BOUND["稳态相对范数界限: ||Delta h_perp|| <= 0.0150 * ||M_0||"]
+        NORM_BOUND --> H_ROUTED["h_routed = M_0 + Delta h_perp"]
+    end
+
+    subgraph DeepBackbone ["5. 深度 Transformer 主干网络 (Layers 8-27)"]
+        H_ROUTED --> L8_27["冻结层 8 至 27 (连续流形前向传递)"]
+        L8_27 --> H28["Layer 28 中间状态"]
+    end
+
+    subgraph SymbolicRegisters ["6. 刚性 IPv6 符号记忆协处理器 (Layer 28)"]
+        H28 --> RIGID_64D["64D 刚性子空间 (注意力层不可旋转)"]
+        RIGID_64D --> ALU["精确整数/浮点数 ALU (GSM8K & MATH 100/100)"]
+        RIGID_64D --> Z7Z["日历循环群 Z/7Z 计算引擎 (星期精确判定)"]
+        RIGID_64D --> AST["静态 AST 异常引擎 (ast.parse, 零代码执行风险)"]
+    end
+
+    subgraph OutputTransducer ["7. 外设输出换能器 (直接生成答案)"]
+        H28 & ALU & Z7Z & AST --> ARBITRATE["认知仲裁: 符号 ALU <-> 神经 Logits"]
+        ARBITRATE --> RMS["最终 RMSNorm 归一化"]
+        RMS --> LM_HEAD["冻结词表投影头 lm_head"]
+        LM_HEAD --> ANSWER["表面答案 Token 生成 (0 思考Token, 1.5s-3.5s 时延)"]
+    end
+
+    style InputPipeline fill:#111827,stroke:#3B82F6,stroke-width:2px,color:#F9FAFB
+    style SpikingLIF fill:#111827,stroke:#8B5CF6,stroke-width:2px,color:#F9FAFB
+    style LatentMatrix fill:#111827,stroke:#10B981,stroke-width:2px,color:#F9FAFB
+    style ToroidalRouter fill:#111827,stroke:#06B6D4,stroke-width:2px,color:#F9FAFB
+    style DeepBackbone fill:#111827,stroke:#6B7280,stroke-width:2px,color:#F9FAFB
+    style SymbolicRegisters fill:#111827,stroke:#F59E0B,stroke-width:2px,color:#F9FAFB
+    style OutputTransducer fill:#111827,stroke:#10B981,stroke-width:2px,color:#F9FAFB
+
+    style M0 fill:#1E3A8A,stroke:#3B82F6,stroke-width:1.5px,color:#FFFFFF
+    style M1 fill:#78350F,stroke:#F59E0B,stroke-width:1.5px,color:#FFFFFF
+    style M2 fill:#881337,stroke:#F43F5E,stroke-width:1.5px,color:#FFFFFF
+    style M3 fill:#4C1D95,stroke:#8B5CF6,stroke-width:1.5px,color:#FFFFFF
+    style TORUS_BIAS fill:#164E63,stroke:#06B6D4,stroke-width:2px,color:#FFFFFF
+    style CYCLES fill:#164E63,stroke:#06B6D4,stroke-width:2px,color:#FFFFFF
+    style NORM_BOUND fill:#064E3B,stroke:#10B981,stroke-width:2px,color:#FFFFFF
+    style ALU fill:#064E3B,stroke:#10B981,stroke-width:1.5px,color:#FFFFFF
+    style Z7Z fill:#1E3A8A,stroke:#3B82F6,stroke-width:1.5px,color:#FFFFFF
+    style AST fill:#4C1D95,stroke:#8B5CF6,stroke-width:1.5px,color:#FFFFFF
+```
+
 ### 2.1 Rank-4 隐空间思维矩阵 ($\mathbf{M} \in \mathbb{R}^{B \times S \times 4 \times D}$)
 
 在 Layer 7 隐藏状态 $\mathbf{h} \in \mathbb{R}^{B \times S \times D}$ 上展开：

@@ -22,29 +22,45 @@ In HADL v5.8, we eliminate the static `myth_keywords` list completely. Instead, 
 
 Implemented in [`LatentThoughtMatrixEngine`](file:///c:/Users/Matthew%20Chen/Documents/X-Star/dual_loop/neuromorphic/latent_matrix_router.py#L22-L162) and re-exported through [`pacemaker_router.py`](file:///c:/Users/Matthew%20Chen/Documents/X-Star/dual_loop/neuromorphic/pacemaker_router.py#L466-L473), the incoming Layer 7 hidden state $\mathbf{h} \in \mathbb{R}^{B \times S \times D}$ is mapped into a rank-4 latent thought tensor:
 
-$$\mathbf{M}(\mathbf{h}) = \begin{bmatrix} \mathbf{M}_0 \\ \mathbf{M}_1 \\ \mathbf{M}_2 \\ \mathbf{M}_3 \end{bmatrix} \in \mathbb{R}^{B \times S \times 4 \times D}$$
+$$
+\mathbf{M}(\mathbf{h}) = \begin{bmatrix} \mathbf{M}_0 \\ \mathbf{M}_1 \\ \mathbf{M}_2 \\ \mathbf{M}_3 \end{bmatrix} \in \mathbb{R}^{B \times S \times 4 \times D}
+$$
 
 where:
 1. **$\mathbf{M}_0 = \mathbf{h}$ (Factual & Syntactic Anchor)**: Preserves the exact unperturbed pre-trained representation of the frozen Qwen3.5-2B + LoRA backbone.
-2. **$\mathbf{M}_1 = \mathcal{P}_{\perp \mathbf{M}_0}\!\left(f_{\text{veracity}}(\mathbf{h})\right)$ (Epistemic Veracity & Conflict Subspace)**: Projects the normalized pooled sequence representation into a learned veracity manifold ($d_v = 256$), producing both an orthogonal veracity vector $\mathbf{M}_1 \perp \mathbf{M}_0$ and a continuous scalar conflict signal:
-   $$s_{\text{veracity}}(\mathbf{h}) = \tanh\!\left(\mathbf{w}_v^\top \phi(\bar{\mathbf{h}}) + b_v\right) \in [-1, +1]$$
-   where $s_{\text{veracity}} > 0$ indicates an internal epistemic conflict (popular misconception / false premise) and $s_{\text{veracity}} < 0$ indicates grounded factual consistency.
-3. **$\mathbf{M}_2 = \mathcal{P}_{\perp \mathbf{M}_0}\!\left(f_{\text{spatial}}(\mathbf{h})\right)$ (Spatial, Kinematic & Symbolic Structure Subspace)**: Extracts geometric, algebraic, and structural invariants strictly orthogonal to $\mathbf{M}_0$.
-4. **$\mathbf{M}_3 = \mathcal{P}_{\perp \mathbf{M}_0}\!\left(f_{\text{counter}}(\mathbf{h}, \mathbf{M}_1, \mathbf{M}_2)\right)$ (Popperian Falsification & Counter-Hypothesis Subspace)**: Synthesizes a joint interaction of $\mathbf{h}, \mathbf{M}_1, \mathbf{M}_2$ to test counter-hypotheses in latent space without emitting surface `<think>` tokens.
+2. **$\mathbf{M}_1 = \mathcal{P}_{\perp \mathbf{M}_0}\left(f_{\text{veracity}}(\mathbf{h})\right)$ (Epistemic Veracity & Conflict Subspace)**: Projects the normalized pooled sequence representation into a learned veracity manifold ($d_v = 256$), producing both an orthogonal veracity vector $\mathbf{M}_1 \perp \mathbf{M}_0$ and a continuous scalar conflict signal:
+
+$$
+s_{\text{veracity}}(\mathbf{h}) = \tanh\left(\mathbf{w}_v^\top \phi(\bar{\mathbf{h}}) + b_v\right) \in [-1, +1]
+$$
+
+where $s_{\text{veracity}} > 0$ indicates an internal epistemic conflict (popular misconception / false premise) and $s_{\text{veracity}} < 0$ indicates grounded factual consistency.
+3. **$\mathbf{M}_2 = \mathcal{P}_{\perp \mathbf{M}_0}\left(f_{\text{spatial}}(\mathbf{h})\right)$ (Spatial, Kinematic & Symbolic Structure Subspace)**: Extracts geometric, algebraic, and structural invariants strictly orthogonal to $\mathbf{M}_0$.
+4. **$\mathbf{M}_3 = \mathcal{P}_{\perp \mathbf{M}_0}\left(f_{\text{counter}}(\mathbf{h}, \mathbf{M}_1, \mathbf{M}_2)\right)$ (Popperian Falsification & Counter-Hypothesis Subspace)**: Synthesizes a joint interaction of $\mathbf{h}, \mathbf{M}_1, \mathbf{M}_2$ to test counter-hypotheses in latent space without emitting surface `<think>` tokens.
 
 Strict Gram-Schmidt orthogonal projection guarantees at every token position $(b, s)$:
-$$\mathcal{P}_{\perp \mathbf{M}_0}(\mathbf{v}) = \mathbf{v} - \frac{\langle \mathbf{v}, \mathbf{M}_0 \rangle}{\|\mathbf{M}_0\|_2^2 + \epsilon}\,\mathbf{M}_0, \qquad \langle \mathbf{M}_k, \mathbf{M}_0 \rangle = 0 \quad \forall k \in \{1, 2, 3\}$$
+
+$$
+\mathcal{P}_{\perp \mathbf{M}_0}(\mathbf{v}) = \mathbf{v} - \frac{\langle \mathbf{v}, \mathbf{M}_0 \rangle}{\|\mathbf{M}_0\|_2^2 + \epsilon}\,\mathbf{M}_0, \qquad \langle \mathbf{M}_k, \mathbf{M}_0 \rangle \equiv 0 \quad \forall k \in \{1, 2, 3\}
+$$
 
 ### 1.2 Recurrent Toroidal Central Cognitive Router ("Otak Berputar")
 
 Implemented in [`CentralCognitiveRouter`](file:///c:/Users/Matthew%20Chen/Documents/X-Star/dual_loop/neuromorphic/latent_matrix_router.py#L165-L294), the central hub maintains a circulating state $\mathbf{c}^{(0)} = \frac{1}{4}\sum_{k=0}^3 \mathbf{M}_k$ and executes $C = 2$ recurrent toroidal deliberation cycles ($c = 0, \dots, C-1$):
 
-$$\boldsymbol{\alpha}^{(c)} = \text{softmax}\!\left(\mathbf{W}_{\text{gate}}\,\text{LN}(\mathbf{c}^{(c)}) + \boldsymbol{\beta}_{\text{telemetry}}\right) \in \Delta^3$$
-$$\mathbf{r}^{(c)} = \sum_{k=0}^{3} \alpha_k^{(c)} \mathbf{M}_k, \qquad \mathbf{c}^{(c+1)} = \text{GRUCell}\!\left(\mathbf{r}^{(c)}, \mathbf{c}^{(c)}\right)$$
+$$
+\begin{aligned}
+\boldsymbol{\alpha}^{(c)} &= \operatorname{softmax}\left(\mathbf{W}_{\text{gate}}\,\operatorname{LN}(\mathbf{c}^{(c)}) + \boldsymbol{\beta}_{\text{telemetry}}\right) \in \Delta^3 \\
+\mathbf{r}^{(c)} &= \sum_{k=0}^{3} \alpha_k^{(c)} \mathbf{M}_k \\
+\mathbf{c}^{(c+1)} &= \operatorname{GRUCell}\left(\mathbf{r}^{(c)}, \mathbf{c}^{(c)}\right)
+\end{aligned}
+$$
 
 After $C$ cycles, the router projects only the orthogonal correction component back into the Layer 7 residual stream with a strict relative norm bound $\eta_{\max} = 0.015$:
 
-$$\Delta \mathbf{h}_{\perp} = \mathcal{P}_{\perp \mathbf{M}_0}\!\left(\mathbf{c}^{(C)} - \mathbf{M}_0\right), \qquad \mathbf{h}_{\text{routed}} = \mathbf{M}_0 + \gamma_{\text{scale}}\,\Delta \mathbf{h}_{\perp}, \quad \frac{\|\gamma_{\text{scale}}\Delta \mathbf{h}_{\perp}\|_2}{\|\mathbf{M}_0\|_2} \le 0.015$$
+$$
+\Delta \mathbf{h}_{\perp} = \mathcal{P}_{\perp \mathbf{M}_0}\left(\mathbf{c}^{(C)} - \mathbf{M}_0\right), \qquad \mathbf{h}_{\text{routed}} = \mathbf{M}_0 + \gamma_{\text{scale}}\,\Delta \mathbf{h}_{\perp}, \quad \frac{\|\gamma_{\text{scale}}\Delta \mathbf{h}_{\perp}\|_2}{\|\mathbf{M}_0\|_2} \le 0.015
+$$
 
 This guarantees that the pre-trained token manifold $\mathbf{M}_0$ cannot be degraded by destructive interference while propagating the exact veracity and routing telemetry (`veracity_conflict_score`, `central_router_weights`, `central_router_cycles`) to the downstream cognitive control loop.
 

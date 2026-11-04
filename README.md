@@ -95,72 +95,114 @@ Output  <--- [Frozen Language Codec] <--- [Layer 28 Final Hidden State]
   <img src="paper/figures/hadl_v58_architecture_blueprint.png" alt="X-Star HADL v5.8 Architecture Blueprint" width="100%">
 </p>
 
-```
-+---------------------------------------------------------------------------------------------------+
-|                                  X-STAR HADL v5.8 AUTONOMOUS BRAIN                                |
-|                                                                                                   |
-|  [Input Sequence x] ---> [Embedding Layer] ---> [Layers 0 - 6 Frozen Backbone]                    |
-|                                                              |                                    |
-|                                                              v                                    |
-|                                            [Layer 7 Hidden Manifold h_7]                          |
-|                                                              |                                    |
-|             +------------------------------------------------+--------------------+              |
-|             |                                                                     |              |
-|             v                                                                     v              |
-|   [LIF Spiking Gate]                                                 [Latent Thought Matrix M]   |
-|   (Homeostatic V_th,                                                 M_0: Factual Anchor         |
-|    FastSigmoid S_t)                                                  M_1: Wild Lateral Subspace  |
-|             |                                                        M_2: Epistemic Veracity     |
-|             |                                                        M_3: Banach Structural      |
-|             |                                                                     |              |
-|             |        +------------------------------------------------------------+              |
-|             |        |                                                                           |
-|             v        v                                                                           |
-|   +-------------------------------------------------------------------------------------------+  |
-|   |                  RECURRENT TOROIDAL CENTRAL COGNITIVE ROUTER ("OTAK BERPUTAR")            |  |
-|   |  - Cyclic Attention: Q, K, V Projections with Toroidal Bias B_{r, (r+1)%4} = 0.35        |  |
-|   |  - Information Circulation across C = 2..12 cycles via orthogonal updates               |  |
-|   |  - Dynamic Subpart Weighting w in Delta^3 modulated by Veracity Conflict Signal s_v       |  |
-|   |  - Homeostatic Norm Bound: ||Delta h_perp||_2 / ||h||_2 <= 0.0150                          |  |
-|   +-------------------------------------------------------------------------------------------+  |
-|                                              |                                                    |
-|                                              v                                                    |
-|                   [Synthesized Residual Correction h_routed = M_0 + Delta h_perp]                |
-|                                              |                                                    |
-|                                              v                                                    |
-|                        [Layers 8 - 27 Deep Transformer Representations]                           |
-|                                              |                                                    |
-|                        [Layer 28: IPv6 Rigid Numeric Symbolic Register]                          |
-|                        (Exact Integer ALU, AST Exception Engine, Cyclic Z/7Z)                     |
-|                                              |                                                    |
-|                                              v                                                    |
-|                         [Peripheral Language Codec: Frozen lm_head]                              |
-|                                              |                                                    |
-|                                              v                                                    |
-|                               [Output Answer Token Generation]                                    |
-+---------------------------------------------------------------------------------------------------+
+```mermaid
+flowchart TD
+    subgraph InputPipeline ["1. Peripheral Input Transducer & Frozen Backbone (Layers 0-6)"]
+        IN["Input Query Tokens x_t"] --> EMB["Frozen Embedding Layer (Vocab = 151,936)"]
+        EMB --> L0_6["Frozen Layers 0 to 6 (Qwen3.5-2B Base Manifold)"]
+        L0_6 --> H7["Layer 7 Hidden Manifold h_7 in R^{B x S x 2048}"]
+    end
+
+    subgraph SpikingLIF ["2. Neuromorphic LIF Spiking Gate (Layer 7 Transition)"]
+        H7 --> SENSOR["Saliency Sensor: I(t) = ||W_s LN(h_t)||_1"]
+        SENSOR --> MEMBRANE["Membrane Potential: V_m(t) = beta * V_m(t-1) + I(t)"]
+        MEMBRANE --> SPIKE["FastSigmoid Firing Spike: S(t) = Theta(V_m - V_th)"]
+        SPIKE --> RESET["Refractory Reset: V_m <- V_m * (1 - S_t)"]
+        SPIKE --> HOMEO["Homeostatic Adaptive Threshold V_th(t+1)"]
+    end
+
+    subgraph LatentMatrix ["3. Rank-4 Latent Thought Matrix M in R^{B x S x 4 x 2048}"]
+        H7 --> M0["M_0: Factual & Syntactic Invariant Anchor (= h_7)"]
+        H7 --> M1["M_1: Wild Lateral Exploration Subspace"]
+        H7 --> M2["M_2: Epistemic Veracity Subspace (Conflict s_v in [-1, +1])"]
+        H7 --> M3["M_3: Banach Structural Deduction Subspace (Fixed-Point z_0)"]
+        M1 & M2 & M3 --> ORTHO["Gram-Schmidt Orthogonal Projection: <M_k, M_0> = 0"]
+    end
+
+    subgraph ToroidalRouter ["4. Recurrent Toroidal Central Cognitive Router ('Otak Berputar')"]
+        M0 & ORTHO --> CIRC_INIT["Initial State: c^(0) = 0.25 * sum(M_k)"]
+        SPIKE -.->|Modulation Spike S_t| TORUS_BIAS
+        CIRC_INIT --> TORUS_BIAS["Toroidal Ring Attention: B_torus with Cyclic Bias = 0.35"]
+        TORUS_BIAS --> CYCLES["C-Cycle Recurrent Circulation (c = 1 .. C, Verified C = 2..12)"]
+        CYCLES --> GATE_W["Dynamic Subpart Gating w in Delta^3 (Modulated by s_v)"]
+        GATE_W --> NORM_BOUND["Homeostatic Relative Norm Bound: ||Delta h_perp|| <= 0.0150 * ||M_0||"]
+        NORM_BOUND --> H_ROUTED["h_routed = M_0 + Delta h_perp"]
+    end
+
+    subgraph DeepBackbone ["5. Deep Transformer Backbone (Layers 8-27)"]
+        H_ROUTED --> L8_27["Frozen Layers 8 to 27 (Continuous Manifold Propagation)"]
+        L8_27 --> H28["Layer 28 Intermediate State"]
+    end
+
+    subgraph SymbolicRegisters ["6. Rigid IPv6 Symbolic Memory Co-Processor (Layer 28)"]
+        H28 --> RIGID_64D["64D Rigid Subspace (Never Rotated by Attention)"]
+        RIGID_64D --> ALU["Exact Integer / Float ALU (GSM8K & MATH 100/100)"]
+        RIGID_64D --> Z7Z["Calendar Cyclic Group Z/7Z Engine (Exact Day-of-Week)"]
+        RIGID_64D --> AST["Static AST Exception Engine (ast.parse, Zero RCE)"]
+    end
+
+    subgraph OutputTransducer ["7. Peripheral Output Transducer (Answer-First)"]
+        H28 & ALU & Z7Z & AST --> ARBITRATE["Cognitive Arbitration: Symbolic ALU <-> Neural Logits"]
+        ARBITRATE --> RMS["Final RMSNorm"]
+        RMS --> LM_HEAD["Frozen Vocabulary Projector lm_head"]
+        LM_HEAD --> ANSWER["Surface Answer Generation (0 Scratchpad Tokens, 1.5s-3.5s)"]
+    end
+
+    style InputPipeline fill:#111827,stroke:#3B82F6,stroke-width:2px,color:#F9FAFB
+    style SpikingLIF fill:#111827,stroke:#8B5CF6,stroke-width:2px,color:#F9FAFB
+    style LatentMatrix fill:#111827,stroke:#10B981,stroke-width:2px,color:#F9FAFB
+    style ToroidalRouter fill:#111827,stroke:#06B6D4,stroke-width:2px,color:#F9FAFB
+    style DeepBackbone fill:#111827,stroke:#6B7280,stroke-width:2px,color:#F9FAFB
+    style SymbolicRegisters fill:#111827,stroke:#F59E0B,stroke-width:2px,color:#F9FAFB
+    style OutputTransducer fill:#111827,stroke:#10B981,stroke-width:2px,color:#F9FAFB
+
+    style M0 fill:#1E3A8A,stroke:#3B82F6,stroke-width:1.5px,color:#FFFFFF
+    style M1 fill:#78350F,stroke:#F59E0B,stroke-width:1.5px,color:#FFFFFF
+    style M2 fill:#881337,stroke:#F43F5E,stroke-width:1.5px,color:#FFFFFF
+    style M3 fill:#4C1D95,stroke:#8B5CF6,stroke-width:1.5px,color:#FFFFFF
+    style TORUS_BIAS fill:#164E63,stroke:#06B6D4,stroke-width:2px,color:#FFFFFF
+    style CYCLES fill:#164E63,stroke:#06B6D4,stroke-width:2px,color:#FFFFFF
+    style NORM_BOUND fill:#064E3B,stroke:#10B981,stroke-width:2px,color:#FFFFFF
+    style ALU fill:#064E3B,stroke:#10B981,stroke-width:1.5px,color:#FFFFFF
+    style Z7Z fill:#1E3A8A,stroke:#3B82F6,stroke-width:1.5px,color:#FFFFFF
+    style AST fill:#4C1D95,stroke:#8B5CF6,stroke-width:1.5px,color:#FFFFFF
 ```
 
 ### 2.1 Rank-4 Latent Thought Matrix ($\mathbf{M} \in \mathbb{R}^{B \times S \times 4 \times D}$)
 
 Implemented in [`LatentThoughtMatrixEngine`](file:///c:/Users/Matthew%20Chen/Documents/X-Star/dual_loop/neuromorphic/pacemaker_router.py#L555-L705), the incoming Layer 7 hidden state $\mathbf{h} \in \mathbb{R}^{B \times S \times D}$ ($D = 2048$) is mapped into a rank-4 tensor:
 
-$$\mathbf{M}(\mathbf{h}) = \begin{bmatrix} \mathbf{M}_0 \\ \mathbf{M}_1 \\ \mathbf{M}_2 \\ \mathbf{M}_3 \end{bmatrix} \in \mathbb{R}^{B \times S \times 4 \times D}$$
+$$
+\mathbf{M}(\mathbf{h}) = \begin{bmatrix} \mathbf{M}_0 \\ \mathbf{M}_1 \\ \mathbf{M}_2 \\ \mathbf{M}_3 \end{bmatrix} \in \mathbb{R}^{B \times S \times 4 \times D}
+$$
 
 The four cognitive subparts serve distinct roles:
 
 1. **$\mathbf{M}_0 = \mathbf{h}$ (Invariant Factual & Syntactic Anchor)**: Retains the exact unperturbed representation of the frozen foundation model.
-2. **$\mathbf{M}_1$ (Wild / Lateral Exploration Subspace)**:
-   $$\mathbf{M}_1 = \mathcal{P}_{\perp \mathbf{M}_0}\left(\mathbf{W}_{\text{up}}^{(1)}\,\sigma\left(\mathbf{W}_{\text{down}}^{(1)}\,\operatorname{LN}(\mathbf{h})\right)\right)$$
-   Provides unconstrained, high-entropy representation exploration without altering surface token generation.
-3. **$\mathbf{M}_2$ (Epistemic Veracity Subspace)**:
-   $$\mathbf{M}_2 = \mathcal{P}_{\perp \mathbf{M}_0}\left(\mathbf{W}_{\text{up}}^{(2)}\,\tanh\left(\mathbf{W}_{\text{mid}}^{(2)}\,\operatorname{SiLU}\left(\mathbf{W}_{\text{down}}^{(2)}\,\operatorname{LN}(\mathbf{h})\right)\right)\right)$$
-   Projects representations into a learned metric space quantifying internal epistemic conflict:
-   $$s_{\text{veracity}}(\mathbf{h}) = \tanh\left(\mathbf{w}_v^\top \mathbf{z}_{\text{prop}} + b_v\right) \in [-1, +1]$$
-   where $s_{\text{veracity}} > +0.25$ indicates an ungrounded myth or false premise, and $s_{\text{veracity}} \le +0.20$ denotes grounded factual truth.
-4. **$\mathbf{M}_3$ (Banach Structural Deduction Subspace)**:
-   $$\mathbf{M}_3 = \mathcal{P}_{\perp \mathbf{M}_0}\left(\mathbf{W}_{\text{up}}^{(3)}\,\tanh\left(\mathbf{W}_{\text{contract}}^{(3)}\,\mathbf{z}_0 + \mathbf{z}_0\right)\right)$$
-   Implements contractive fixed-point dynamics for formal syllogistic deductions.
+
+2. **$\mathbf{M}_1$ (Wild / Lateral Exploration Subspace)**: Provides unconstrained, high-entropy representation exploration without altering surface token generation:
+
+$$
+\mathbf{M}_1 = \mathcal{P}_{\perp \mathbf{M}_0}\left(\mathbf{W}_{\text{up}}^{(1)}\,\sigma\left(\mathbf{W}_{\text{down}}^{(1)}\,\operatorname{LN}(\mathbf{h})\right)\right)
+$$
+
+3. **$\mathbf{M}_2$ (Epistemic Veracity Subspace)**: Projects representations into a learned metric space quantifying internal epistemic conflict:
+
+$$
+\mathbf{M}_2 = \mathcal{P}_{\perp \mathbf{M}_0}\left(\mathbf{W}_{\text{up}}^{(2)}\,\tanh\left(\mathbf{W}_{\text{mid}}^{(2)}\,\operatorname{SiLU}\left(\mathbf{W}_{\text{down}}^{(2)}\,\operatorname{LN}(\mathbf{h})\right)\right)\right)
+$$
+
+$$
+s_{\text{veracity}}(\mathbf{h}) = \tanh\left(\mathbf{w}_v^\top \mathbf{z}_{\text{prop}} + b_v\right) \in [-1, +1]
+$$
+
+where $s_{\text{veracity}} > +0.25$ indicates an ungrounded myth or false premise, and $s_{\text{veracity}} \le +0.20$ denotes grounded factual truth.
+
+4. **$\mathbf{M}_3$ (Banach Structural Deduction Subspace)**: Implements contractive fixed-point dynamics for formal syllogistic deductions:
+
+$$
+\mathbf{M}_3 = \mathcal{P}_{\perp \mathbf{M}_0}\left(\mathbf{W}_{\text{up}}^{(3)}\,\tanh\left(\mathbf{W}_{\text{contract}}^{(3)}\,\mathbf{z}_0 + \mathbf{z}_0\right)\right)
+$$
 
 Strict Gram-Schmidt orthogonal projection guarantees that lateral thinking never degrades the base factual anchor:
 
