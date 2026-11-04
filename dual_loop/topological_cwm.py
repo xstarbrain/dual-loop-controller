@@ -265,3 +265,45 @@ class SpatioTemporalEntropicCWM(nn.Module):
                 "bimodal": False
             }
             return memory, slots_visual, telemetry
+
+    def compress_3d_volumetric_primitives(
+        self,
+        centers_3d: torch.Tensor,
+        scales_3d: torch.Tensor,
+        opacities: torch.Tensor,
+        basis_3d: torch.Tensor,
+        h_text: Optional[torch.Tensor] = None
+    ) -> Tuple[torch.Tensor, Dict[str, Any]]:
+        """
+        Embeds 3D Gaussian/SDF volumetric primitives (centers_3d [B, M_p, 3],
+        scales_3d [B, M_p, 3], opacities [B, M_p]) along the orthonormal 3D
+        subspace basis E = [e_1, e_2, e_3] ([B, 3, D]) into R^D visual patch
+        tokens and compresses them into bounded CWM slots via entropic saliency.
+        """
+        B, M_p, _ = centers_3d.shape
+        device = self.visual_slot_queries.device
+        dtype = self.visual_slot_queries.dtype
+
+        c_f = centers_3d.to(device=device, dtype=torch.float32)
+        s_f = scales_3d.to(device=device, dtype=torch.float32)
+        o_f = opacities.to(device=device, dtype=torch.float32).unsqueeze(-1)  # [B, M_p, 1]
+        b_f = basis_3d.to(device=device, dtype=torch.float32)                  # [B, 3, D]
+
+        # Lift 3D coordinates + scale anisotropy back into R^D along (e_1, e_2, e_3)
+        # weighted by volumetric opacity alpha_i
+        prim_vec = o_f * (torch.bmm(c_f, b_f) + 0.5 * torch.bmm(s_f, b_f))     # [B, M_p, D]
+        prim_tokens = prim_vec.to(dtype=dtype)
+
+        if h_text is not None:
+            mem, visual_slots, tel = self.forward(
+                h_text=h_text.to(device=device, dtype=dtype),
+                h_vision=prim_tokens
+            )
+        else:
+            mem, visual_slots, tel = self.forward(
+                h_text=None,
+                h_vision=prim_tokens
+            )
+        tel["volumetric_3d_primitives"] = int(M_p)
+        return visual_slots, tel
+

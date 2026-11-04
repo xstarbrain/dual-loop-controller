@@ -262,7 +262,9 @@ class VirtualWorldGeneralIntelligence(nn.Module):
         if curr_n == 0:
             return torch.zeros_like(h_query.mean(dim=1)), 0.0
 
-        q_norm = F.normalize(h_query.mean(dim=1), dim=-1)
+        target_dtype = self.concept_anchors.dtype
+        target_device = self.concept_anchors.device
+        q_norm = F.normalize(h_query.mean(dim=1).to(device=target_device, dtype=target_dtype), dim=-1)
         valid_anchors = self.concept_anchors[:curr_n]  # [N, D]
         valid_approaches = self.approach_vectors[:curr_n]  # [N, D]
 

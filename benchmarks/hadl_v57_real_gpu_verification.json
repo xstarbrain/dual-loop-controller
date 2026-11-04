@@ -1,0 +1,377 @@
+{
+  "timestamp": "2026-10-23 20:13:37",
+  "device": "cuda:0",
+  "dtype": "torch.bfloat16",
+  "vram_usage": {
+    "allocated_mb": 3849.13,
+    "reserved_mb": 3934.0,
+    "total_mb": 8123.44,
+    "allocated_gb": 3.76,
+    "total_gb": 7.93,
+    "percent_used": 47.4
+  },
+  "load_time_s": 8.81,
+  "total_tasks": 6,
+  "passed_tasks": 6,
+  "pass_rate_percent": 100.0,
+  "results": [
+    {
+      "id": "math_35_neg_eval",
+      "category": "Math (Negative Polynomial Evaluation P(4) = -13)",
+      "prompt": "Evaluate the polynomial P(x) = x^2 - 8x + 3 at x = 4. Provide the final numerical value.\nAnswer:",
+      "response": "-13",
+      "benchmark_passed": true,
+      "popperian_verified": true,
+      "overall_passed": true,
+      "dopamine_sign": 1.0,
+      "evolution_passes": 1,
+      "ttft_ms": 16513.95,
+      "tps": 0.3,
+      "f0_mean_hz": 195.18,
+      "formants_hz": [
+        548.8,
+        1514.0,
+        2489.4,
+        3582.5
+      ],
+      "consistency_2d_to_3d": 0.6822
+    },
+    {
+      "id": "math_roots_neg",
+      "category": "Math (Negative Quadratic Roots x^2 + 8x + 7 = 0)",
+      "prompt": "Find the roots of x^2 + 8x + 7 = 0.",
+      "response": "-7, -1",
+      "benchmark_passed": true,
+      "popperian_verified": true,
+      "overall_passed": true,
+      "dopamine_sign": 1.0,
+      "evolution_passes": 2,
+      "ttft_ms": 482.74,
+      "tps": 14.48,
+      "f0_mean_hz": 193.77,
+      "formants_hz": [
+        598.2,
+        1541.9,
+        2512.4,
+        3583.1
+      ],
+      "consistency_2d_to_3d": 0.6581
+    },
+    {
+      "id": "he_11",
+      "category": "HumanEval Code (Multi-Token Stub Shadow KV Fix)",
+      "prompt": "Complete the Python function to check if string s is a palindrome.\n```python\ndef is_palindrome(s):\n    # Your implementation here\n```\nPython code:",
+      "response": "def is_palindrome(s):\r\n        # Check if s is a palindrome in O(1) time complexity\r\n        # by comparing first and last characters, then second and second-to-last, etc.\r\n        for i in range(len(s)//2 + 1):\r\n            if s[i] != s[len(s) - 1 - i]:\r\n                return False\r\n        return True\r\n\r\n# Test",
+      "benchmark_passed": true,
+      "popperian_verified": true,
+      "overall_passed": true,
+      "dopamine_sign": 1.0,
+      "evolution_passes": 2,
+      "ttft_ms": 6366.17,
+      "tps": 13.35,
+      "f0_mean_hz": 188.53,
+      "formants_hz": [
+        541.4,
+        1637.3,
+        2554.3,
+        3615.0
+      ],
+      "consistency_2d_to_3d": 0.6809
+    },
+    {
+      "id": "mbpp_04",
+      "category": "MBPP Code (List Concatenation)",
+      "prompt": "Problem 4: In Python, write a function to concatenate two lists l1 and l2.\nProvide the Python code definition for `concat_lists(l1, l2)`:\nAnswer:",
+      "response": "```python\n\ndef concat_lists(l1, l2): \n   # Concatenate list l1 with list l2 in this order: l1 followed by l2\n   result = l1 + l2\n   return result\n```",
+      "benchmark_passed": true,
+      "popperian_verified": true,
+      "overall_passed": true,
+      "dopamine_sign": 1.0,
+      "evolution_passes": 1,
+      "ttft_ms": 4360.63,
+      "tps": 11.69,
+      "f0_mean_hz": 199.11,
+      "formants_hz": [
+        533.9,
+        1652.2,
+        2556.7,
+        3605.0
+      ],
+      "consistency_2d_to_3d": 0.6917
+    },
+    {
+      "id": "mbpp_18",
+      "category": "MBPP Code (Index Search)",
+      "prompt": "Problem 18: In Python, write a function to find the index of element x in list lst.\nProvide the Python code definition for `find_index(lst, x)`:\nAnswer:",
+      "response": "```python\n    \ndef find_index(lst, x): \n\t\"Returns the index of element x in lst, or -1 if not found.\"\n\tfor i in range(len(lst)):\n\t\tif lst[i] == x:\n\t\t\treturn i\n\treturn -1\n```",
+      "benchmark_passed": true,
+      "popperian_verified": true,
+      "overall_passed": true,
+      "dopamine_sign": 1.0,
+      "evolution_passes": 1,
+      "ttft_ms": 4285.1,
+      "tps": 13.76,
+      "f0_mean_hz": 195.69,
+      "formants_hz": [
+        538.2,
+        1673.8,
+        2572.4,
+        3622.2
+      ],
+      "consistency_2d_to_3d": 0.6918
+    },
+    {
+      "id": "conv_open_ended",
+      "category": "Conversational Open-Ended (No Yes/No Truncation)",
+      "prompt": "Can you suggest 3 classic books on machine learning?",
+      "response": "def book_recommendation(): # Define the core recommendation logic based on user input and book titles in real-world scenarios, define the core challenges and constraints.\n    books = ['The Night Machine', 'Pattern Recognition and Machine Learning', 'Deep Learning'] # Define the specific features and labels for each book.\n    return books\n\nbook1 = 'The Night Machine' # Initialize the main tracking variable and state.\nbook2 = 'Pattern Recognition and Machine Learning'\nbook3 = 'Deep Learning'\n\n# Validate user input to ensure the book is actually available and relevant.\nif book1 or book2 or book3:",
+      "benchmark_passed": true,
+      "popperian_verified": true,
+      "overall_passed": true,
+      "dopamine_sign": 1.0,
+      "evolution_passes": 2,
+      "ttft_ms": 13604.22,
+      "tps": 9.48,
+      "f0_mean_hz": 189.54,
+      "formants_hz": [
+        534.7,
+        1644.0,
+        2559.5,
+        3610.0
+      ],
+      "consistency_2d_to_3d": 0.6796
+    }
+  ],
+  "endogenous_voice": {
+    "wav_file": {
+      "path": "C:\\Users\\Matthew Chen\\Documents\\X-Star\\benchmarks\\hadl_v57_real_voice.wav",
+      "channels": 1,
+      "sample_width_bytes": 2,
+      "sample_rate_hz": 16000,
+      "num_frames": 24000,
+      "duration_s": 1.5
+    },
+    "synthesis_telemetry": {
+      "sample_rate": 16000,
+      "duration_sec": 1.5,
+      "n_samples": 24000,
+      "f0_mean_hz": 189.6002655029297,
+      "f0_min_hz": 176.19122314453125,
+      "f0_max_hz": 198.02554321289062,
+      "formants_hz": [
+        528.05,
+        1652.97,
+        2566.09,
+        3617.94
+      ],
+      "bandwidths_hz": [
+        94.53,
+        141.4,
+        195.71,
+        241.16
+      ],
+      "waveform_rms": 0.325778603553772,
+      "misf_coupled": true,
+      "auditory_reentry_delta_norm": 0.019999999552965164,
+      "semantic_acoustic_coherence_before": 0.36868444085121155,
+      "semantic_acoustic_coherence_after": 0.5022069215774536,
+      "spectral_resonance_overlap": 0.8372185826301575,
+      "voice_adaptation_steps": 10,
+      "ema_voice_coherence": 0.3888556957244873,
+      "wav_filepath": "C:\\Users\\Matthew Chen\\Documents\\X-Star\\benchmarks\\hadl_v57_real_voice.wav"
+    },
+    "self_listening_telemetry": {
+      "coherence_before": 0.36868444085121155,
+      "coherence_after": 0.5022069215774536,
+      "voice_adaptation_steps": 10
+    }
+  },
+  "imagination_2d_to_3d": {
+    "imagination_stage": "1D_to_2D_sketchpad_to_3D_volumetric_SO3",
+    "sketchpad_2d_resolution": [
+      16,
+      16
+    ],
+    "num_3d_primitives": 8,
+    "n_3d_primitives": 8,
+    "so3_orthogonality_error": 5.961452842484505e-08,
+    "so3_det": 1.0,
+    "so3_determinant": 1.0,
+    "consistency_2d_to_3d": 0.7178663015365601,
+    "sdf_isosurface_occupancy": 0.0625
+  },
+  "brain_telemetry": {
+    "falsified_token_ids": [
+      52451,
+      71093
+    ],
+    "last_verification_sign": -1.0,
+    "pacemaker_firing_rate": 0.0,
+    "pacemaker_v_m_mean": 0.1221,
+    "pacemaker_v_m_max": 0.1221,
+    "pacemaker_v_th": 0.2002,
+    "pacemaker_spikes_fired": 0,
+    "pacemaker_u_drive_mean": 0.9688,
+    "router_route_mode": "bypass",
+    "router_p_bypass": 1.0,
+    "router_p_hybrid": 0.0,
+    "router_p_heavy": 0.0,
+    "gate_status": "CLOSED_ISOLATED",
+    "spikes_fired": 0,
+    "cognitive_state": "ROUTINE_CALM",
+    "subspace_rank": 1,
+    "subspace_3d_extracted": true,
+    "spike_telemetry": {
+      "spike_firing_rate": 0.0,
+      "v_membrane_mean": 0.3633,
+      "v_threshold_adaptive": 0.9922,
+      "dynamic_threshold_factor": 0.8125,
+      "dyn_th_factor": 0.8125,
+      "mean_dynamic_threshold": 0.8047,
+      "cognitive_state": "ROUTINE_CALM",
+      "gate_open_ratio": 0.0,
+      "total_spikes_fired": 6
+    },
+    "dual_stream_telemetry": {
+      "s2_delta_norm": 3.9062,
+      "s2_drive_weight": 0.75,
+      "tour_restoring_force": 0.2119,
+      "tour_active": true,
+      "effective_mu_tour": 0.0156,
+      "inner_product_preservation_ratio": 1.0,
+      "deliberation_steps_k": 1,
+      "fluid_sensitivity": 2.0781,
+      "code_viscosity": 0.3164,
+      "math_viscosity": 0.2451,
+      "logic_viscosity": 0.2285,
+      "discourse_viscosity": 0.21,
+      "metastable_risk": 0.0,
+      "misf_viscosity": {
+        "fluid_sensitivity": 2.0781,
+        "code_viscosity": 0.3164,
+        "math_viscosity": 0.2451,
+        "logic_viscosity": 0.2285,
+        "discourse_viscosity": 0.21,
+        "metastable_risk": 0.0
+      },
+      "router_route_mode": "bypass",
+      "router_p_bypass": 1.0,
+      "router_p_hybrid": 0.0,
+      "router_p_heavy": 0.0,
+      "dream_energy": 15.5625,
+      "confusion_mean": 0.4902,
+      "dream_active": true
+    },
+    "plasticity_telemetry": {
+      "fluid_viscosity_mu": 0.0,
+      "phase_state": "SOLID_FROZEN",
+      "plastic_energy": 0.7422
+    },
+    "imagination_3d_telemetry": {
+      "imagination_stage": "1D_to_2D_sketchpad_to_3D_volumetric_SO3",
+      "consistency_2d_to_3d": 0.6796,
+      "so3_orthogonality_error": 0.0,
+      "so3_determinant": 1.0,
+      "sdf_isosurface_occupancy": 0.0625,
+      "n_3d_primitives": 8,
+      "unitary_givens_mean_angle_rad": 0.01124
+    },
+    "vocal_telemetry": {
+      "f0_mean_hz": 187.25,
+      "formants_hz": [
+        570.7,
+        1609.5,
+        2548.1,
+        3630.4
+      ],
+      "ema_voice_coherence": 0.3535
+    },
+    "closed_loop_deflection_norm": 1.07768,
+    "vgni_engaged": false,
+    "sandbox_engaged": false,
+    "misf_viscosity": {
+      "fluid_sensitivity": 2.0781,
+      "code_viscosity": 0.3164,
+      "math_viscosity": 0.2451,
+      "logic_viscosity": 0.2285,
+      "discourse_viscosity": 0.21,
+      "metastable_risk": 0.0
+    },
+    "generation_step_count": 178,
+    "total_generation_spikes": 6,
+    "generation_mean_spike_rate": 0.033707865168539325,
+    "peak_cognitive_state": "ROUTINE_CALM",
+    "deep_reentry_14": {
+      "reentry_active": true,
+      "ambiguity": 0.72265625,
+      "vgni_affinity": 0.3046875,
+      "reentry_delta_norm": 0.1001
+    },
+    "deep_reentry_21": {
+      "reentry_active": true,
+      "ambiguity": 0.7109375,
+      "vgni_affinity": 0.291015625,
+      "reentry_delta_norm": 0.1001
+    },
+    "sandbox_telemetry": {
+      "sandbox_simulated_drift": 0.1533,
+      "contraction_scale": 1.0,
+      "dynamic_gamma": 0.8516,
+      "computational_energy": 0.0535,
+      "sandbox_intervention_active": false
+    },
+    "vgni_affinity": 0.458984375,
+    "plastic_steps": 22142,
+    "last_dopamine": -1.0,
+    "plastic_drift": 0.03784,
+    "closed_loop_verification": {
+      "verified": true,
+      "dopamine_sign": 1.0,
+      "verification_mode": "popperian_code_sandbox",
+      "reason": "popperian_code_verified",
+      "cycle_energy": 0.1,
+      "correction_hint": null,
+      "consolidation_mode": "hebbian_consolidation",
+      "verified_basis_count": 6,
+      "falsified_count": 0,
+      "delta_norm": 0.05000000074505806,
+      "max_basis_leakage": 5.961832982848136e-08,
+      "orthogonality_ratio": 2.2940932353776589e-07,
+      "is_strictly_orthogonal": true,
+      "banach_delta_norm": 0.003723,
+      "liquid_delta_norm": 1.59375
+    },
+    "endogenous_voice": {
+      "sample_rate": 16000,
+      "duration_sec": 1.5,
+      "n_samples": 24000,
+      "f0_mean_hz": 189.6002655029297,
+      "f0_min_hz": 176.19122314453125,
+      "f0_max_hz": 198.02554321289062,
+      "formants_hz": [
+        528.05,
+        1652.97,
+        2566.09,
+        3617.94
+      ],
+      "bandwidths_hz": [
+        94.53,
+        141.4,
+        195.71,
+        241.16
+      ],
+      "waveform_rms": 0.325778603553772,
+      "misf_coupled": true,
+      "semantic_acoustic_coherence_before": 0.36868444085121155,
+      "semantic_acoustic_coherence_after": 0.5022069215774536,
+      "spectral_resonance_overlap": 0.8372185826301575,
+      "voice_adaptation_steps": 10,
+      "ema_voice_coherence": 0.3888556957244873,
+      "wav_filepath": "C:\\Users\\Matthew Chen\\Documents\\X-Star\\benchmarks\\hadl_v57_real_voice.wav"
+    },
+    "boost_active": false,
+    "boost_level": 3,
+    "spike_v_th": 0.9921875,
+    "variance_stabilizer_enabled": true
+  }
+}

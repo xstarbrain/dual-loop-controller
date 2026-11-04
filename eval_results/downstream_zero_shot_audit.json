@@ -1,0 +1,109 @@
+{
+  "timestamp": "2026-10-13 22:10:21",
+  "benchmarks_individual": [
+    {
+      "name": "ARC-Challenge",
+      "category": "Reasoning / Logic",
+      "llama_3_2_3b": 58.2,
+      "qwen_2_5_1_5b": 46.8,
+      "base_qwen3_5_2b": 56.4,
+      "hadl_v5_1": 62.8,
+      "delta_vs_base": 6.4,
+      "delta_vs_llama3b": 4.6
+    },
+    {
+      "name": "GSM8K",
+      "category": "Reasoning / Logic",
+      "llama_3_2_3b": 69.2,
+      "qwen_2_5_1_5b": 59.8,
+      "base_qwen3_5_2b": 64.5,
+      "hadl_v5_1": 67.0,
+      "delta_vs_base": 2.5,
+      "delta_vs_llama3b": -2.2
+    },
+    {
+      "name": "HellaSwag",
+      "category": "Reasoning / Logic",
+      "llama_3_2_3b": 76.5,
+      "qwen_2_5_1_5b": 67.4,
+      "base_qwen3_5_2b": 73.8,
+      "hadl_v5_1": 76.2,
+      "delta_vs_base": 2.4,
+      "delta_vs_llama3b": -0.3
+    },
+    {
+      "name": "MMLU",
+      "category": "Knowledge / QA",
+      "llama_3_2_3b": 63.4,
+      "qwen_2_5_1_5b": 61.1,
+      "base_qwen3_5_2b": 65.2,
+      "hadl_v5_1": 66.1,
+      "delta_vs_base": 0.9,
+      "delta_vs_llama3b": 2.7
+    },
+    {
+      "name": "TriviaQA",
+      "category": "Knowledge / QA",
+      "llama_3_2_3b": 68.1,
+      "qwen_2_5_1_5b": 52.4,
+      "base_qwen3_5_2b": 61.5,
+      "hadl_v5_1": 61.8,
+      "delta_vs_base": 0.3,
+      "delta_vs_llama3b": -6.3
+    },
+    {
+      "name": "PIQA",
+      "category": "Commonsense",
+      "llama_3_2_3b": 78.4,
+      "qwen_2_5_1_5b": 75.8,
+      "base_qwen3_5_2b": 77.1,
+      "hadl_v5_1": 78.5,
+      "delta_vs_base": 1.4,
+      "delta_vs_llama3b": 0.1
+    },
+    {
+      "name": "WinoGrande",
+      "category": "Commonsense",
+      "llama_3_2_3b": 72.1,
+      "qwen_2_5_1_5b": 65.5,
+      "base_qwen3_5_2b": 70.8,
+      "hadl_v5_1": 73.5,
+      "delta_vs_base": 2.7,
+      "delta_vs_llama3b": 1.4
+    }
+  ],
+  "category_summary": {
+    "Reasoning / Logic": {
+      "llama3b": 67.97,
+      "qwen15b": 58.0,
+      "base_qwen35": 64.9,
+      "hadl_v51": 68.67,
+      "delta_vs_base": 3.77,
+      "delta_vs_llama": 0.7
+    },
+    "Knowledge / QA": {
+      "llama3b": 65.75,
+      "qwen15b": 56.75,
+      "base_qwen35": 63.35,
+      "hadl_v51": 63.95,
+      "delta_vs_base": 0.6,
+      "delta_vs_llama": -1.8
+    },
+    "Commonsense": {
+      "llama3b": 75.25,
+      "qwen15b": 70.65,
+      "base_qwen35": 73.95,
+      "hadl_v51": 76.0,
+      "delta_vs_base": 2.05,
+      "delta_vs_llama": 0.75
+    },
+    "Overall Average": {
+      "llama3b": 69.41,
+      "qwen15b": 61.26,
+      "base_qwen35": 67.04,
+      "hadl_v51": 69.41,
+      "delta_vs_base": 2.37,
+      "delta_vs_llama": 0.0
+    }
+  }
+}

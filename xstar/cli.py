@@ -195,6 +195,40 @@ def cmd_serve(args):
     uvicorn.run(app, host=args.host, port=args.port)
 
 
+def cmd_infer(args):
+    """Launches custom inference session or one-shot prompt with /browser, /goal, and /boost."""
+    from xstar.inference.engine import CustomInferenceEngine, EngineConfig
+    from xstar.inference.cli_app import InteractiveCLI
+
+    model_dir = args.model or "dist/staging_hf_fused"
+    adapter_dir = None if getattr(args, "no_lora", False) else getattr(args, "adapter", "dist/frontier_lora_adapter")
+
+    config = EngineConfig(
+        model_path=model_dir,
+        adapter_path=adapter_dir,
+        device=args.device,
+        dtype=getattr(args, "dtype", "bfloat16"),
+        enable_brain=not getattr(args, "no_brain", False),
+        enable_adapter=not getattr(args, "no_lora", False),
+        boost_mode=getattr(args, "boost", False),
+        boost_level=getattr(args, "boost_level", 3),
+    )
+    engine = CustomInferenceEngine(config)
+    engine.load()
+
+    cli = InteractiveCLI(engine, default_system=getattr(args, "system", None))
+    cli.temperature = getattr(args, "temperature", 0.7)
+    cli.top_p = getattr(args, "top_p", 0.9)
+    cli.top_k = getattr(args, "top_k", 40)
+    cli.max_tokens = getattr(args, "max_tokens", 512)
+    cli.repetition_penalty = getattr(args, "repetition_penalty", 1.1)
+
+    if getattr(args, "prompt", None):
+        cli.execute_turn(args.prompt)
+    else:
+        cli.run_repl()
+
+
 def main():
     parser = argparse.ArgumentParser(description="X-Star Autonomous Brain CLI")
     parser.add_argument("--model", type=str, default=None, help="Path to X-Star model directory")
@@ -202,6 +236,22 @@ def main():
     parser.add_argument("--trust-remote-code", action="store_true", default=False, help="Allow executing remote code when loading custom models (default: False)")
 
     subparsers = parser.add_subparsers(dest="command", help="Available subcommands")
+
+    # Command: infer (NEW: Custom Inference CLI with /browser, /goal, /boost)
+    p_infer = subparsers.add_parser("infer", help="Professional CLI inference with streaming, /browser, /goal, and /boost")
+    p_infer.add_argument("--prompt", "-p", type=str, default=None, help="One-shot prompt to generate and exit")
+    p_infer.add_argument("--adapter", type=str, default="dist/frontier_lora_adapter", help="Path to LoRA adapter weights")
+    p_infer.add_argument("--dtype", type=str, default="bfloat16", choices=["bfloat16", "float16", "float32"], help="Model precision")
+    p_infer.add_argument("--no-brain", action="store_true", help="Disable HADL v5.2 Neuromorphic Spiking Brain hooks")
+    p_infer.add_argument("--no-lora", action="store_true", help="Disable LoRA adapter weights")
+    p_infer.add_argument("--boost", action="store_true", help="Initialize with Neuromorphic Deliberation Boost enabled")
+    p_infer.add_argument("--boost-level", type=int, default=3, choices=[1, 2, 3, 4, 5], help="Deliberation boost intensity (1-5)")
+    p_infer.add_argument("--temperature", "-t", type=float, default=0.7, help="Sampling temperature")
+    p_infer.add_argument("--top-p", type=float, default=0.9, help="Top-p sampling")
+    p_infer.add_argument("--top-k", type=int, default=40, help="Top-k sampling")
+    p_infer.add_argument("--max-tokens", "-n", type=int, default=512, help="Maximum generation tokens")
+    p_infer.add_argument("--repetition-penalty", type=float, default=1.1, help="Repetition penalty")
+    p_infer.add_argument("--system", "-s", type=str, default=None, help="Custom system prompt")
 
     # Command: run
     p_run = subparsers.add_parser("run", help="Run single-shot prompt inference")
@@ -230,7 +280,9 @@ def main():
 
     args = parser.parse_args()
 
-    if args.command == "run":
+    if args.command == "infer":
+        cmd_infer(args)
+    elif args.command == "run":
         cmd_run(args)
     elif args.command == "chat":
         cmd_chat(args)

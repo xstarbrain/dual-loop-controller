@@ -44,7 +44,7 @@ class EmergentLatentCanvas(nn.Module):
         dream_steps: int = 2,
         contraction_factor: float = 0.20,
         enable_stochastic_flux: bool = False,
-        confusion_tolerance: float = 0.54,
+        confusion_tolerance: float = 0.40,
         enable_confusion_gating: bool = True,
         use_adaptive_sensor: bool = False
     ):
@@ -108,7 +108,9 @@ class EmergentLatentCanvas(nn.Module):
         nn.init.orthogonal_(self.w_unroll.weight)
         nn.init.normal_(self.w_flux.weight, std=0.02)
         nn.init.orthogonal_(self.w_evolve.weight)
-        nn.init.zeros_(self.w_collapse.weight)
+        nn.init.orthogonal_(self.w_collapse.weight)
+        with torch.no_grad():
+            self.w_collapse.weight.data *= 0.15
 
     def forward(
         self,
@@ -227,3 +229,7 @@ class EmergentLatentCanvas(nn.Module):
         if return_confusion:
             return delta_dream, energy, confusion_scores
         return delta_dream, energy
+
+
+from dual_loop.neuromorphic.latent_imagination_canvas import Progressive2Dto3DImaginationCanvas
+

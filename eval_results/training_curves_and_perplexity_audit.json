@@ -1,0 +1,48 @@
+{
+  "timestamp": "2026-10-13 21:57:49",
+  "hardware": {
+    "device": "cuda:0",
+    "gpu": "NVIDIA GeForce RTX 5060 Laptop GPU"
+  },
+  "empirical_metrics": {
+    "base_model": {
+      "frontier_validation": {
+        "cross_entropy_loss": 2.2249,
+        "perplexity": 9.25,
+        "total_tokens_evaluated": 4146
+      },
+      "general_technical_validation": {
+        "cross_entropy_loss": 1.6207,
+        "perplexity": 5.06,
+        "total_tokens_evaluated": 308
+      }
+    },
+    "finetuned_model": {
+      "frontier_validation": {
+        "cross_entropy_loss": 0.6325,
+        "perplexity": 1.88,
+        "total_tokens_evaluated": 4146
+      },
+      "general_technical_validation": {
+        "cross_entropy_loss": 1.8237,
+        "perplexity": 6.19,
+        "total_tokens_evaluated": 308
+      }
+    },
+    "perplexity_reduction_ratio": {
+      "frontier": 4.92,
+      "general": 0.82
+    }
+  },
+  "training_dynamics": {
+    "total_optimizer_steps": 125,
+    "total_tokens_processed": 142500,
+    "initial_train_loss": 2.7487,
+    "final_train_loss": 0.043,
+    "final_val_loss": 0.116,
+    "max_grad_norm_observed": 0.928,
+    "gradient_clipping_threshold": 1.0,
+    "gradient_spike_count": 0,
+    "numerical_instability_events": 0
+  }
+}

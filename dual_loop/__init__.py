@@ -1,12 +1,12 @@
 """
-Dual-Loop Cognitive Controller v4.5.0 (HADL Car-Lift Edition)
-============================================================
+Dual-Loop Cognitive Controller v5.8.0 (HADL Non-Token Latent Matrix Edition)
+============================================================================
 A hardware-aligned, manifold-preserving latent reasoning framework
-with Two-Piston Hydraulic Equilibrium, Porous Orifice Firewall,
-and 100% Frozen Foundation Model Architecture.
+with Continuous Latent Thought Matrix (N_m x D_m), Toroidal Central Routing,
+IPv6 Hexadecadic Symbolic Memory, and 100% Frozen Foundation Model Architecture.
 """
 
-__version__ = "4.6.1"
+__version__ = "5.8.0"
 
 try:
     import torch
@@ -22,7 +22,7 @@ if _HAS_TORCH:
     from .evidential import EvidentialEpistemicGate
     from .open_concept import OpenConceptSynthesizer
     from .homeostasis import HomeostaticDriveEngine, ActiveInferencePolicyRouter
-    from .nullspace_engine import OrthogonalNullspaceProjector
+    from .nullspace_engine import OrthogonalNullspaceProjector, SynapticEligibilityTrace, NullspaceMemoryEngine
     from .allostasis import AllostaticEnergyModulator
     from .curiosity_daemon import (
         EpistemicHumilityModule,
@@ -37,7 +37,8 @@ if _HAS_TORCH:
         UncertaintySurpriseGate,
         ContrastiveEvidenceAccumulator,
         DirectionalSafetyProjection,
-        AdaptiveSurpriseThreshold
+        AdaptiveSurpriseThreshold,
+        IntrinsicPopperianCycleVerifier
     )
     from .matrix_helper import CognitiveMatrixHelper
     from .cognitive_judge import ProbabilisticCognitiveJudge
@@ -46,7 +47,7 @@ if _HAS_TORCH:
     from .multimodal_transport import ProcrustesOptimalManifoldTransport
     from .topological_cwm import SpatioTemporalEntropicCWM
     from .plasticity import HeteroAssociativePlasticMemory
-    from .imagination_canvas import EmergentLatentCanvas
+    from .imagination_canvas import EmergentLatentCanvas, Progressive2Dto3DImaginationCanvas
     from .adapters.latent_adapter import LatentDeliberationAdapter
     from .adapters.qwen_adapter import (
         DualLoopQwenModel,
@@ -118,6 +119,30 @@ if _HAS_TORCH:
         HADLv45DualCupController,
         HADLv45ModelWrapper,
         attach_hadl_v45_dualcup
+    )
+    from .neuromorphic import (
+        FastSigmoidSurrogate,
+        spike_fn,
+        LeakyIntegrateAndFireGate,
+        DynamicNeuralReplicator,
+        OpenFreezeLiquidPlasticity,
+        ReEntrantCrossLayerBus,
+        VirtualLatentSandbox,
+        NeuromorphicSpikingBrain,
+        HADLv5SpikingBrainModelWrapper,
+        attach_hadl_v5_spiking_brain,
+        PersonalityProfile,
+        ModelPersonalityAdapter,
+        PreRouterSpikingPacemaker,
+        TourLeaderAttractor,
+        ConcurrentDualStreamSynthesizer,
+        DirectionalSafetyProjection,
+        IPv6NumericRegister,
+        ThoughtPurifiedKVCache,
+        EndogenousMetaRLPolicy,
+        TokenlessLatentThoughtEngine,
+        EndogenousAcousticVocalOrgan,
+        Progressive2Dto3DImaginationCanvas,
     )
     # Convenient shorthand alias for users: default to Universal Adapter in v3.0!
     attach = attach_universal_dual_loop
@@ -233,7 +258,27 @@ if _HAS_TORCH:
         "IDSMILController",
         "HADLIDSMILModelWrapper",
         "attach_hadl_idsmil",
-        "EmergentLatentCanvas"
+        "EmergentLatentCanvas",
+        "FastSigmoidSurrogate",
+        "spike_fn",
+        "LeakyIntegrateAndFireGate",
+        "DynamicNeuralReplicator",
+        "OpenFreezeLiquidPlasticity",
+        "ReEntrantCrossLayerBus",
+        "VirtualLatentSandbox",
+        "NeuromorphicSpikingBrain",
+        "HADLv5SpikingBrainModelWrapper",
+        "attach_hadl_v5_spiking_brain",
+        "PersonalityProfile",
+        "ModelPersonalityAdapter",
+        "PreRouterSpikingPacemaker",
+        "TourLeaderAttractor",
+        "ConcurrentDualStreamSynthesizer",
+        "DirectionalSafetyProjection",
+        "IPv6NumericRegister",
+        "ThoughtPurifiedKVCache",
+        "EndogenousMetaRLPolicy",
+        "TokenlessLatentThoughtEngine",
     ]
 
 else:

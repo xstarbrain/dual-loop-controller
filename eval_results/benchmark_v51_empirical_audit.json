@@ -1,0 +1,89 @@
+{
+  "timestamp": "2026-10-13 17:57:32",
+  "mathematical_verification": {
+    "dynamic_lipschitz": {
+      "calm_gamma": 0.8516,
+      "stress_gamma": 0.9648,
+      "e_comp_calm": 0.0503,
+      "e_comp_stress": 0.8477,
+      "passed": true
+    },
+    "dynamic_threshold": {
+      "v_th_predictable": 0.6914,
+      "v_th_complex": 1.0625,
+      "passed": true
+    },
+    "multivector_subspace": {
+      "max_cross_dot": 0.01538445707410574,
+      "delta_r1": 0.69140625,
+      "delta_r3": 1.5234375,
+      "passed": true
+    },
+    "cognitive_spiking": {
+      "calm_state": "ROUTINE_CALM",
+      "stress_state": "EUREKA",
+      "eureka_state": "EUREKA",
+      "fatigue_state": "ROUTINE_CALM",
+      "passed": true
+    },
+    "consensus_gating": {
+      "routine_status": "CLOSED_ISOLATED",
+      "complex_status": "OPEN_SPIKING",
+      "passed": true
+    }
+  },
+  "targeted_benchmark": {
+    "MATH": {
+      "total": 20,
+      "base_score": "18/20",
+      "base_pct": 90.0,
+      "v50_score": "18/20",
+      "v50_pct": 90.0,
+      "v51_score": "18/20",
+      "v51_pct": 90.0,
+      "delta_v51_vs_v50": 0.0,
+      "delta_v51_vs_base": 0.0,
+      "mean_latency_base_ms": 39.82,
+      "mean_latency_v51_ms": 42.73
+    },
+    "GSM8K": {
+      "total": 20,
+      "base_score": "19/20",
+      "base_pct": 95.0,
+      "v50_score": "20/20",
+      "v50_pct": 100.0,
+      "v51_score": "19/20",
+      "v51_pct": 95.0,
+      "delta_v51_vs_v50": -5.0,
+      "delta_v51_vs_base": 0.0,
+      "mean_latency_base_ms": 39.14,
+      "mean_latency_v51_ms": 42.27
+    },
+    "HumanEval": {
+      "total": 10,
+      "base_score": "6/10",
+      "base_pct": 60.0,
+      "v50_score": "7/10",
+      "v50_pct": 70.0,
+      "v51_score": "7/10",
+      "v51_pct": 70.0,
+      "delta_v51_vs_v50": 0.0,
+      "delta_v51_vs_base": 10.0,
+      "mean_latency_base_ms": 42.51,
+      "mean_latency_v51_ms": 45.66
+    },
+    "BBH": {
+      "total": 10,
+      "base_score": "6/10",
+      "base_pct": 60.0,
+      "v50_score": "6/10",
+      "v50_pct": 60.0,
+      "v51_score": "6/10",
+      "v51_pct": 60.0,
+      "delta_v51_vs_v50": 0.0,
+      "delta_v51_vs_base": 0.0,
+      "mean_latency_base_ms": 41.22,
+      "mean_latency_v51_ms": 43.8
+    }
+  }
+}

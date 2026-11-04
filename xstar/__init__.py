@@ -10,7 +10,17 @@ import sys
 from pathlib import Path
 from typing import Dict, List, Any, Optional, Union
 
-__version__ = "4.6.1"
+from .inference import (
+    CustomInferenceEngine,
+    EngineConfig,
+    GenerationMetrics,
+    WebBrowser,
+    CognitiveTriadRunner,
+    InteractiveCLI,
+    start_server,
+)
+
+__version__ = "5.8.0"
 __author__ = "Ch3nOff & X-Star Research Team"
 
 DEFAULT_MODEL_DIR = Path(__file__).resolve().parent.parent / "dist" / "xstar_2b_autonomous_brain"
@@ -196,3 +206,43 @@ def load(
         print(model.generate("Explain quantum superposition."))
     """
     return XStarModel(model_path=model_path, device=device, dtype=dtype, trust_remote_code=trust_remote_code)
+
+
+def load_custom_inference(
+    model_path: str = "dist/staging_hf_fused",
+    adapter_path: Optional[str] = "dist/frontier_lora_adapter",
+    device: str = "auto",
+    dtype: str = "bfloat16",
+    enable_brain: bool = True,
+    boost: bool = False,
+    boost_level: int = 3,
+) -> CustomInferenceEngine:
+    """
+    Factory function to instantiate and load the CustomInferenceEngine with
+    Qwen3.5-2B, Frontier LoRA adapter, and HADL v5.2 Neuromorphic Spiking Brain.
+    """
+    cfg = EngineConfig(
+        model_path=model_path,
+        adapter_path=adapter_path,
+        device=device,
+        dtype=dtype,
+        enable_brain=enable_brain,
+        boost_mode=boost,
+        boost_level=boost_level,
+    )
+    engine = CustomInferenceEngine(cfg)
+    return engine.load()
+
+
+__all__ = [
+    "XStarModel",
+    "load",
+    "load_custom_inference",
+    "CustomInferenceEngine",
+    "EngineConfig",
+    "GenerationMetrics",
+    "WebBrowser",
+    "CognitiveTriadRunner",
+    "InteractiveCLI",
+    "start_server",
+]

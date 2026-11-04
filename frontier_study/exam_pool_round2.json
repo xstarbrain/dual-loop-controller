@@ -1,0 +1,552 @@
+[
+  {
+    "id": "EX2_01",
+    "domain": "Distributed Consensus",
+    "question": "Analyze how Raft handles non-voting members (Learners) when scaling clusters, and how it prevents network partition stalls during joint consensus membership changes.",
+    "rubrics": [
+      "learner node",
+      "joint consensus",
+      "cluster membership",
+      "two-phase configuration"
+    ]
+  },
+  {
+    "id": "EX2_02",
+    "domain": "Distributed Consensus",
+    "question": "Explain the Paxos Leases mechanism. How do master leases allow consistent linearizable reads without running Phase 2 accepts for read-only queries?",
+    "rubrics": [
+      "paxos lease",
+      "linearizable read",
+      "master lease",
+      "clock synchronization"
+    ]
+  },
+  {
+    "id": "EX2_03",
+    "domain": "Distributed Consensus",
+    "question": "In the Raft protocol, explain why a candidate node that increments its term must explicitly persist currentTerm and votedFor to non-volatile disk before sending RequestVote.",
+    "rubrics": [
+      "non-volatile disk",
+      "votedfor",
+      "currentterm",
+      "split vote prevention"
+    ]
+  },
+  {
+    "id": "EX2_04",
+    "domain": "Distributed Consensus",
+    "question": "Formulate the LWW-Element-Set (Last-Write-Wins Element Set) CRDT. What are its failure modes when distributed physical clocks experience NTP drift?",
+    "rubrics": [
+      "lww-element-set",
+      "wall clock timestamp",
+      "ntp drift",
+      "causality loss"
+    ]
+  },
+  {
+    "id": "EX2_05",
+    "domain": "Distributed Consensus",
+    "question": "Explain the concept of Chain Replication in distributed storage. How does it separate read path at the tail and write path at the head to achieve high throughput?",
+    "rubrics": [
+      "chain replication",
+      "head node",
+      "tail node",
+      "strong consistency"
+    ]
+  },
+  {
+    "id": "EX2_06",
+    "domain": "Distributed Consensus",
+    "question": "Describe the Zab (ZooKeeper Atomic Broadcast) protocol's recovery phase versus broadcast phase. How does it differ from Paxos in maintaining FIFO order?",
+    "rubrics": [
+      "zab protocol",
+      "recovery phase",
+      "zxid identifier",
+      "fifo atomic broadcast"
+    ]
+  },
+  {
+    "id": "EX2_07",
+    "domain": "Distributed Consensus",
+    "question": "Explain the concept of Quorum Leases in distributed caches. How do they balance read latency with cache invalidation guarantees across partitions?",
+    "rubrics": [
+      "quorum lease",
+      "cache invalidation",
+      "lease expiration",
+      "stale read bound"
+    ]
+  },
+  {
+    "id": "EX2_08",
+    "domain": "Distributed Consensus",
+    "question": "Analyze how Byzantine Fault Tolerant protocols like Tendermint consensus utilize 2/3+1 voting rounds (Pre-vote and Pre-commit) to achieve instant finality.",
+    "rubrics": [
+      "tendermint",
+      "2/3 majority",
+      "prevote precommit",
+      "instant finality"
+    ]
+  },
+  {
+    "id": "EX2_09",
+    "domain": "Distributed Consensus",
+    "question": "In distributed systems, what is Chandy-Lamport distributed snapshotting algorithm? How do marker messages record global state without stopping execution?",
+    "rubrics": [
+      "chandy-lamport",
+      "marker message",
+      "channel state",
+      "global snapshot"
+    ]
+  },
+  {
+    "id": "EX2_10",
+    "domain": "Distributed Consensus",
+    "question": "Analyze the Raft log truncation scenario: explain what occurs when an elected leader detects a follower log mismatch at index N and decrements nextIndex.",
+    "rubrics": [
+      "nextindex",
+      "matchindex",
+      "log truncation",
+      "uncommitted entries"
+    ]
+  },
+  {
+    "id": "EX2_11",
+    "domain": "Zero-Knowledge Cryptography",
+    "question": "Explain how the Groth16 zk-SNARK achieves 3-group-element proof size. Why is it non-malleable only under specific simulation-sound variants?",
+    "rubrics": [
+      "groth16",
+      "3 group elements",
+      "trusted setup",
+      "simulation soundness"
+    ]
+  },
+  {
+    "id": "EX2_12",
+    "domain": "Zero-Knowledge Cryptography",
+    "question": "Detail the role of roots of unity in vanishing polynomial Z_H(X) = X^n - 1 over a multiplicative subgroup in polynomial SNARKs.",
+    "rubrics": [
+      "roots of unity",
+      "vanishing polynomial",
+      "multiplicative subgroup",
+      "fft efficiency"
+    ]
+  },
+  {
+    "id": "EX2_13",
+    "domain": "Zero-Knowledge Cryptography",
+    "question": "Explain how multi-scalar multiplication (MSM) dominates prover computation time in elliptic-curve SNARKs, and how Pippenger's algorithm optimizes it.",
+    "rubrics": [
+      "multi-scalar multiplication",
+      "pippenger algorithm",
+      "bucket method",
+      "prover bottleneck"
+    ]
+  },
+  {
+    "id": "EX2_14",
+    "domain": "Zero-Knowledge Cryptography",
+    "question": "Explain the Reed-Solomon proximity testing problem in STARKs and how the FRI (Fast Reed-Solomon Interactive Oracle Proof) protocol solves it.",
+    "rubrics": [
+      "reed-solomon",
+      "fri protocol",
+      "proximity testing",
+      "folding degree"
+    ]
+  },
+  {
+    "id": "EX2_15",
+    "domain": "Zero-Knowledge Cryptography",
+    "question": "Describe the difference between arithmetic circuits over prime fields versus boolean circuits. Why do hashes like Poseidon or Rescue outperform SHA-256 in ZKPs?",
+    "rubrics": [
+      "poseidon hash",
+      "algebraic hash",
+      "sha-256 constraint cost",
+      "prime field"
+    ]
+  },
+  {
+    "id": "EX2_16",
+    "domain": "Zero-Knowledge Cryptography",
+    "question": "Explain how look-up arguments (such as Plookup and Halo2 Lookups) bypass expensive R1CS multiplication gates for bitwise operations and ranges.",
+    "rubrics": [
+      "plookup",
+      "lookup table",
+      "grand product",
+      "bitwise efficiency"
+    ]
+  },
+  {
+    "id": "EX2_17",
+    "domain": "Zero-Knowledge Cryptography",
+    "question": "Detail how the Sumcheck protocol verifies that the sum of a multivariate polynomial over a Boolean hypercube equals a claimed scalar in O(d log N) verifier time.",
+    "rubrics": [
+      "sumcheck protocol",
+      "boolean hypercube",
+      "univariate reduction",
+      "round challenges"
+    ]
+  },
+  {
+    "id": "EX2_18",
+    "domain": "Zero-Knowledge Cryptography",
+    "question": "Explain how Zero-Knowledge Rollups (ZK-Rollups) verify thousands of layer-2 transactions off-chain and commit succinct state roots to layer-1.",
+    "rubrics": [
+      "zk-rollup",
+      "state root",
+      "validity proof",
+      "data availability"
+    ]
+  },
+  {
+    "id": "EX2_19",
+    "domain": "Zero-Knowledge Cryptography",
+    "question": "Explain the concept of DLOG hardness on elliptic curves and how it underpins the binding property of Pedersen commitments: C = g^m h^r.",
+    "rubrics": [
+      "pedersen commitment",
+      "discrete log",
+      "blinding factor",
+      "perfect hiding"
+    ]
+  },
+  {
+    "id": "EX2_20",
+    "domain": "Zero-Knowledge Cryptography",
+    "question": "Analyze the difference between interactive arguments and proofs. Why does statistical soundness differ from computational soundness in SNARKs?",
+    "rubrics": [
+      "computational soundness",
+      "statistical zero knowledge",
+      "negligible error",
+      "prover bound"
+    ]
+  },
+  {
+    "id": "EX2_21",
+    "domain": "Quantum Stabilizers & Topological Codes",
+    "question": "Explain the 5-qubit quantum code [[5, 1, 3]]. Why is it the smallest possible code capable of protecting a logical qubit against arbitrary single-qubit errors?",
+    "rubrics": [
+      "5-qubit code",
+      "quantum hamming bound",
+      "single-qubit error",
+      "stabilizer generators"
+    ]
+  },
+  {
+    "id": "EX2_22",
+    "domain": "Quantum Stabilizers & Topological Codes",
+    "question": "Describe how X-cut and Z-cut topological boundary conditions in planar surface codes define logical operators X_L and Z_L on boundaries.",
+    "rubrics": [
+      "planar surface code",
+      "rough boundary",
+      "smooth boundary",
+      "logical operator"
+    ]
+  },
+  {
+    "id": "EX2_23",
+    "domain": "Quantum Stabilizers & Topological Codes",
+    "question": "Explain how Lattice Surgery implements fault-tolerant logical CNOT gates between two planar surface code patches using merge and split operations.",
+    "rubrics": [
+      "lattice surgery",
+      "patch merge",
+      "patch split",
+      "logical cnot"
+    ]
+  },
+  {
+    "id": "EX2_24",
+    "domain": "Quantum Stabilizers & Topological Codes",
+    "question": "Detail the role of the Clifford hierarchy P_k in quantum error correction. Why does the T gate sit at level 3, outside the Clifford group at level 2?",
+    "rubrics": [
+      "clifford hierarchy",
+      "t gate level 3",
+      "pauli group level 1",
+      "non-transversal"
+    ]
+  },
+  {
+    "id": "EX2_25",
+    "domain": "Quantum Stabilizers & Topological Codes",
+    "question": "Explain how the Union-Find decoder works as an alternative to MWPM in surface codes, and why its O(N) complexity enables real-time syndrome decoding.",
+    "rubrics": [
+      "union-find decoder",
+      "linear time complexity",
+      "cluster growth",
+      "real-time decoding"
+    ]
+  },
+  {
+    "id": "EX2_26",
+    "domain": "Quantum Stabilizers & Topological Codes",
+    "question": "Describe how leakage errors (where qubits leave the |0>, |1> computational subspace) threaten fault-tolerant codes, and how Leakage Reduction Units (LRUs) reset them.",
+    "rubrics": [
+      "leakage error",
+      "computational subspace",
+      "leakage reduction unit",
+      "ancilla reset"
+    ]
+  },
+  {
+    "id": "EX2_27",
+    "domain": "Quantum Stabilizers & Topological Codes",
+    "question": "Explain the Bacon-Shor subsystem code. How do gauge operators simplify syndrome extraction compared to standard stabilizer codes?",
+    "rubrics": [
+      "bacon-shor code",
+      "subsystem code",
+      "gauge operators",
+      "two-body measurements"
+    ]
+  },
+  {
+    "id": "EX2_28",
+    "domain": "Quantum Stabilizers & Topological Codes",
+    "question": "What is the physical meaning of fault-tolerance threshold ~1% in surface codes under depolarizing noise models?",
+    "rubrics": [
+      "depolarizing noise",
+      "physical threshold",
+      "fault-tolerant scaling",
+      "syndrome measurement noise"
+    ]
+  },
+  {
+    "id": "EX2_29",
+    "domain": "Quantum Stabilizers & Topological Codes",
+    "question": "Explain how quantum teleportation of gates (Gottesman-Chuang trick) enables execution of non-Clifford gates using offline prepared magic states.",
+    "rubrics": [
+      "gate teleportation",
+      "gottesman-chuang",
+      "magic state",
+      "byproduct operator"
+    ]
+  },
+  {
+    "id": "EX2_30",
+    "domain": "Quantum Stabilizers & Topological Codes",
+    "question": "Analyze the difference between geometric locality in 2D surface codes versus high-rate LDPC (Low-Density Parity-Check) quantum codes.",
+    "rubrics": [
+      "quantum ldpc",
+      "geometric locality",
+      "hyperbolic code",
+      "syndrome sparsity"
+    ]
+  },
+  {
+    "id": "EX2_31",
+    "domain": "Symplectic Dynamics & Neural ODEs",
+    "question": "Explain how Hamiltonian Neural Networks parameterize kinetic and potential energy T(p) and V(q) to learn physics from raw trajectory data.",
+    "rubrics": [
+      "hamiltonian mechanics",
+      "kinetic energy",
+      "potential energy",
+      "phase trajectory"
+    ]
+  },
+  {
+    "id": "EX2_32",
+    "domain": "Symplectic Dynamics & Neural ODEs",
+    "question": "Explain how Lagrangian Neural Networks (LNNs) parameterize dynamics using L(q, q_dot) and the Euler-Lagrange equations without requiring canonical momenta.",
+    "rubrics": [
+      "lagrangian neural network",
+      "euler-lagrange equation",
+      "generalized coordinates",
+      "mass matrix inversion"
+    ]
+  },
+  {
+    "id": "EX2_33",
+    "domain": "Symplectic Dynamics & Neural ODEs",
+    "question": "Describe how adaptive step-size ODE solvers (such as Dormand-Prince / RK45) adjust step size Delta t based on local truncation error estimates during forward Neural ODE passes.",
+    "rubrics": [
+      "adaptive step size",
+      "dormand-prince",
+      "local truncation error",
+      "step rejection"
+    ]
+  },
+  {
+    "id": "EX2_34",
+    "domain": "Symplectic Dynamics & Neural ODEs",
+    "question": "Explain how Augmented Neural ODEs resolve the limitation of standard Neural ODEs in learning trajectories with self-intersecting flows.",
+    "rubrics": [
+      "augmented neural ode",
+      "extra dimensions",
+      "flow intersection",
+      "homeomorphism"
+    ]
+  },
+  {
+    "id": "EX2_35",
+    "domain": "Symplectic Dynamics & Neural ODEs",
+    "question": "Explain the concept of Symplectic Matrix group Sp(2n, R) and why any Hamiltonian transformation must satisfy M^T J M = J.",
+    "rubrics": [
+      "symplectic group",
+      "canonical transformation",
+      "phase space volume",
+      "invariance of j"
+    ]
+  },
+  {
+    "id": "EX2_36",
+    "domain": "Symplectic Dynamics & Neural ODEs",
+    "question": "Describe the role of Picard-Lindelof Theorem in ensuring unique solutions to Neural ODE initial value problems: dz/dt = f(z, t).",
+    "rubrics": [
+      "picard-lindel\\u00f6f theorem",
+      "existence and uniqueness",
+      "lipschitz continuity",
+      "initial value problem"
+    ]
+  },
+  {
+    "id": "EX2_37",
+    "domain": "Symplectic Dynamics & Neural ODEs",
+    "question": "Explain how neural vector fields with non-zero curl fail to represent conservative forces in physical systems.",
+    "rubrics": [
+      "conservative force",
+      "curl free vector field",
+      "gradient system",
+      "potential energy"
+    ]
+  },
+  {
+    "id": "EX2_38",
+    "domain": "Symplectic Dynamics & Neural ODEs",
+    "question": "Explain how discrete residual connections z_{k+1} = z_k + f(z_k) approximate continuous Euler discretization of an underlying continuous neural flow.",
+    "rubrics": [
+      "residual connection",
+      "euler discretization",
+      "continuous flow",
+      "step size dt"
+    ]
+  },
+  {
+    "id": "EX2_39",
+    "domain": "Symplectic Dynamics & Neural ODEs",
+    "question": "Analyze why stiff differential equations cause extreme step size contraction in explicit Runge-Kutta solvers and require implicit A-stable methods.",
+    "rubrics": [
+      "stiff equation",
+      "implicit solver",
+      "a-stability",
+      "step size collapse"
+    ]
+  },
+  {
+    "id": "EX2_40",
+    "domain": "Symplectic Dynamics & Neural ODEs",
+    "question": "Explain how spectral normalization restricts the Lipschitz constant of each linear layer W to ||W||_2 <= 1 to enforce globally contractive neural networks.",
+    "rubrics": [
+      "spectral normalization",
+      "singular value",
+      "power iteration",
+      "contractive network"
+    ]
+  },
+  {
+    "id": "EX2_41",
+    "domain": "Category Theory & Formal Semantics",
+    "question": "Explain how Functoriality preserves identities and composition: F(id_A) = id_{F(A)} and F(g o f) = F(g) o F(f). What happens if a mapping fails compositionality?",
+    "rubrics": [
+      "functoriality",
+      "identity preservation",
+      "composition preservation",
+      "arrow mapping"
+    ]
+  },
+  {
+    "id": "EX2_42",
+    "domain": "Category Theory & Formal Semantics",
+    "question": "Explain the universal property of the Categorical Product A x B. How do projection morphisms pi_1 and pi_2 uniquely factor any pair of morphisms f: C -> A, g: C -> B?",
+    "rubrics": [
+      "categorical product",
+      "projection morphisms",
+      "universal property",
+      "unique mediating morphism"
+    ]
+  },
+  {
+    "id": "EX2_43",
+    "domain": "Category Theory & Formal Semantics",
+    "question": "Explain the universal property of the Categorical Coproduct A + B and its canonical inclusion morphisms i_1 and i_2.",
+    "rubrics": [
+      "categorical coproduct",
+      "inclusion morphisms",
+      "dual product",
+      "sum type"
+    ]
+  },
+  {
+    "id": "EX2_44",
+    "domain": "Category Theory & Formal Semantics",
+    "question": "Explain how the Reader Monad (-> R) and State Monad (s -> (a, s)) are formulated categorically as endofunctors with Kleisli triples.",
+    "rubrics": [
+      "state monad",
+      "reader monad",
+      "kleisli triple",
+      "environment threading"
+    ]
+  },
+  {
+    "id": "EX2_45",
+    "domain": "Category Theory & Formal Semantics",
+    "question": "Describe the difference between an Equivalence of Categories versus an Isomorphism of Categories. What role do natural isomorphisms of functors play?",
+    "rubrics": [
+      "equivalence of categories",
+      "isomorphism of categories",
+      "full faithful essentially surjective",
+      "natural isomorphism"
+    ]
+  },
+  {
+    "id": "EX2_46",
+    "domain": "Category Theory & Formal Semantics",
+    "question": "Explain the concept of a Sheaf on a topological space and how the gluing axiom ensures local consistency leads to unique global sections.",
+    "rubrics": [
+      "sheaf",
+      "gluing axiom",
+      "presheaf",
+      "local sections"
+    ]
+  },
+  {
+    "id": "EX2_47",
+    "domain": "Category Theory & Formal Semantics",
+    "question": "Explain how an Epimorphism is defined categorically without referring to element surjectivity: g o f = h o f implies g = h.",
+    "rubrics": [
+      "epimorphism",
+      "right cancellation",
+      "dual of monomorphism",
+      "surjection"
+    ]
+  },
+  {
+    "id": "EX2_48",
+    "domain": "Category Theory & Formal Semantics",
+    "question": "Explain how a Monomorphism is defined categorically: f o g = f o h implies g = h, and why it models injective structure preservation.",
+    "rubrics": [
+      "monomorphism",
+      "left cancellation",
+      "injection",
+      "subobject"
+    ]
+  },
+  {
+    "id": "EX2_49",
+    "domain": "Category Theory & Formal Semantics",
+    "question": "Explain the adjunction between Free and Forgetful functors (Free -| Forgetful) using the example of Sets and Groups.",
+    "rubrics": [
+      "free functor",
+      "forgetful functor",
+      "free group",
+      "universal property"
+    ]
+  },
+  {
+    "id": "EX2_50",
+    "domain": "Category Theory & Formal Semantics",
+    "question": "Explain how Dependent Type Theory formalizes Pi-types (dependent function types) and Sigma-types (dependent pair types) categorically as local cartesian closed categories.",
+    "rubrics": [
+      "pi-type",
+      "sigma-type",
+      "dependent type theory",
+      "locally cartesian closed"
+    ]
+  }
+]

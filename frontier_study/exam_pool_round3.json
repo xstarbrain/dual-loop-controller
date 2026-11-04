@@ -1,0 +1,552 @@
+[
+  {
+    "id": "EX3_01",
+    "domain": "Distributed Consensus",
+    "question": "Explain how Mencius achieves multi-leader high throughput by partitioning the Paxos instance space, and how it skips empty instances using SKIP messages.",
+    "rubrics": [
+      "mencius",
+      "multi-leader",
+      "skip message",
+      "instance partition"
+    ]
+  },
+  {
+    "id": "EX3_02",
+    "domain": "Distributed Consensus",
+    "question": "Describe how Raft's Pre-Vote phase prevents disrupted partitioned nodes from causing leadership instability upon network reconnection.",
+    "rubrics": [
+      "pre-vote phase",
+      "partitioned node",
+      "disruptive election",
+      "term increment"
+    ]
+  },
+  {
+    "id": "EX3_03",
+    "domain": "Distributed Consensus",
+    "question": "In distributed systems, what is the Byzantine Generals Problem under synchronous vs asynchronous networks? State the FLP Impossibility connection.",
+    "rubrics": [
+      "byzantine generals",
+      "synchronous network",
+      "asynchronous network",
+      "flp impossibility"
+    ]
+  },
+  {
+    "id": "EX3_04",
+    "domain": "Distributed Consensus",
+    "question": "Explain how PN-Counter (Positive-Negative Counter) CRDT works by combining two G-Counters (Grow-Only Counters) for increments and decrements.",
+    "rubrics": [
+      "pn-counter",
+      "g-counter",
+      "increment decrement",
+      "state-based crdt"
+    ]
+  },
+  {
+    "id": "EX3_05",
+    "domain": "Distributed Consensus",
+    "question": "Describe how Google Spanner uses TrueTime API with GPS and atomic clocks to achieve external consistency without wide-area lock synchronization.",
+    "rubrics": [
+      "truetime",
+      "gps atomic clock",
+      "uncertainty epsilon",
+      "external consistency"
+    ]
+  },
+  {
+    "id": "EX3_06",
+    "domain": "Distributed Consensus",
+    "question": "Explain how Chubby lock service uses coarse-grained distributed locking with Paxos to prevent split-brain in master-worker architectures.",
+    "rubrics": [
+      "chubby",
+      "coarse-grained lock",
+      "master election",
+      "paxos coordination"
+    ]
+  },
+  {
+    "id": "EX3_07",
+    "domain": "Distributed Consensus",
+    "question": "Explain the Raft log invariance proof: why cannot a leader commit a log entry from an older term by simply counting replicas?",
+    "rubrics": [
+      "older term entry",
+      "indirect commit",
+      "figure 8 scenario",
+      "current term commit"
+    ]
+  },
+  {
+    "id": "EX3_08",
+    "domain": "Distributed Consensus",
+    "question": "Analyze how HotStuff consensus simplifies PBFT view change complexity from O(n^2) to linear O(n) using threshold signatures and a Pacemaker.",
+    "rubrics": [
+      "hotstuff",
+      "linear view change",
+      "threshold signature",
+      "pacemaker"
+    ]
+  },
+  {
+    "id": "EX3_09",
+    "domain": "Distributed Consensus",
+    "question": "Explain how distributed transaction saga pattern maintains eventual data consistency using compensating transactions instead of 2PC locks.",
+    "rubrics": [
+      "saga pattern",
+      "compensating transaction",
+      "forward recovery",
+      "backward recovery"
+    ]
+  },
+  {
+    "id": "EX3_10",
+    "domain": "Distributed Consensus",
+    "question": "Describe how dynamic quorum reconfiguration via vertical Paxos decouples consensus from state machine execution.",
+    "rubrics": [
+      "vertical paxos",
+      "master reconfiguration",
+      "read quorum",
+      "write quorum"
+    ]
+  },
+  {
+    "id": "EX3_11",
+    "domain": "Zero-Knowledge Cryptography",
+    "question": "Explain how Lookup Arguments in Plookup use sorting and grand products to prove values exist in a precomputed table in O(n log n) time.",
+    "rubrics": [
+      "plookup",
+      "sorted multiset",
+      "grand product",
+      "precomputed table"
+    ]
+  },
+  {
+    "id": "EX3_12",
+    "domain": "Zero-Knowledge Cryptography",
+    "question": "Detail the role of elliptic curve endomorphisms and GLV method in accelerating scalar multiplication in cryptographic provers.",
+    "rubrics": [
+      "endomorphism",
+      "glv method",
+      "scalar decomposition",
+      "elliptic curve"
+    ]
+  },
+  {
+    "id": "EX3_13",
+    "domain": "Zero-Knowledge Cryptography",
+    "question": "Explain how zero-knowledge SNARKs achieve zero-knowledge by blinding witness polynomials with random polynomial multiples of the vanishing polynomial.",
+    "rubrics": [
+      "blinding polynomial",
+      "zero-knowledge witness",
+      "vanishing polynomial",
+      "random blinding factor"
+    ]
+  },
+  {
+    "id": "EX3_14",
+    "domain": "Zero-Knowledge Cryptography",
+    "question": "Explain how Nova achieves incrementally verifiable computation (IVC) using relaxed R1CS folding without expensive FFTs or trusted setups.",
+    "rubrics": [
+      "nova",
+      "relaxed r1cs",
+      "folding scheme",
+      "ivc"
+    ]
+  },
+  {
+    "id": "EX3_15",
+    "domain": "Zero-Knowledge Cryptography",
+    "question": "Explain the mechanics of Pedersen Hash functions on Edwards curves and why they are efficient inside SNARK circuits.",
+    "rubrics": [
+      "pedersen hash",
+      "edwards curve",
+      "in-circuit efficiency",
+      "group addition"
+    ]
+  },
+  {
+    "id": "EX3_16",
+    "domain": "Zero-Knowledge Cryptography",
+    "question": "Describe how multivariate polynomial commitments (like Multilinear KZG or Hyrax) avoid FFT interpolation in high-degree circuits.",
+    "rubrics": [
+      "multilinear kzg",
+      "hyrax",
+      "boolean hypercube",
+      "no fft overhead"
+    ]
+  },
+  {
+    "id": "EX3_17",
+    "domain": "Zero-Knowledge Cryptography",
+    "question": "Explain the difference between knowledge soundness and standard soundness in interactive proof systems.",
+    "rubrics": [
+      "knowledge soundness",
+      "extractor",
+      "computational soundness",
+      "witness extraction"
+    ]
+  },
+  {
+    "id": "EX3_18",
+    "domain": "Zero-Knowledge Cryptography",
+    "question": "Explain how recursive SNARK proofs aggregate thousands of transaction proofs into a single constant-sized on-chain validity proof.",
+    "rubrics": [
+      "recursive snark",
+      "proof aggregation",
+      "on-chain verification",
+      "constant proof size"
+    ]
+  },
+  {
+    "id": "EX3_19",
+    "domain": "Zero-Knowledge Cryptography",
+    "question": "Describe the role of quotient polynomial degree in Groth16 and why the SRS degree d must equal the number of multiplication gates m.",
+    "rubrics": [
+      "srs degree",
+      "multiplication gates",
+      "quotient polynomial",
+      "groth16 setup"
+    ]
+  },
+  {
+    "id": "EX3_20",
+    "domain": "Zero-Knowledge Cryptography",
+    "question": "Explain how Plonky2 combines STARK-like FRI commitments with small 64-bit Goldilocks field to achieve sub-second proof generation.",
+    "rubrics": [
+      "plonky2",
+      "goldilocks field",
+      "fri commitment",
+      "64-bit field arithmetic"
+    ]
+  },
+  {
+    "id": "EX3_21",
+    "domain": "Quantum Stabilizers & Topological Codes",
+    "question": "Explain the Color Code on a 2D triangular/hexagonal lattice and why all Clifford gates can be implemented transversally on color codes.",
+    "rubrics": [
+      "color code",
+      "transversal clifford",
+      "2d lattice",
+      "hexagonal tiling"
+    ]
+  },
+  {
+    "id": "EX3_22",
+    "domain": "Quantum Stabilizers & Topological Codes",
+    "question": "Describe how Floquet quantum error-correcting codes (such as the Honeycomb code) dynamically cycle measurements without static stabilizers.",
+    "rubrics": [
+      "floquet code",
+      "honeycomb code",
+      "dynamic measurement cycle",
+      "instantaneous stabilizer"
+    ]
+  },
+  {
+    "id": "EX3_23",
+    "domain": "Quantum Stabilizers & Topological Codes",
+    "question": "Explain how coherent noise (unitary rotation drift) accumulates quadratically in quantum circuits compared to stochastic Pauli noise.",
+    "rubrics": [
+      "coherent noise",
+      "unitary drift",
+      "pauli twirling",
+      "quadratic accumulation"
+    ]
+  },
+  {
+    "id": "EX3_24",
+    "domain": "Quantum Stabilizers & Topological Codes",
+    "question": "Describe how quantum error detection differs from error correction, and how [[4, 2, 2]] detects single-qubit errors without correcting them.",
+    "rubrics": [
+      "[[4, 2, 2]] code",
+      "error detection",
+      "parity check",
+      "subspace projection"
+    ]
+  },
+  {
+    "id": "EX3_25",
+    "domain": "Quantum Stabilizers & Topological Codes",
+    "question": "Explain how catastrophic cosmic ray or phonon burst events cause correlated multi-qubit errors across planar superconducting chips.",
+    "rubrics": [
+      "correlated error",
+      "cosmic ray burst",
+      "phonon poisoning",
+      "superconducting qubit"
+    ]
+  },
+  {
+    "id": "EX3_26",
+    "domain": "Quantum Stabilizers & Topological Codes",
+    "question": "Describe the role of boundary rough edges and smooth edges in encoding logical |0_L> and |+_L> states in surface codes.",
+    "rubrics": [
+      "rough boundary",
+      "smooth boundary",
+      "logical state",
+      "boundary termination"
+    ]
+  },
+  {
+    "id": "EX3_27",
+    "domain": "Quantum Stabilizers & Topological Codes",
+    "question": "Explain how randomized benchmarking (RB) measures average Clifford gate fidelity independently of state preparation and measurement (SPAM) errors.",
+    "rubrics": [
+      "randomized benchmarking",
+      "clifford fidelity",
+      "spam error",
+      "exponential decay"
+    ]
+  },
+  {
+    "id": "EX3_28",
+    "domain": "Quantum Stabilizers & Topological Codes",
+    "question": "Explain how bosonic quantum codes (such as GKP codes - Gottesman-Kitaev-Preskill) protect information within infinite-dimensional continuous oscillator spaces.",
+    "rubrics": [
+      "gkp code",
+      "bosonic code",
+      "harmonic oscillator",
+      "phase space grid"
+    ]
+  },
+  {
+    "id": "EX3_29",
+    "domain": "Quantum Stabilizers & Topological Codes",
+    "question": "Describe how the Knill-Laflamme conditions state the necessary and sufficient algebraic criteria for quantum error correction.",
+    "rubrics": [
+      "knill-laflamme",
+      "error operator",
+      "orthogonal code space",
+      "c_ab identity"
+    ]
+  },
+  {
+    "id": "EX3_30",
+    "domain": "Quantum Stabilizers & Topological Codes",
+    "question": "Explain the concept of quantum LDPC codes with non-zero asymptotic code rate [[n, kn, dn]] overcoming 2D planar geometric limits.",
+    "rubrics": [
+      "quantum ldpc",
+      "asymptotic rate",
+      "non-local connectivity",
+      "fiber bundle code"
+    ]
+  },
+  {
+    "id": "EX3_31",
+    "domain": "Symplectic Dynamics & Neural ODEs",
+    "question": "Explain how symplectic integrators preserve Poincar\u00e9 invariants in multi-degree-of-freedom Hamiltonian systems.",
+    "rubrics": [
+      "poincar\\u00e9 invariant",
+      "symplectic structure",
+      "canonical momentum",
+      "hamiltonian flow"
+    ]
+  },
+  {
+    "id": "EX3_32",
+    "domain": "Symplectic Dynamics & Neural ODEs",
+    "question": "Explain the role of Monomial Symplectic maps and generating functions in preserving canonical phase space geometry.",
+    "rubrics": [
+      "generating function",
+      "canonical map",
+      "phase space",
+      "hamilton-jacobi"
+    ]
+  },
+  {
+    "id": "EX3_33",
+    "domain": "Symplectic Dynamics & Neural ODEs",
+    "question": "Describe how implicit midpoint rule achieves unconditional symplecticity for non-separable Hamiltonian neural networks.",
+    "rubrics": [
+      "implicit midpoint",
+      "unconditional symplecticity",
+      "non-separable hamiltonian",
+      "phase preservation"
+    ]
+  },
+  {
+    "id": "EX3_34",
+    "domain": "Symplectic Dynamics & Neural ODEs",
+    "question": "Explain how continuous-depth neural networks avoid shattered gradient phenomena that plague ultra-deep feedforward networks.",
+    "rubrics": [
+      "gradient shattering",
+      "continuous depth",
+      "smooth flow",
+      "residual limit"
+    ]
+  },
+  {
+    "id": "EX3_35",
+    "domain": "Symplectic Dynamics & Neural ODEs",
+    "question": "Describe how Neural Jump SDEs combine continuous drift-diffusion with discrete Poisson jump processes for irregular event modelling.",
+    "rubrics": [
+      "neural jump sde",
+      "poisson process",
+      "drift diffusion",
+      "jump intensity"
+    ]
+  },
+  {
+    "id": "EX3_36",
+    "domain": "Symplectic Dynamics & Neural ODEs",
+    "question": "Explain how Riemannian Neural ODEs generalize continuous flow networks to curved manifolds (such as spheres and hyperbolic spaces).",
+    "rubrics": [
+      "riemannian neural ode",
+      "curved manifold",
+      "geodesic flow",
+      "metric tensor"
+    ]
+  },
+  {
+    "id": "EX3_37",
+    "domain": "Symplectic Dynamics & Neural ODEs",
+    "question": "Describe how symplectic shadow Hamiltonians prevent secular drift in long-term orbital predictions of astronomical systems.",
+    "rubrics": [
+      "shadow hamiltonian",
+      "secular drift",
+      "backward error analysis",
+      "long-term stability"
+    ]
+  },
+  {
+    "id": "EX3_38",
+    "domain": "Symplectic Dynamics & Neural ODEs",
+    "question": "Explain the role of Barbalat's Lemma in proving asymptotic stability of continuous-time adaptive neural controllers.",
+    "rubrics": [
+      "barbalat lemma",
+      "asymptotic stability",
+      "uniform continuity",
+      "lyapunov derivative"
+    ]
+  },
+  {
+    "id": "EX3_39",
+    "domain": "Symplectic Dynamics & Neural ODEs",
+    "question": "Explain how Hamiltonian Generative Adversarial Networks (H-GANs) eliminate mode collapse by preserving phase space volume.",
+    "rubrics": [
+      "hamiltonian gan",
+      "mode collapse",
+      "volume preservation",
+      "symplectic discriminator"
+    ]
+  },
+  {
+    "id": "EX3_40",
+    "domain": "Symplectic Dynamics & Neural ODEs",
+    "question": "Analyze the connection between optimal transport, Wasserstein distance, and continuous normalizing flows under Benamou-Brenier formulation.",
+    "rubrics": [
+      "optimal transport",
+      "wasserstein distance",
+      "benamou-brenier",
+      "geodesic in probability space"
+    ]
+  },
+  {
+    "id": "EX3_41",
+    "domain": "Category Theory & Formal Semantics",
+    "question": "Explain how Slice Categories C/A and Coslice Categories A/C model generalized objects equipped with a morphism to/from a fixed base object.",
+    "rubrics": [
+      "slice category",
+      "coslice category",
+      "base object",
+      "commutative triangle"
+    ]
+  },
+  {
+    "id": "EX3_42",
+    "domain": "Category Theory & Formal Semantics",
+    "question": "Explain the universal property of Equalizers and Coequalizers in category theory and how they formalize equation solutions.",
+    "rubrics": [
+      "equalizer",
+      "coequalizer",
+      "kernel dual",
+      "universal arrow"
+    ]
+  },
+  {
+    "id": "EX3_43",
+    "domain": "Category Theory & Formal Semantics",
+    "question": "Describe how Pullbacks and Pushouts generalize fibred products and fibred coproducts in category theory.",
+    "rubrics": [
+      "pullback",
+      "pushout",
+      "fibred product",
+      "commutative square"
+    ]
+  },
+  {
+    "id": "EX3_44",
+    "domain": "Category Theory & Formal Semantics",
+    "question": "Explain how Kan Extensions (Left Kan Extension Lan_K F and Right Kan Extension Ran_K F) universalize all categorical concepts.",
+    "rubrics": [
+      "kan extension",
+      "lan_k f",
+      "ran_k f",
+      "universal approximation"
+    ]
+  },
+  {
+    "id": "EX3_45",
+    "domain": "Category Theory & Formal Semantics",
+    "question": "Describe the role of Monads in modeling stateful imperative computation in Haskell (IO and State monads).",
+    "rubrics": [
+      "io monad",
+      "state monad",
+      "pure functional programming",
+      "equational reasoning"
+    ]
+  },
+  {
+    "id": "EX3_46",
+    "domain": "Category Theory & Formal Semantics",
+    "question": "Explain how Enriched Category Theory replaces Hom-sets with objects in an arbitrary monoidal category V.",
+    "rubrics": [
+      "enriched category",
+      "hom-object",
+      "v-enriched",
+      "monoidal base"
+    ]
+  },
+  {
+    "id": "EX3_47",
+    "domain": "Category Theory & Formal Semantics",
+    "question": "Describe the Beck-Chevalley condition in categorical logic and how it formalizes substitution commuting with quantifiers.",
+    "rubrics": [
+      "beck-chevalley",
+      "pullback square",
+      "quantifier substitution",
+      "hyperdoctrine"
+    ]
+  },
+  {
+    "id": "EX3_48",
+    "domain": "Category Theory & Formal Semantics",
+    "question": "Explain how Lawvere Theories provide a purely categorical formulation of universal algebra without variable binding.",
+    "rubrics": [
+      "lawvere theory",
+      "cartesian category",
+      "finite product category",
+      "algebraic model"
+    ]
+  },
+  {
+    "id": "EX3_49",
+    "domain": "Category Theory & Formal Semantics",
+    "question": "Explain how Operads generalize categories to multi-input operations (trees and string diagrams).",
+    "rubrics": [
+      "operad",
+      "multi-input",
+      "tree operad",
+      "colored operad"
+    ]
+  },
+  {
+    "id": "EX3_50",
+    "domain": "Category Theory & Formal Semantics",
+    "question": "Explain how Higher Category Theory (infinity-categories and quasicategories) models homotopy theory where morphisms are defined up to coherent higher homotopies.",
+    "rubrics": [
+      "infinity-category",
+      "quasicategory",
+      "homotopy coherence",
+      "higher morphisms"
+    ]
+  }
+]

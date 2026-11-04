@@ -1,0 +1,552 @@
+[
+  {
+    "id": "EX1_01",
+    "domain": "Distributed Consensus",
+    "question": "In the Raft consensus protocol, explain step-by-step why an election split occurs when multiple candidates launch concurrent RequestVote RPCs, and how randomized election timeouts mathematically minimize split election deadlocks.",
+    "rubrics": [
+      "election split",
+      "randomized timeout",
+      "split-vote deadlock",
+      "majority quorum"
+    ]
+  },
+  {
+    "id": "EX1_02",
+    "domain": "Distributed Consensus",
+    "question": "Explain how Raft log compaction via Snapshotting interacts with followers that lag far behind. Detail the role of the InstallSnapshot RPC.",
+    "rubrics": [
+      "snapshotting",
+      "installsnapshot",
+      "state machine",
+      "log compaction"
+    ]
+  },
+  {
+    "id": "EX1_03",
+    "domain": "Distributed Consensus",
+    "question": "Detail how Multi-Paxos optimizes the standard Synod protocol into a single round-trip for steady-state client requests once a stable leader is established.",
+    "rubrics": [
+      "multi-paxos",
+      "phase 1 skip",
+      "stable leader",
+      "accept phase"
+    ]
+  },
+  {
+    "id": "EX1_04",
+    "domain": "Distributed Consensus",
+    "question": "In distributed storage systems, what is the Split-Brain scenario? Prove mathematically why a system of N replicas can only tolerate f = (N - 1) / 2 crash faults under majority consensus.",
+    "rubrics": [
+      "split-brain",
+      "strict majority",
+      "quorum intersection",
+      "f crash faults"
+    ]
+  },
+  {
+    "id": "EX1_05",
+    "domain": "Distributed Consensus",
+    "question": "Describe the Observed-Remove Set (OR-Set) CRDT. How does it resolve concurrent additions and deletions of the exact same element across distributed replicas?",
+    "rubrics": [
+      "or-set",
+      "unique tag",
+      "add-wins",
+      "concurrent delete"
+    ]
+  },
+  {
+    "id": "EX1_06",
+    "domain": "Distributed Consensus",
+    "question": "Explain the primary difference between crash-fault-tolerant (CFT) protocols like Raft and Byzantine fault-tolerant (BFT) protocols like PBFT regarding quorum sizes and cryptographic signatures.",
+    "rubrics": [
+      "byzantine fault",
+      "3f + 1 nodes",
+      "cryptographic digest",
+      "equivocation"
+    ]
+  },
+  {
+    "id": "EX1_07",
+    "domain": "Distributed Consensus",
+    "question": "Explain the term 'Read Index' optimization in Raft. How does a leader serve linearizable read requests without appending a new entry to the replicated log?",
+    "rubrics": [
+      "read index",
+      "linearizable read",
+      "heartbeat quorum",
+      "commit index"
+    ]
+  },
+  {
+    "id": "EX1_08",
+    "domain": "Distributed Consensus",
+    "question": "Analyze the CAP theorem in modern distributed systems. Why is network partition tolerance (P) unavoidable in physical networks, leaving only the tradeoff between Consistency (C) and Availability (A)?",
+    "rubrics": [
+      "network partition",
+      "linearizability",
+      "availability tradeoff",
+      "flp impossibility"
+    ]
+  },
+  {
+    "id": "EX1_09",
+    "domain": "Distributed Consensus",
+    "question": "Explain how Vector Clocks handle concurrent writes in distributed key-value stores (e.g., Dynamo DB) and what role client-side sibling resolution plays.",
+    "rubrics": [
+      "vector clock",
+      "concurrent sibling",
+      "causal conflict",
+      "client resolution"
+    ]
+  },
+  {
+    "id": "EX1_10",
+    "domain": "Distributed Consensus",
+    "question": "In distributed transactions, contrast Two-Phase Commit (2PC) with Three-Phase Commit (3PC). Why does 2PC suffer from blocking upon coordinator failure, and how does 3PC's PreCommit phase alleviate this?",
+    "rubrics": [
+      "two-phase commit",
+      "three-phase commit",
+      "blocking coordinator",
+      "precommit phase"
+    ]
+  },
+  {
+    "id": "EX1_11",
+    "domain": "Zero-Knowledge Cryptography",
+    "question": "Explain how an arithmetic circuit with addition and multiplication gates is converted into a system of Quadratic Arithmetic Programs (QAP). What role do Lagrange basis polynomials play?",
+    "rubrics": [
+      "quadratic arithmetic program",
+      "lagrange interpolation",
+      "polynomial division",
+      "target polynomial"
+    ]
+  },
+  {
+    "id": "EX1_12",
+    "domain": "Zero-Knowledge Cryptography",
+    "question": "In the KZG commitment scheme, explain why the trusted setup powers of tau must have toxic waste secret tau discarded. What catastrophic forgery occurs if tau is leaked?",
+    "rubrics": [
+      "toxic waste",
+      "discrete logarithm",
+      "polynomial forgery",
+      "powers of tau"
+    ]
+  },
+  {
+    "id": "EX1_13",
+    "domain": "Zero-Knowledge Cryptography",
+    "question": "Explain the Fiat-Shamir Heuristic. How does it convert an interactive zero-knowledge public-coin proof into a non-interactive proof (NIZK) using a cryptographic hash function?",
+    "rubrics": [
+      "fiat-shamir",
+      "random oracle",
+      "non-interactive",
+      "challenge hash"
+    ]
+  },
+  {
+    "id": "EX1_14",
+    "domain": "Zero-Knowledge Cryptography",
+    "question": "Explain the concept of Bilinear Pairings e: G1 x G2 -> GT. What properties (bilinearity and non-degeneracy) make them essential for cryptographic verification?",
+    "rubrics": [
+      "bilinearity",
+      "non-degeneracy",
+      "elliptic curve",
+      "pairing verification"
+    ]
+  },
+  {
+    "id": "EX1_15",
+    "domain": "Zero-Knowledge Cryptography",
+    "question": "In PLONK, explain how polynomial commitment schemes verify that a quotient polynomial t(X) divides the constraint polynomial without revealing witness values.",
+    "rubrics": [
+      "quotient polynomial",
+      "vanishing polynomial",
+      "random evaluation",
+      "zero-knowledge witness"
+    ]
+  },
+  {
+    "id": "EX1_16",
+    "domain": "Zero-Knowledge Cryptography",
+    "question": "What is the difference between Transparent SNARKs (like STARKs) and SNARKs requiring a Trusted Setup (like Groth16)? How do STARKs eliminate trusted setups using FRI?",
+    "rubrics": [
+      "trusted setup",
+      "stark",
+      "fast reed-solomon",
+      "hash-based"
+    ]
+  },
+  {
+    "id": "EX1_17",
+    "domain": "Zero-Knowledge Cryptography",
+    "question": "Explain the role of Range Proofs in confidential transactions (e.g., Bulletproofs) and how inner product arguments achieve logarithmic proof size.",
+    "rubrics": [
+      "range proof",
+      "bulletproofs",
+      "inner product argument",
+      "logarithmic size"
+    ]
+  },
+  {
+    "id": "EX1_18",
+    "domain": "Zero-Knowledge Cryptography",
+    "question": "Analyze the Rank-1 Constraint System (R1CS) satisfiability problem. Why is finding a witness vector for an arbitrary R1CS NP-complete?",
+    "rubrics": [
+      "r1cs",
+      "witness vector",
+      "np-complete",
+      "boolean circuit reduction"
+    ]
+  },
+  {
+    "id": "EX1_19",
+    "domain": "Zero-Knowledge Cryptography",
+    "question": "Explain how recursive SNARKs (proof of a proof) operate. How do cycles of pairing-friendly elliptic curves (like Pasta curves: Pallas and Vesta) prevent field emulation overhead?",
+    "rubrics": [
+      "recursive snark",
+      "elliptic curve cycle",
+      "pasta curves",
+      "proof composition"
+    ]
+  },
+  {
+    "id": "EX1_20",
+    "domain": "Zero-Knowledge Cryptography",
+    "question": "Explain how polynomial commitments in Halo 2 achieve recursive verification without a trusted setup using the accumulation scheme.",
+    "rubrics": [
+      "halo 2",
+      "accumulation scheme",
+      "ipa commitment",
+      "no trusted setup"
+    ]
+  },
+  {
+    "id": "EX1_21",
+    "domain": "Quantum Stabilizers & Topological Codes",
+    "question": "In quantum error correction, explain the Stabilizer Formalism. What mathematical conditions must a subgroup of the Pauli group satisfy to define a valid quantum code?",
+    "rubrics": [
+      "pauli group",
+      "abelian subgroup",
+      "-i not in group",
+      "code subspace"
+    ]
+  },
+  {
+    "id": "EX1_22",
+    "domain": "Quantum Stabilizers & Topological Codes",
+    "question": "Explain how the 9-qubit Shor Code protects against both arbitrary bit-flip (X) and phase-flip (Z) errors by concatenating repetition codes.",
+    "rubrics": [
+      "shor code",
+      "concatenation",
+      "bit-flip error",
+      "phase-flip error"
+    ]
+  },
+  {
+    "id": "EX1_23",
+    "domain": "Quantum Stabilizers & Topological Codes",
+    "question": "Describe the physical difference between star operators A_s and plaquette operators B_p in the Toric Code, and how error chains create anyonic excitations (e and m particles).",
+    "rubrics": [
+      "star operator",
+      "plaquette operator",
+      "anyonic excitation",
+      "error chain endpoints"
+    ]
+  },
+  {
+    "id": "EX1_24",
+    "domain": "Quantum Stabilizers & Topological Codes",
+    "question": "Explain why transversal gates in quantum error correction cannot achieve universal fault-tolerant quantum computing on their own (Eastin-Knill Theorem).",
+    "rubrics": [
+      "eastin-knill theorem",
+      "transversal gates",
+      "no-go theorem",
+      "universal computing"
+    ]
+  },
+  {
+    "id": "EX1_25",
+    "domain": "Quantum Stabilizers & Topological Codes",
+    "question": "Detail the process of Magic State Distillation. Why is it used to inject non-Clifford T gates into surface codes?",
+    "rubrics": [
+      "magic state distillation",
+      "t-gate",
+      "noisy ancilla",
+      "clifford filtering"
+    ]
+  },
+  {
+    "id": "EX1_26",
+    "domain": "Quantum Stabilizers & Topological Codes",
+    "question": "In surface code decoding, explain how Minimum-Weight Perfect Matching (MWPM) pairs defect syndromes to correct errors with threshold ~1%.",
+    "rubrics": [
+      "mwpm",
+      "syndrome defect",
+      "blossom algorithm",
+      "error threshold"
+    ]
+  },
+  {
+    "id": "EX1_27",
+    "domain": "Quantum Stabilizers & Topological Codes",
+    "question": "Explain the concept of Topological Braiding of anyons. How does non-Abelian anyon exchange realize fault-tolerant quantum gates geometrically?",
+    "rubrics": [
+      "topological braiding",
+      "non-abelian anyons",
+      "geometric phase",
+      "decoherence immunity"
+    ]
+  },
+  {
+    "id": "EX1_28",
+    "domain": "Quantum Stabilizers & Topological Codes",
+    "question": "What is the Quantum Threshold Theorem? State the condition under which arbitrarily long quantum computations can be executed reliably.",
+    "rubrics": [
+      "threshold theorem",
+      "physical error rate",
+      "fault tolerance",
+      "concatenated scaling"
+    ]
+  },
+  {
+    "id": "EX1_29",
+    "domain": "Quantum Stabilizers & Topological Codes",
+    "question": "Explain how the Steane [[7, 1, 3]] code works and why it is classified as a CSS (Calderbank-Shor-Steane) code.",
+    "rubrics": [
+      "steane code",
+      "css code",
+      "classical hamming code",
+      "transversal clifford"
+    ]
+  },
+  {
+    "id": "EX1_30",
+    "domain": "Quantum Stabilizers & Topological Codes",
+    "question": "Explain the difference between active quantum error correction and passive fault-tolerance in topological systems.",
+    "rubrics": [
+      "active error correction",
+      "passive fault-tolerance",
+      "energy gap",
+      "syndrome measurement"
+    ]
+  },
+  {
+    "id": "EX1_31",
+    "domain": "Symplectic Dynamics & Neural ODEs",
+    "question": "Explain the continuous adjoint state equation in Neural ODEs. Why does the adjoint vector propagate backward in time with the negative transpose of the Jacobian?",
+    "rubrics": [
+      "adjoint state",
+      "lagrange multiplier",
+      "jacobian transpose",
+      "backward propagation"
+    ]
+  },
+  {
+    "id": "EX1_32",
+    "domain": "Symplectic Dynamics & Neural ODEs",
+    "question": "In Hamiltonian Neural Networks (HNNs), how does parameterizing the network with a scalar energy function H(q, p) enforce exact energy conservation?",
+    "rubrics": [
+      "hamiltonian neural network",
+      "phase space",
+      "symplectic gradient",
+      "energy conservation"
+    ]
+  },
+  {
+    "id": "EX1_33",
+    "domain": "Symplectic Dynamics & Neural ODEs",
+    "question": "Compare standard explicit Euler integration with the symplectic Euler method. Why does explicit Euler fail on harmonic oscillators while symplectic Euler preserves closed orbits?",
+    "rubrics": [
+      "symplectic euler",
+      "harmonic oscillator",
+      "phase space area",
+      "shadow hamiltonian"
+    ]
+  },
+  {
+    "id": "EX1_34",
+    "domain": "Symplectic Dynamics & Neural ODEs",
+    "question": "Explain the role of Dynamic Lipschitz Constant control L(t) in preventing exploding trajectories and ensuring contractive stability in deep continuous-time networks.",
+    "rubrics": [
+      "lipschitz constant",
+      "contractive stability",
+      "exploding trajectories",
+      "spectral norm"
+    ]
+  },
+  {
+    "id": "EX1_35",
+    "domain": "Symplectic Dynamics & Neural ODEs",
+    "question": "What is the Adjoint Sensitivity Method's main numerical pitfall when solving stiff differential equations, and how do checkpointing techniques alleviate it?",
+    "rubrics": [
+      "stiff ode",
+      "numerical error accumulation",
+      "reverse reconstruction",
+      "checkpointing"
+    ]
+  },
+  {
+    "id": "EX1_36",
+    "domain": "Symplectic Dynamics & Neural ODEs",
+    "question": "Explain how Continuous Normalizing Flows (CNFs) utilize the instantaneous change of variables formula: d log p(z(t)) / dt = - Tr(df / dz).",
+    "rubrics": [
+      "continuous normalizing flow",
+      "instantaneous change of variables",
+      "trace of jacobian",
+      "hutchinson estimator"
+    ]
+  },
+  {
+    "id": "EX1_37",
+    "domain": "Symplectic Dynamics & Neural ODEs",
+    "question": "Explain how Hutchinson's Trace Estimator enables unbiased O(1) computation of Tr(df/dz) in high-dimensional continuous neural flows using random Gaussian vectors.",
+    "rubrics": [
+      "hutchinson trace estimator",
+      "random vector",
+      "unbiased estimate",
+      "quadratic form"
+    ]
+  },
+  {
+    "id": "EX1_38",
+    "domain": "Symplectic Dynamics & Neural ODEs",
+    "question": "Describe the concept of Neural Controlled Differential Equations (Neural CDEs) and why they are continuous-time analogues to Recurrent Neural Networks (RNNs).",
+    "rubrics": [
+      "neural cde",
+      "riemann-stieltjes integral",
+      "rough paths",
+      "continuous rnn"
+    ]
+  },
+  {
+    "id": "EX1_39",
+    "domain": "Symplectic Dynamics & Neural ODEs",
+    "question": "Explain how Symplectic St\u00f6rmer-Verlet integrators maintain invariant phase volume according to Liouville's theorem in N-body dynamical systems.",
+    "rubrics": [
+      "st\\u00f6rmer-verlet",
+      "liouville theorem",
+      "phase volume",
+      "symplectic 2-form"
+    ]
+  },
+  {
+    "id": "EX1_40",
+    "domain": "Symplectic Dynamics & Neural ODEs",
+    "question": "Explain why bounding the logarithmic norm of a neural vector field guarantees that perturbed trajectories do not diverge exponentially.",
+    "rubrics": [
+      "logarithmic norm",
+      "trajectory divergence",
+      "contraction metric",
+      "matrix measure"
+    ]
+  },
+  {
+    "id": "EX1_41",
+    "domain": "Category Theory & Formal Semantics",
+    "question": "State the categorical definition of a Natural Transformation between two functors F, G: C -> D. Write the commutative diagram that must hold for every morphism f: A -> B.",
+    "rubrics": [
+      "natural transformation",
+      "commutative diagram",
+      "functor component",
+      "naturality square"
+    ]
+  },
+  {
+    "id": "EX1_42",
+    "domain": "Category Theory & Formal Semantics",
+    "question": "Explain why the Yoneda embedding y: C -> [C^op, Set] is fully faithful, and what that implies about morphisms in C versus natural transformations between presheaves.",
+    "rubrics": [
+      "yoneda embedding",
+      "fully faithful",
+      "presheaf category",
+      "isomorphism preservation"
+    ]
+  },
+  {
+    "id": "EX1_43",
+    "domain": "Category Theory & Formal Semantics",
+    "question": "Define an Adjunction between two categories (F -| G). What are the unit eta and counit epsilon of an adjunction, and what triangular identities must they satisfy?",
+    "rubrics": [
+      "adjunction",
+      "unit eta",
+      "counit epsilon",
+      "triangle identities"
+    ]
+  },
+  {
+    "id": "EX1_44",
+    "domain": "Category Theory & Formal Semantics",
+    "question": "Explain the categorical semantics of Monads in functional programming. How does the Kleisli category model effectful computations (such as state, I/O, or non-determinism)?",
+    "rubrics": [
+      "kleisli category",
+      "monadic effects",
+      "endofunctor",
+      "bind operation"
+    ]
+  },
+  {
+    "id": "EX1_45",
+    "domain": "Category Theory & Formal Semantics",
+    "question": "Explain the concept of an Exponential Object B^A in Cartesian Closed Categories (CCC) and write the universal property that characterizes it via evaluation morphism.",
+    "rubrics": [
+      "exponential object",
+      "evaluation morphism",
+      "cartesian closed category",
+      "currying"
+    ]
+  },
+  {
+    "id": "EX1_46",
+    "domain": "Category Theory & Formal Semantics",
+    "question": "What is a Topos in category theory? Explain the role of the Subobject Classifier Omega and why the internal logic of an elementary topos is intuitionistic rather than classical.",
+    "rubrics": [
+      "topos",
+      "subobject classifier",
+      "characteristic morphism",
+      "intuitionistic logic"
+    ]
+  },
+  {
+    "id": "EX1_47",
+    "domain": "Category Theory & Formal Semantics",
+    "question": "Explain the Curry-Howard-Lambek Correspondence. How do types, propositions, and categorical objects map to each other?",
+    "rubrics": [
+      "curry-howard-lambek",
+      "propositions-as-types",
+      "proofs-as-programs",
+      "cartesian closed"
+    ]
+  },
+  {
+    "id": "EX1_48",
+    "domain": "Category Theory & Formal Semantics",
+    "question": "Define a Monoidal Category (C, tensor, I, alpha, lambda, rho). What coherence conditions do the Mac Lane Pentagon and Triangle diagrams guarantee?",
+    "rubrics": [
+      "monoidal category",
+      "tensor product",
+      "pentagon diagram",
+      "mac lane coherence"
+    ]
+  },
+  {
+    "id": "EX1_49",
+    "domain": "Category Theory & Formal Semantics",
+    "question": "Explain the concept of a Comonad (W, epsilon, delta) in Category Theory and how its co-Kleisli category models contextual or stream computations.",
+    "rubrics": [
+      "comonad",
+      "extract epsilon",
+      "duplicate delta",
+      "co-kleisli category"
+    ]
+  },
+  {
+    "id": "EX1_49b",
+    "domain": "Category Theory & Formal Semantics",
+    "question": "Explain how Limits and Colimits generalize products and coproducts, and state what it means for a category to be complete and cocomplete.",
+    "rubrics": [
+      "limit and colimit",
+      "universal cone",
+      "complete category",
+      "cocomplete"
+    ]
+  }
+]

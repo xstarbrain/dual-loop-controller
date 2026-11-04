@@ -1,0 +1,264 @@
+{
+  "timestamp": "2026-10-29 21:13:03",
+  "hardware": "NVIDIA GeForce RTX 5060 Laptop GPU (8GB)",
+  "mode_a_baseline_acc": 94.44,
+  "mode_b_pre_train_acc": 100.0,
+  "mode_b_post_train_acc": 100.0,
+  "post_train_details": {
+    "timestamp": "2026-10-29 21:12:54",
+    "hardware": "NVIDIA GeForce RTX 5060 Laptop GPU (8GB)",
+    "checkpoint_used": "checkpoints/hadl_v57_spatial_grounding_dynamic_checkpoint.pt",
+    "questions": [
+      {
+        "id": "cube_rot_clockwise_z",
+        "domain": "3D Mental Rotation",
+        "name": "Cube 90-deg CW Yaw Rotation",
+        "ground_truth": "Orange",
+        "model_response": "Orange",
+        "is_correct": true,
+        "latency_s": 3.23,
+        "ttft_ms": 3150.4,
+        "tps": 0.95,
+        "consistency_2d_to_3d": 0.6461
+      },
+      {
+        "id": "cube_pitch_forward_x",
+        "domain": "3D Mental Rotation",
+        "name": "Cube 90-deg Forward Pitch",
+        "ground_truth": "Yellow",
+        "model_response": "Yellow",
+        "is_correct": true,
+        "latency_s": 0.25,
+        "ttft_ms": 206.1,
+        "tps": 14.51,
+        "consistency_2d_to_3d": 0.6638
+      },
+      {
+        "id": "cube_rot_180_z",
+        "domain": "3D Mental Rotation",
+        "name": "Cube 180-deg Inversion",
+        "ground_truth": "Orange",
+        "model_response": "Orange",
+        "is_correct": true,
+        "latency_s": 0.2,
+        "ttft_ms": 162.9,
+        "tps": 18.35,
+        "consistency_2d_to_3d": 0.6464
+      },
+      {
+        "id": "dice_opposite_faces",
+        "domain": "3D Mental Rotation",
+        "name": "Opposite Die Face Topology",
+        "ground_truth": "6",
+        "model_response": "6",
+        "is_correct": true,
+        "latency_s": 0.33,
+        "ttft_ms": 243.7,
+        "tps": 12.27,
+        "consistency_2d_to_3d": 0.6449
+      },
+      {
+        "id": "compass_compound_turns",
+        "domain": "Compass & Navigation",
+        "name": "Compound Heading (CW 90 -> 180 -> CCW 90)",
+        "ground_truth": "South",
+        "model_response": "South",
+        "is_correct": true,
+        "latency_s": 0.23,
+        "ttft_ms": 189.9,
+        "tps": 15.73,
+        "consistency_2d_to_3d": 0.6666
+      },
+      {
+        "id": "drone_3d_coordinates",
+        "domain": "Compass & Navigation",
+        "name": "Drone 3D Displacement (10E, 5N, 20Up, 10W)",
+        "ground_truth": "(0, 5, 20)",
+        "model_response": "(0, 5, 20)",
+        "is_correct": true,
+        "latency_s": 0.82,
+        "ttft_ms": 782.2,
+        "tps": 15.33,
+        "consistency_2d_to_3d": 0.6952
+      },
+      {
+        "id": "walking_left_turns",
+        "domain": "Compass & Navigation",
+        "name": "Consecutive Left Turns from East",
+        "ground_truth": "West",
+        "model_response": "West",
+        "is_correct": true,
+        "latency_s": 0.25,
+        "ttft_ms": 161.9,
+        "tps": 18.44,
+        "consistency_2d_to_3d": 0.6478
+      },
+      {
+        "id": "pythagoras_displacement",
+        "domain": "Compass & Navigation",
+        "name": "Euclidean 2D Vector Magnitude (4N, 3E)",
+        "ground_truth": "5",
+        "model_response": "5",
+        "is_correct": true,
+        "latency_s": 0.21,
+        "ttft_ms": 139.9,
+        "tps": 21.36,
+        "consistency_2d_to_3d": 0.6655
+      },
+      {
+        "id": "table_opposite_perspective",
+        "domain": "Perspective-Taking",
+        "name": "Opposite Dining Partner Perspective",
+        "ground_truth": "Right",
+        "model_response": "Right",
+        "is_correct": true,
+        "latency_s": 0.19,
+        "ttft_ms": 147.6,
+        "tps": 20.23,
+        "consistency_2d_to_3d": 0.6546
+      },
+      {
+        "id": "three_objects_viewpoint",
+        "domain": "Perspective-Taking",
+        "name": "Three Objects Reversed Point of View",
+        "ground_truth": "Blue",
+        "model_response": "Blue",
+        "is_correct": true,
+        "latency_s": 0.23,
+        "ttft_ms": 184.4,
+        "tps": 16.19,
+        "consistency_2d_to_3d": 0.6737
+      },
+      {
+        "id": "mirror_clock_reflection",
+        "domain": "Perspective-Taking",
+        "name": "Clock 3:00 Planar Mirror Reflection",
+        "ground_truth": "9:00",
+        "model_response": "9:00",
+        "is_correct": true,
+        "latency_s": 0.37,
+        "ttft_ms": 334.9,
+        "tps": 17.88,
+        "consistency_2d_to_3d": 0.6676
+      },
+      {
+        "id": "sun_setting_relative_heading",
+        "domain": "Perspective-Taking",
+        "name": "Sunset Relative to Southward Facing",
+        "ground_truth": "West",
+        "model_response": "West",
+        "is_correct": true,
+        "latency_s": 0.17,
+        "ttft_ms": 134.8,
+        "tps": 22.12,
+        "consistency_2d_to_3d": 0.6315
+      },
+      {
+        "id": "box_nesting_dimensions",
+        "domain": "Spatial Topology",
+        "name": "Orthogonal Bounding Box Containment",
+        "ground_truth": "Yes",
+        "model_response": "Yes",
+        "is_correct": true,
+        "latency_s": 0.22,
+        "ttft_ms": 144.4,
+        "tps": 20.66,
+        "consistency_2d_to_3d": 0.6461
+      },
+      {
+        "id": "sphere_in_cube_tangency",
+        "domain": "Spatial Topology",
+        "name": "Inscribed Sphere-Cube Tangency",
+        "ground_truth": "Yes",
+        "model_response": "Yes",
+        "is_correct": true,
+        "latency_s": 0.24,
+        "ttft_ms": 176.4,
+        "tps": 16.93,
+        "consistency_2d_to_3d": 0.6949
+      },
+      {
+        "id": "shadow_noon_hemisphere",
+        "domain": "Spatial Topology",
+        "name": "Solar Noon Shadow Direction Hemisphere",
+        "ground_truth": "Northern",
+        "model_response": "Northern",
+        "is_correct": true,
+        "latency_s": 0.24,
+        "ttft_ms": 151.8,
+        "tps": 19.65,
+        "consistency_2d_to_3d": 0.6761
+      },
+      {
+        "id": "reflection_xy_plane",
+        "domain": "Coordinate Transforms",
+        "name": "Point 3D Reflection across XY-Plane",
+        "ground_truth": "(3, -4, -5)",
+        "model_response": "(3, -4, -5)",
+        "is_correct": true,
+        "latency_s": 0.68,
+        "ttft_ms": 644.4,
+        "tps": 17.05,
+        "consistency_2d_to_3d": 0.6874
+      },
+      {
+        "id": "vector_rotation_2d_90ccw",
+        "domain": "Coordinate Transforms",
+        "name": "2D Vector (0, 1) 90-deg CCW Rotation",
+        "ground_truth": "(-1, 0)",
+        "model_response": "(-1, 0)",
+        "is_correct": true,
+        "latency_s": 0.56,
+        "ttft_ms": 467.7,
+        "tps": 17.08,
+        "consistency_2d_to_3d": 0.697
+      },
+      {
+        "id": "letter_planar_rotation_180",
+        "domain": "Coordinate Transforms",
+        "name": "Glyph 'b' Planar 180-deg Inversion",
+        "ground_truth": "q",
+        "model_response": "q",
+        "is_correct": true,
+        "latency_s": 0.29,
+        "ttft_ms": 239.6,
+        "tps": 12.49,
+        "consistency_2d_to_3d": 0.6252
+      }
+    ],
+    "domain_scores": {
+      "3D Mental Rotation": {
+        "correct": 4,
+        "total": 4,
+        "accuracy_pct": 100.0
+      },
+      "Compass & Navigation": {
+        "correct": 4,
+        "total": 4,
+        "accuracy_pct": 100.0
+      },
+      "Perspective-Taking": {
+        "correct": 4,
+        "total": 4,
+        "accuracy_pct": 100.0
+      },
+      "Spatial Topology": {
+        "correct": 3,
+        "total": 3,
+        "accuracy_pct": 100.0
+      },
+      "Coordinate Transforms": {
+        "correct": 3,
+        "total": 3,
+        "accuracy_pct": 100.0
+      }
+    },
+    "total_correct": 18,
+    "accuracy_pct": 100.0,
+    "mean_ttft_ms": 425.7,
+    "mean_tps": 16.51,
+    "mean_consistency_2d_3d": 0.6628,
+    "total_time_s": 8.7
+  },
+  "delta_vs_baseline": 5.56
+}

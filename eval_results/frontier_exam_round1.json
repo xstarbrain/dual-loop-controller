@@ -1,0 +1,858 @@
+{
+  "timestamp": "2026-10-13 21:43:59",
+  "exam_file": "frontier_study/exam_pool_round1.json",
+  "use_adapter": true,
+  "total_score": 80.5,
+  "max_score": 100.0,
+  "score_percentage": 80.5,
+  "domain_scores": {
+    "Distributed Consensus": {
+      "scored": 19.5,
+      "total": 20.0
+    },
+    "Zero-Knowledge Cryptography": {
+      "scored": 15.5,
+      "total": 20.0
+    },
+    "Quantum Stabilizers & Topological Codes": {
+      "scored": 16.0,
+      "total": 20.0
+    },
+    "Symplectic Dynamics & Neural ODEs": {
+      "scored": 14.5,
+      "total": 20.0
+    },
+    "Category Theory & Formal Semantics": {
+      "scored": 15.0,
+      "total": 20.0
+    }
+  },
+  "question_records": [
+    {
+      "idx": 1,
+      "id": "EX1_01",
+      "domain": "Distributed Consensus",
+      "question": "In the Raft consensus protocol, explain step-by-step why an election split occurs when multiple candidates launch concurrent RequestVote RPCs, and how randomized election timeouts mathematically minimize split election deadlocks.",
+      "score": 2.0,
+      "max_score": 2.0,
+      "passed_rubrics": [
+        "election split",
+        "randomized timeout",
+        "split-vote deadlock",
+        "majority quorum"
+      ],
+      "missing_rubrics": [],
+      "response": "Key Invariant Analysis:\n1. Election Split Mechanism: When a leader fails, multiple followers' election timers may expire simultaneously. Each candidate votes for itself and requests votes from peers. In an N-node cluster, votes can divide evenly (e.g., 2 votes each in a 4-node or 5-node cluster), leaving no candidate with a strict majority (quorum of \u230aN/2\u230b + 1). Without intervention, candidates timeout together, increment term simultaneously, and split the vote in an infinite deadlock loop.\n\n2. Randomized Election Timeouts: Raft assigns election timeouts chosen uniformly at random from a range [T, 2T] (typically 150ms - 300ms).\n\n3. Mathematical Deadlock Prevention: The probability of two nodes timing out within the network round-trip time (RTT) \u03b4 becomes negligible (approximately \u03b4 / T << 1). One node's timer expires first, collects a majority quorum before competitors time out, becomes leader, and sends heartbeats to suppress competing elections."
+    },
+    {
+      "idx": 2,
+      "id": "EX1_02",
+      "domain": "Distributed Consensus",
+      "question": "Explain how Raft log compaction via Snapshotting interacts with followers that lag far behind. Detail the role of the InstallSnapshot RPC.",
+      "score": 2.0,
+      "max_score": 2.0,
+      "passed_rubrics": [
+        "snapshotting",
+        "installsnapshot",
+        "state machine",
+        "log compaction"
+      ],
+      "missing_rubrics": [],
+      "response": "Key Invariant Analysis:\n1. Log Compaction Need: As the replicated log grows, storing every command consumes excessive disk space and slows restart replay. In Snapshotting, the node writes its state machine state up to lastIncludedIndex and lastIncludedTerm to a snapshot file, then discards prior log entries.\n\n2. Lagging Followers: If a follower is partitioned or disconnected for a prolonged period, the leader may have already discarded log entries starting from follower's nextIndex. The leader cannot send missing entries via AppendEntries.\n\n3. InstallSnapshot RPC: The leader detects this condition (nextIndex \u2264 leader's snapshot lastIncludedIndex) and sends InstallSnapshot RPC containing the snapshot chunks, lastIncludedIndex, and lastIncludedTerm. The follower discards its conflicting uncommitted log, resets its state machine to the snapshot, sets its commitIndex to lastIncludedIndex, and resumes standard AppendEntries replication.\nMathematical Rigor: Correct operation requires verifying that lastIncludedIndex \u2264 leader's snapshot lastIncludedIndex and lastIncludedTerm \u2264 leader's snapshot lastIncludedTerm before initiating InstallSnapshot."
+    },
+    {
+      "idx": 3,
+      "id": "EX1_03",
+      "domain": "Distributed Consensus",
+      "question": "Detail how Multi-Paxos optimizes the standard Synod protocol into a single round-trip for steady-state client requests once a stable leader is established.",
+      "score": 2.0,
+      "max_score": 2.0,
+      "passed_rubrics": [
+        "multi-paxos",
+        "phase 1 skip",
+        "stable leader",
+        "accept phase"
+      ],
+      "missing_rubrics": [],
+      "response": "Key Invariant Analysis:\n1. Synod Overhead: Basic Paxos requires two phases for every single decision: Phase 1 (Prepare/Promise) to establish leadership and discover accepted values, and Phase 2 (Accept/Accepted) to commit the value. This imposes 2 network round-trips (RTTs) per operation.\n\n2. Multi-Paxos Optimization: Multi-Paxos extends the ballot number to govern an entire sequence of log instances. Once a proposer successfully runs Phase 1 for all future instances (by obtaining promises from a majority quorum that no higher ballot will be accepted), it becomes the stable Master Leader.\n\n3. Single RTT Steady-State: For all subsequent client write requests, the stable leader skips Phase 1 entirely and immediately executes Phase 2 (Accept(b, i, v)). Acceptors respond Accepted, achieving consensus in a single round-trip.\nTechnical Application: In production architectures, verifying these conditions prevents state divergence and ensures formal safety guarantees."
+    },
+    {
+      "idx": 4,
+      "id": "EX1_04",
+      "domain": "Distributed Consensus",
+      "question": "In distributed storage systems, what is the Split-Brain scenario? Prove mathematically why a system of N replicas can only tolerate f = (N - 1) / 2 crash faults under majority consensus.",
+      "score": 2.0,
+      "max_score": 2.0,
+      "passed_rubrics": [
+        "split-brain",
+        "strict majority",
+        "quorum intersection",
+        "f crash faults"
+      ],
+      "missing_rubrics": [],
+      "response": "Key Invariant Analysis:\n1. Split-Brain Scenario: A network partition divides a distributed cluster into isolated sub-networks. If both partitions believe they have authority to accept and commit writes independently, data diverges irreversibly, destroying consistency.\n\n2. Quorum Intersection Requirement: To prevent split-brain, any two valid decision quorums Q1 and Q2 must overlap by at least one node: |Q1 \u2229 Q2| \u2265 1.\n\n3. Mathematical Bound on Faults: Let cluster size be N. For a quorum size Q to guarantee intersection, 2Q > N, meaning Q \u2265 \u230aN/2\u230b + 1 (strict majority). If f nodes crash, the remaining N - f live nodes must still form a valid majority quorum: N - f \u2265 \u230aN/2\u230b + 1. Rearranging: f \u2264 N - (\u230aN/2\u230b + 1) = \u230a(N - 1)/2\u230b. Therefore, an N-node system can tolerate at most f = (N - 1)/2"
+    },
+    {
+      "idx": 5,
+      "id": "EX1_05",
+      "domain": "Distributed Consensus",
+      "question": "Describe the Observed-Remove Set (OR-Set) CRDT. How does it resolve concurrent additions and deletions of the exact same element across distributed replicas?",
+      "score": 2.0,
+      "max_score": 2.0,
+      "passed_rubrics": [
+        "or-set",
+        "unique tag",
+        "add-wins",
+        "concurrent delete"
+      ],
+      "missing_rubrics": [],
+      "response": "Key Invariant Analysis:\n1. Problem in Distributed Sets: If replica A adds element x while replica B concurrently deletes x, naive sets cannot resolve whether x exists without coordinating.\n\n2. Observed-Remove Set (OR-Set) Structure: An OR-Set maintains two internal sets: an Add-Set of pairs (element, unique_tag) and a Remove-Set of observed tags. Each tag is a globally unique UUID or logical timestamp.\n\n3. Add Operation: Adding element x generates a fresh unique tag t and inserts (x, t) into the Add-Set.\n\n4. Delete Operation: Deleting element x observes all currently existing tags for x in local Add-Set and adds those observed tags to the Remove-Set.\n\n5. Membership & Add-Wins Resolution: Element x is considered present if there exists at least one pair (x, t) in the Add-Set whose tag t is NOT in the Remove-Set. Because a concurrent add generates a brand new tag t_new that was not observed by the concurrent delete, t_new survives. Thus, the OR-Set implements Add-Wins semantics with mathematically provable strong eventual consistency."
+    },
+    {
+      "idx": 6,
+      "id": "EX1_06",
+      "domain": "Distributed Consensus",
+      "question": "Explain the primary difference between crash-fault-tolerant (CFT) protocols like Raft and Byzantine fault-tolerant (BFT) protocols like PBFT regarding quorum sizes and cryptographic signatures.",
+      "score": 2.0,
+      "max_score": 2.0,
+      "passed_rubrics": [
+        "byzantine fault",
+        "3f + 1 nodes",
+        "cryptographic digest",
+        "equivocation"
+      ],
+      "missing_rubrics": [],
+      "response": "Key Invariant Analysis:\n1. Threat Model: CFT (Raft, Paxos) assumes nodes may crash or delay messages, but never lie, forge messages, or send contradictory information (no equivocation). BFT (PBFT, Tendermint) assumes malicious adversaries who can send conflicting messages to different peers, forge identities, and intentionally subvert protocol logic.\n\n2. Quorum Size Mathematics: In CFT, majority quorum is (N/2 + 1), tolerating f = (N - 1)/2 faults (N \u2265 2f + 1). In BFT, a malicious node can equivocate: it can send 'commit' to node A and 'abort' to node B while f nodes are silent/crashed. To ensure honest nodes always intersect by at least f + 1 honest nodes, the cluster requires N \u2265 3f + 1 nodes and quorums of 2f + 1.\n\n3. Cryptographic Verification: CFT uses simple checksums and integer term numbers. BFT strictly requires digital signatures and cryptographic digests (e.g., pre-prepare, prepare, and commit certs) to"
+    },
+    {
+      "idx": 7,
+      "id": "EX1_07",
+      "domain": "Distributed Consensus",
+      "question": "Explain the term 'Read Index' optimization in Raft. How does a leader serve linearizable read requests without appending a new entry to the replicated log?",
+      "score": 2.0,
+      "max_score": 2.0,
+      "passed_rubrics": [
+        "read index",
+        "linearizable read",
+        "heartbeat quorum",
+        "commit index"
+      ],
+      "missing_rubrics": [],
+      "response": "1. Linearizable Read Challenge: If a network partition occurs and a new leader is elected in a higher term, an old leader might still receive read requests. If the stale leader serves reads from its local state machine, it returns stale data, violating linearizability.\n\n2. Naive Solution: The leader appends a no-op read entry to the log and commits it via full quorum replication before returning the result. This consumes disk I/O and log space.\n\n3. Read Index Optimization: The leader records its current commitIndex as the readIndex. Before reading state machine at readIndex, the leader broadcasts a round of heartbeat RPCs to verify it is still the authoritative leader. Once a majority quorum confirms receipt, the leader waits until its state machine has applied at least up to readIndex, then returns the read result. This guarantees linearizability without writing any new entries to disk or log."
+    },
+    {
+      "idx": 8,
+      "id": "EX1_08",
+      "domain": "Distributed Consensus",
+      "question": "Analyze the CAP theorem in modern distributed systems. Why is network partition tolerance (P) unavoidable in physical networks, leaving only the tradeoff between Consistency (C) and Availability (A)?",
+      "score": 2.0,
+      "max_score": 2.0,
+      "passed_rubrics": [
+        "network partition",
+        "linearizability",
+        "availability tradeoff",
+        "flp impossibility"
+      ],
+      "missing_rubrics": [],
+      "response": "Key Invariant Analysis:\n1. Definitions: Consistency (C) means linearizability: every read receives the most recent write or an error. Availability (A) means every non-failing node returns a non-error response. Partition Tolerance (P) means the system continues operating despite dropped or delayed messages between nodes.\n\n2. Unavoidability of Partitions: Physical networks (cables, routers, switches, cloud VPCs) inherently suffer packet loss, hardware faults, GC pauses, and fiber cuts. A distributed system cannot choose 'No Partitions' (CA does not exist in real distributed systems).\n\n3. The Inevitable Tradeoff: When a partition occurs between node group G1 and group G2: if a client writes to G1, G1 cannot replicate to G2. If a client reads from G2, the system must either: (a) Reject the read or block to preserve Consistency (CP), or (b) Return stale data from G2 to maintain Availability (AP). By the FLP Impossibility and Brewer's theorem, no system can achieve both simultaneously under network partitions.\nPractical Application: In production architectures"
+    },
+    {
+      "idx": 9,
+      "id": "EX1_09",
+      "domain": "Distributed Consensus",
+      "question": "Explain how Vector Clocks handle concurrent writes in distributed key-value stores (e.g., Dynamo DB) and what role client-side sibling resolution plays.",
+      "score": 1.5,
+      "max_score": 2.0,
+      "passed_rubrics": [
+        "vector clock",
+        "concurrent sibling",
+        "client resolution"
+      ],
+      "missing_rubrics": [
+        "causal conflict"
+      ],
+      "response": "1. Problem in Concurrency: If two clients update the same key independently, naive stores cannot know whether the update is an update to an existing value or a brand new key.\n\n2. Vector Clocks: Each node maintains a vector clock C = (c_1, c_2, ..., c_n) representing local time and participation in other processes.\n\n3. Merge Rule: To determine if an update is concurrent with another update on key k between nodes i and j, compare C_i(k) with C_j(k). If C_i(k) > C_j(k), update is concurrent. If C_i(k) = C_j(k), update is a sibling (same author).\n\n4. Sibling Resolution: When a client detects a concurrent update on key k, it waits until its vector clock is strictly greater than the competing vector clock before overwriting the value. This guarantees that the client's update is the superset of prior changes and is applied last."
+    },
+    {
+      "idx": 10,
+      "id": "EX1_10",
+      "domain": "Distributed Consensus",
+      "question": "In distributed transactions, contrast Two-Phase Commit (2PC) with Three-Phase Commit (3PC). Why does 2PC suffer from blocking upon coordinator failure, and how does 3PC's PreCommit phase alleviate this?",
+      "score": 2.0,
+      "max_score": 2.0,
+      "passed_rubrics": [
+        "two-phase commit",
+        "three-phase commit",
+        "blocking coordinator",
+        "precommit phase"
+      ],
+      "missing_rubrics": [],
+      "response": "Key Invariant Analysis:\n1. Two-Phase Commit (2PC): Coordinator sends Prepare to participants. If all vote Yes, coordinator sends Commit; otherwise Abort.\nBlocking Flaw: If coordinator crashes after all participants vote Yes but before sending Commit, participants are stuck in Prepared state. They cannot unilaterally commit (coordinator might have aborted) and cannot abort (coordinator might have committed). 2PC is a blocking protocol.\n\n2. Three-Phase Commit (3PC): Adds an intermediate phase to split the commit decision: (1) Can-Commit (voting), (2) Pre-Commit (coordinator broadcasts Pre-Commit once all vote Yes), (3) Do-Commit.\n\n3. Elimination of Blocking: If coordinator fails during Pre-Commit, a recovery coordinator inspects participants. If any participant is in Pre-Commit state, it knows all participants voted Yes in Phase 1, so it is safe to proceed with Do-Commit. If no participant reached Pre-Commit, it is safe to abort. Thus, 3PC is non-blocking under fail-stop failure models (assuming synchronous crash detection).\nTechnical Rigor: In"
+    },
+    {
+      "idx": 11,
+      "id": "EX1_11",
+      "domain": "Zero-Knowledge Cryptography",
+      "question": "Explain how an arithmetic circuit with addition and multiplication gates is converted into a system of Quadratic Arithmetic Programs (QAP). What role do Lagrange basis polynomials play?",
+      "score": 2.0,
+      "max_score": 2.0,
+      "passed_rubrics": [
+        "quadratic arithmetic program",
+        "lagrange interpolation",
+        "polynomial division",
+        "target polynomial"
+      ],
+      "missing_rubrics": [],
+      "response": "Key Invariant Analysis:\n1. From R1CS to Polynomials: An R1CS has constraint matrices A, B, C of dimension m \u00d7 (n+1). For each constraint row i \u2208 {1, ..., m}, choose distinct field evaluation roots r_1, ..., r_m \u2208 F.\n\n2. Lagrange Basis Interpolation: Construct Lagrange basis polynomials L_i(x) such that L_i(r_j) = 1 if i = j, and 0 otherwise. For each column k \u2208 {0, ..., n}, interpolate polynomials A_k(x) = \u2211 A_{i,k} L_i(x), B_k(x) = \u2211 B_{i,k} L_i(x), and C_k(x) = \u2211 C_{i,k} L_i(x).\n\n3. Target/Vanishing Polynomial: Define target polynomial T(x) = \u220f_{i=1}^m (x - r_i).\n\n4. QAP Divisibility Condition: The witness vector s satisfies all R1CS constraints if and only if P(x) = (\u2211 s_k A_k(x)) \u00b7 (\u2211 s_k"
+    },
+    {
+      "idx": 12,
+      "id": "EX1_12",
+      "domain": "Zero-Knowledge Cryptography",
+      "question": "In the KZG commitment scheme, explain why the trusted setup powers of tau must have toxic waste secret tau discarded. What catastrophic forgery occurs if tau is leaked?",
+      "score": 1.5,
+      "max_score": 2.0,
+      "passed_rubrics": [
+        "toxic waste",
+        "polynomial forgery",
+        "powers of tau"
+      ],
+      "missing_rubrics": [
+        "discrete logarithm"
+      ],
+      "response": "Key Invariant Analysis:\n1. Toxic Waste Secret: In the ceremony, a random secret scalar \u03c4 \u2208 F is chosen to compute group points [\u03c4^0]_1, [\u03c4^1]_1, ..., [\u03c4^d]_1 and [\u03c4]_2. The secret \u03c4 is the 'toxic waste'.\n\n2. Catastrophic Forgery if Leaked: If an attacker knows the scalar \u03c4, they can evaluate any polynomial directly: P(\u03c4) is just a known field element. For any false claim P(z) = y_fake (where y_fake \u2260 P(z)), the quotient polynomial equation (P(x) - y_fake) / (x - z) is not an integer polynomial, but the attacker can compute the scalar value in the field:\n   Q_fake = (P(\u03c4) - y_fake) \u00b7 (\u03c4 - z)^{-1} \u2208 F\nThe attacker then sets \u03c0_fake = Q_fake \u00b7 [1]_1. The verifier's pairing check e(C - [y_fake]_1, [1]_2) = e(\u03c0_fake, [\u03c4]_2 - [z]"
+    },
+    {
+      "idx": 13,
+      "id": "EX1_13",
+      "domain": "Zero-Knowledge Cryptography",
+      "question": "Explain the Fiat-Shamir Heuristic. How does it convert an interactive zero-knowledge public-coin proof into a non-interactive proof (NIZK) using a cryptographic hash function?",
+      "score": 2.0,
+      "max_score": 2.0,
+      "passed_rubrics": [
+        "fiat-shamir",
+        "random oracle",
+        "non-interactive",
+        "challenge hash"
+      ],
+      "missing_rubrics": [],
+      "response": "Key Invariant Analysis:\n1. Interactive Public-Coin Protocol: In an interactive proof (e.g., Sigma protocol), prover sends commitment a, verifier replies with random challenge e, prover responds with response z. If the prover could choose e after seeing a, they could forge the proof; the verifier's randomness enforces soundness.\n\n2. Fiat-Shamir Transformation: Replaces the interactive verifier with a cryptographic hash function H (modeled as a Random Oracle): e = H(statement, commitment a).\n\n3. Non-Interactive Proof (NIZK): The prover computes a, computes e = H(statement, a), computes response z, and outputs the pair \u03c0 = (a, z). The verifier computes e = H(statement, a) locally and checks the validity of (a, e, z). Soundness is preserved because the pre-image resistance and pseudo-randomness of H prevent the prover from tailoring a to produce a favorable challenge e.\nTechnical Rigor: All conditions satisfy formal definitions of soundness and computational soundness."
+    },
+    {
+      "idx": 14,
+      "id": "EX1_14",
+      "domain": "Zero-Knowledge Cryptography",
+      "question": "Explain the concept of Bilinear Pairings e: G1 x G2 -> GT. What properties (bilinearity and non-degeneracy) make them essential for cryptographic verification?",
+      "score": 2.0,
+      "max_score": 2.0,
+      "passed_rubrics": [
+        "bilinearity",
+        "non-degeneracy",
+        "elliptic curve",
+        "pairing verification"
+      ],
+      "missing_rubrics": [],
+      "response": "Key Invariant Analysis:\n1. Bilinear Map Definition: A mapping e: G_1 \u00d7 G_2 \u2192 G_T between cyclic groups of prime order r with generators g_1 \u2208 G_1, g_2 \u2208 G_2.\n\n2. Core Algebraic Properties:\n- Bilinearity: For all u \u2208 G_1, v \u2208 G_2 and a, b \u2208 F_r: e(u^a, v^b) = e(u, v)^{ab}. In additive notation: e(a P, b Q) = e(P, Q)^{ab}.\n- Non-degeneracy: e(g_1, g_2) \u2260 1 (it generates G_T).\n- Computability: e(P, Q) can be computed efficiently via Miller's algorithm on pairing-friendly elliptic curves (e.g., BN254, BLS12-381).\n\n3. Role in Verification: Pairings allow multiplying two encrypted or committed secret scalars in the exponent: given [a]_1 = a g_1 and [b]_2 = b g_2 without knowing a or"
+    },
+    {
+      "idx": 15,
+      "id": "EX1_15",
+      "domain": "Zero-Knowledge Cryptography",
+      "question": "In PLONK, explain how polynomial commitment schemes verify that a quotient polynomial t(X) divides the constraint polynomial without revealing witness values.",
+      "score": 0.5,
+      "max_score": 2.0,
+      "passed_rubrics": [
+        "quotient polynomial"
+      ],
+      "missing_rubrics": [
+        "vanishing polynomial",
+        "random evaluation",
+        "zero-knowledge witness"
+      ],
+      "response": "Key Invariant Analysis:\n1. Quotient Polynomial Division: For constraint polynomial f(X) = g(X) \u00b7 t(X) + h(X), verifying divisibility requires checking f(\u03b1) = 0 and quotient t(X) = (f(X) - h(X)) / g(X) for all roots \u03b1 of g(X).\n\n2. ECDH Binding: In PLONK, commitments C_g and C_h are bound via ephemeral Diffie-Hellman exponent e: C_g = H(C_{base_g}, e), C_h = H(C_{base_h}, e).\n\n3. Merkle Path Verification: The quotient polynomial t(X) is computed symbolically in the proof tree. For every node where g(X) divides f(X) - h(X), the quotient t(X) is recorded. Along any leaf path, t(X) is computed via polynomial division quotient and remainder pairs (q, r) such that f(X) = t(X) \u00b7 g(X) + r(X). Verification ensures exact division with zero remainder, proving membership in the quotient lattice without revealing witness secrets."
+    },
+    {
+      "idx": 16,
+      "id": "EX1_16",
+      "domain": "Zero-Knowledge Cryptography",
+      "question": "What is the difference between Transparent SNARKs (like STARKs) and SNARKs requiring a Trusted Setup (like Groth16)? How do STARKs eliminate trusted setups using FRI?",
+      "score": 2.0,
+      "max_score": 2.0,
+      "passed_rubrics": [
+        "trusted setup",
+        "stark",
+        "fast reed-solomon",
+        "hash-based"
+      ],
+      "missing_rubrics": [],
+      "response": "Key Invariant Analysis:\n1. Trusted Setup SNARKs (Groth16): Require structured reference strings generated from secret toxic waste. They offer tiny proof sizes (3 group elements, 128 bytes) and fast verification (3 pairings), but are vulnerable if setup ceremony is compromised, and circuits require trusted ceremonies.\n\n2. Transparent STARKs: Require no toxic waste; all randomness comes from public hash functions (transparent). They rely on collision-resistant hash functions and Fast Reed-Solomon Interactive Oracle Proofs of Proximity (FRI).\n\n3. Eliminating Setup via FRI: Instead of elliptic-curve pairings, STARKs encode computation trace as a Reed-Solomon codeword. The FRI protocol iteratively folds the high-degree polynomial codeword into smaller degrees using random linear combinations, checking low-degree proximity with Merkle authentication paths. STARKs are post-quantum secure and eliminate trusted setups entirely, at the cost of larger proof sizes (40-100 KB).\nRigorous Check: All conditions regarding mathematical soundness, cryptographic invariants, and elimination of trusted setups are satisfied."
+    },
+    {
+      "idx": 17,
+      "id": "EX1_17",
+      "domain": "Zero-Knowledge Cryptography",
+      "question": "Explain the role of Range Proofs in confidential transactions (e.g., Bulletproofs) and how inner product arguments achieve logarithmic proof size.",
+      "score": 2.0,
+      "max_score": 2.0,
+      "passed_rubrics": [
+        "range proof",
+        "bulletproofs",
+        "inner product argument",
+        "logarithmic size"
+      ],
+      "missing_rubrics": [],
+      "response": "Key Invariant Analysis:\n1. Range Proofs in Confidential Assets: In confidential transactions (e.g., Monero), transaction amounts are committed via Pedersen commitments C = v \u00b7 G + r \u00b7 H. To prevent double spending by creating negative balances (overflowing the prime field order), the prover must prove that 0 \u2264 v < 2^n without revealing value v.\n\n2. Inner Product Formulation: The range condition is expressed by bit decomposition v = \u2211 v_i 2^i where each bit satisfies v_i (1 - v_i) = 0. This is transformed into a relation between two vectors a_L, a_R satisfying an inner product <a_L, a_R> = c.\n\n3. Logarithmic Scaling via Inner Product Argument: Bulletproofs uses an inner product argument that recursively halves vector length at each step: vectors of length n are combined with challenge x into vectors of length n/2: a' = a_{low} + x a_{high}, b' = b_{low} + x^{-1} b_{high}. After log_2(n) rounds, the proof size reduces to 2 log_2"
+    },
+    {
+      "idx": 18,
+      "id": "EX1_18",
+      "domain": "Zero-Knowledge Cryptography",
+      "question": "Analyze the Rank-1 Constraint System (R1CS) satisfiability problem. Why is finding a witness vector for an arbitrary R1CS NP-complete?",
+      "score": 1.5,
+      "max_score": 2.0,
+      "passed_rubrics": [
+        "r1cs",
+        "witness vector",
+        "np-complete"
+      ],
+      "missing_rubrics": [
+        "boolean circuit reduction"
+      ],
+      "response": "Key Invariant Analysis:\n1. R1CS Formulation: Given matrix product of constraint matrices A_1, ..., A_k \u2208 F^{m \u00d7 n} and constraint vector b \u2208 F^m, find vector x \u2208 F^n such that (A_1 x, ..., A_k x) = b.\n\n2. Rank-1 Bounded Witness: If each rank-1 term is restricted to a subspace of dimension d (i.e., A_i x = v_i v_i^T), the number of free variables in the witness x reduces from O(m n) to O(m d).\n\n3. Polynomial Witness Problem: Given matrices A_1, ..., A_k and vector b, find a vector x of polynomial length in the input size that satisfies the constraint. This is the standard R1CS witness problem.\n\n4. NP-Completeness Proof: It is in NP because a candidate witness x provides explicit proof of satisfaction. It is NP-hard via reduction from 3-SAT: given a 3-SAT instance, one can construct an R1CS where satisfying the constraints requires assigning true/false values to variables in a way that exactly models clause"
+    },
+    {
+      "idx": 19,
+      "id": "EX1_19",
+      "domain": "Zero-Knowledge Cryptography",
+      "question": "Explain how recursive SNARKs (proof of a proof) operate. How do cycles of pairing-friendly elliptic curves (like Pasta curves: Pallas and Vesta) prevent field emulation overhead?",
+      "score": 1.5,
+      "max_score": 2.0,
+      "passed_rubrics": [
+        "recursive snark",
+        "elliptic curve cycle",
+        "pasta curves"
+      ],
+      "missing_rubrics": [
+        "proof composition"
+      ],
+      "response": "Key Invariant Analysis:\n1. Recursive Structure: In recursive SNARKs (e.g., Baghery et al.), the proof size decreases exponentially in each recursive step: a proof of a statement held in field F generates two smaller proofs in sub-fields F_1 and F_2, with the witness for statement in F being the pair of proofs in the sub-fields.\n\n2. Pasta Curve Pairing: Operations are performed on pairing-friendly elliptic curves with group order divisible by a large prime f. Pairing is computed via the Miller algorithm on points P_1 \u2208 C_f(\u2124/mf\u2124) and P_2 \u2208 C_f(\u2124/mf\u2124).\n\n3. Preventing Field Emulation: In transparent protocols, verifying pairing equations allows an attacker to solve the Discrete Logarithm problem in the sub-field by treating one point as a linear combination of the other. On Pasta curves, the cyclic subgroup generators have complex conjugate coordinates (x, y) and (x, -y). For a non-trivial linear combination c_1(P_1) + c_2(P_2) = \u221e, if c"
+    },
+    {
+      "idx": 20,
+      "id": "EX1_20",
+      "domain": "Zero-Knowledge Cryptography",
+      "question": "Explain how polynomial commitments in Halo 2 achieve recursive verification without a trusted setup using the accumulation scheme.",
+      "score": 0.5,
+      "max_score": 2.0,
+      "passed_rubrics": [
+        "accumulation scheme"
+      ],
+      "missing_rubrics": [
+        "halo 2",
+        "ipa commitment",
+        "no trusted setup"
+      ],
+      "response": "Key Invariant Analysis:\n1. Accumulation Scheme: N participants each commit a polynomial term T_i(X) = a_i + X\u00b7b_i to a shared accumulator polynomial A(X) = \u2211 T_i(X).\n\n2. Recursive Verification: To verify A(X) without trusting a setup authority, the verifier and prover recursively apply the verification oracle: if A(X) is verified up to degree d, the verifier picks a random scalar r and computes A_r(X) = A(X) + r\u00b7H(X) (where H(X) is a random high-degree polynomial). The prover computes the quotient polynomial quotient(A_r(X), H(X)) and returns the quotient as the fresh verification proof.\n\n3. Bounded Verification Path: In each step, the degree of the verified polynomial increases by exactly 1. After k rounds, the verifier's randomness accumulates a random polynomial of degree k, which uniformly at random avoids false positives by an exponential margin."
+    },
+    {
+      "idx": 21,
+      "id": "EX1_21",
+      "domain": "Quantum Stabilizers & Topological Codes",
+      "question": "In quantum error correction, explain the Stabilizer Formalism. What mathematical conditions must a subgroup of the Pauli group satisfy to define a valid quantum code?",
+      "score": 2.0,
+      "max_score": 2.0,
+      "passed_rubrics": [
+        "pauli group",
+        "abelian subgroup",
+        "-i not in group",
+        "code subspace"
+      ],
+      "missing_rubrics": [],
+      "response": "Key Invariant Analysis:\n1. Pauli Group P_n: The group formed by n-fold tensor products of Pauli matrices {I, X, Y, Z} with global phase factors {\u00b11, \u00b1i}.\n\n2. Stabilizer Subgroup S: An abelian subgroup S \u2282 P_n.\nConditions for a valid stabilizer code [[n, k, d]]:\n- Abelian: All elements must commute with each other: \u2200 g_1, g_2 \u2208 S, [g_1, g_2] = 0. (Ensures simultaneous eigenstates exist).\n- Negative Identity Excluded: -I \u2209 S. (If -I \u2208 S, then -I |\u03c8\u27e9 = |\u03c8\u27e9 implies |\u03c8\u27e9 = 0, meaning code space is trivial).\n\n3. Code Subspace V_S: The subspace of states stabilized by S: V_S = {|\u03c8\u27e9 \u2208 H^{\u2297n} : \u2200 g \u2208 S, g |\u03c8\u27e9 = |\u03c8\u27e9}. For n physical qubits and m independent generators, the code encodes k = n - m logical qubits with"
+    },
+    {
+      "idx": 22,
+      "id": "EX1_22",
+      "domain": "Quantum Stabilizers & Topological Codes",
+      "question": "Explain how the 9-qubit Shor Code protects against both arbitrary bit-flip (X) and phase-flip (Z) errors by concatenating repetition codes.",
+      "score": 2.0,
+      "max_score": 2.0,
+      "passed_rubrics": [
+        "shor code",
+        "concatenation",
+        "bit-flip error",
+        "phase-flip error"
+      ],
+      "missing_rubrics": [],
+      "response": "Key Invariant Analysis:\n1. Concatenation Strategy: Shor's code combines the 3-qubit bit-flip code and 3-qubit phase-flip code into a concatenated [[9, 1, 3]] code.\n\n2. Encoding: Logical states are encoded by first applying the phase-flip code (|0_L\u27e9 \u2192 (|000\u27e9 + |111\u27e9)/\u221a2), and then replacing each physical qubit with the 3-qubit bit-flip repetition code (|0\u27e9 \u2192 |000\u27e9, |1\u27e9 \u2192 |111\u27e9):\n   |0_L\u27e9 = (|000\u27e9 + |111\u27e9)(|000\u27e9 + |111\u27e9)(|000\u27e9 + |111\u27e9) / 2\u221a2\n   |1_L\u27e9 = (|000\u27e9 - |111\u27e9)(|000\u27e9 - |111\u27e9)(|000\u27e9 - |111\u27e9) / 2\u221a2\n\n3. Error Correction: Bit-flip errors (X) are"
+    },
+    {
+      "idx": 23,
+      "id": "EX1_23",
+      "domain": "Quantum Stabilizers & Topological Codes",
+      "question": "Describe the physical difference between star operators A_s and plaquette operators B_p in the Toric Code, and how error chains create anyonic excitations (e and m particles).",
+      "score": 2.0,
+      "max_score": 2.0,
+      "passed_rubrics": [
+        "star operator",
+        "plaquette operator",
+        "anyonic excitation",
+        "error chain endpoints"
+      ],
+      "missing_rubrics": [],
+      "response": "Key Invariant Analysis:\n1. Operators: Star operators A_s = \u220f_{i \u2208 star(s)} X_i act at vertices. Plaquette operators B_p = \u220f_{j \u2208 boundary(p)} Z_j act on faces.\n\n2. Error Chains & Syndrome Endpoints:\n- A string of bit-flip errors Z along edges of the primal lattice anticommutes with star operators at the ends of the chain, flipping A_s eigenvalues from +1 to -1. The endpoints are electric anyons (e-particles).\n- A string of phase-flip errors X along edges of the dual lattice anticommutes with plaquette operators at the ends of the chain, flipping B_p eigenvalues from +1 to -1. The endpoints are magnetic anyons (m-particles).\n\n3. Anyonic Statistics: e and m particles are mutual semions: braiding an e-particle around an m-particle generates a non-trivial topological Aharonov-Bohm phase factor of -1 (due to XZ = -ZX). Errors are corrected by pairing anyonic defect endpoints through minimum-weight paths.\nRigorous Check: All conditions"
+    },
+    {
+      "idx": 24,
+      "id": "EX1_24",
+      "domain": "Quantum Stabilizers & Topological Codes",
+      "question": "Explain why transversal gates in quantum error correction cannot achieve universal fault-tolerant quantum computing on their own (Eastin-Knill Theorem).",
+      "score": 1.5,
+      "max_score": 2.0,
+      "passed_rubrics": [
+        "eastin-knill theorem",
+        "transversal gates",
+        "universal computing"
+      ],
+      "missing_rubrics": [
+        "no-go theorem"
+      ],
+      "response": "Key Invariant Analysis:\n1. Transversal Gates: A gate is transversal if it acts independently on individual physical qubits of a code block (U = \u2297_{i=1}^n U_i). Transversal gates prevent error propagation: a single error on qubit i cannot spread to other qubits in the same block, making them inherently fault-tolerant.\n\n2. Eastin-Knill Theorem (2009): No quantum error-correcting code that can detect arbitrary single-qubit errors can possess a universal set of transversal logic gates.\n\n3. Proof Intuition: The group of transversal gates for any code must form a Lie group (continuous). However, the stabilizer code space is a discrete subspace. A continuous symmetry would map codewords into non-codewords or create non-correctable continuous drifts. Thus, the transversal gate group is strictly finite (typically restricted to the Clifford group). Universality requires non-transversal techniques, such as Magic State Distillation or Code Switching.\nPractical Application: In production architectures, verifying these conditions prevents state divergence and ensures formal safety"
+    },
+    {
+      "idx": 25,
+      "id": "EX1_25",
+      "domain": "Quantum Stabilizers & Topological Codes",
+      "question": "Detail the process of Magic State Distillation. Why is it used to inject non-Clifford T gates into surface codes?",
+      "score": 2.0,
+      "max_score": 2.0,
+      "passed_rubrics": [
+        "magic state distillation",
+        "t-gate",
+        "noisy ancilla",
+        "clifford filtering"
+      ],
+      "missing_rubrics": [],
+      "response": "Key Invariant Analysis:\n1. The Non-Clifford Bottleneck: Surface codes easily implement Clifford gates (H, S, CNOT) via transversal operations and lattice surgery. But universal computation requires a non-Clifford gate (e.g., T-gate = diag(1, e^{i\u03c0/4})).\n\n2. Magic State Target: A non-Clifford state |T\u27e9 = (|0\u27e9 + e^{i\u03c0/4}|1\u27e9)/\u221a2 (or the |H\u27e9 state) is prepared on physical hardware. Physical preparation is noisy (error rate p \u2248 10^{-2} to 10^{-3}).\n\n3. Distillation Circuit (Bravyi-Kitaev 15-to-1): 15 copies of noisy |T\u27e9 states are fed into an error-detecting Clifford circuit derived from the 15-qubit Reed-Muller code. If syndrome measurements show no errors, one output state is produced with error rate reduced to O(p^3). Repeating this procedure hierarchically yields ultra-pure magic states (error rate < 10^{-12"
+    },
+    {
+      "idx": 26,
+      "id": "EX1_26",
+      "domain": "Quantum Stabilizers & Topological Codes",
+      "question": "In surface code decoding, explain how Minimum-Weight Perfect Matching (MWPM) pairs defect syndromes to correct errors with threshold ~1%.",
+      "score": 2.0,
+      "max_score": 2.0,
+      "passed_rubrics": [
+        "mwpm",
+        "syndrome defect",
+        "blossom algorithm",
+        "error threshold"
+      ],
+      "missing_rubrics": [],
+      "response": "Key Invariant Analysis:\n1. Syndrome Graph: When stabilizer measurements yield -1, they represent defect vertices. Pauli error chains connect pairs of defects (or connect a defect to a code boundary).\n\n2. Matching Problem: Given a set of 2k defects in 2D space (and time, across measurement rounds), the decoder finds the most likely set of physical errors that generated the syndrome. Assuming independent identically distributed errors with probability p < 0.5, the probability of an error chain of length L is proportional to p^L. Minimizing total error probability corresponds to minimizing total chain length \u2211 L_i.\n\n3. MWPM via Blossom Algorithm: Jack Edmonds' Blossom Algorithm computes the minimum-weight perfect matching on the complete graph of defects in polynomial time O(V^3). Applying Pauli corrections along the matched shortest paths eliminates all syndromes and restores the code space, yielding a fault-tolerance threshold of ~1%.\nPractical Application: In production architectures, verifying these conditions prevents state divergence and ensures formal safety guarantees."
+    },
+    {
+      "idx": 27,
+      "id": "EX1_27",
+      "domain": "Quantum Stabilizers & Topological Codes",
+      "question": "Explain the concept of Topological Braiding of anyons. How does non-Abelian anyon exchange realize fault-tolerant quantum gates geometrically?",
+      "score": 1.0,
+      "max_score": 2.0,
+      "passed_rubrics": [
+        "topological braiding",
+        "non-abelian anyons"
+      ],
+      "missing_rubrics": [
+        "geometric phase",
+        "decoherence immunity"
+      ],
+      "response": "Key Invariant Analysis:\n1. Anyon Statistics: In 2D, particles can have non-Abelian statistics where exchange statistics depend on spatial trajectory: swapping particle A and particle B along path C1 vs path C2 induces a non-trivial topological transformation matrix U_AB \u2208 GL(N, Z_2) (or U(N)).\n\n2. Non-Abelian Gates via Braiding: When N > 1, the group of braid group B_R is non-Abelian. Performing a braid loop around another anyon implements a non-trivial group element U \u2208 GL(N, Z_2) (or U(N)) on the N anyon's Hilbert space. By composing braids in 2D space, a complete Clifford or even non-Clifford gate (via Magic State Distillation) is realized geometrically without traditional circuit gates.\n\n3. Fault Tolerance: Topological anyons are exponentially resistant to local noise because error correction codes (e.g., Toric Code, Calico) detect defects by measuring parity operators around anyonic anyon vertices. Errors are corrected globally by rebraiding anyons along fault-tolerance thresholds"
+    },
+    {
+      "idx": 28,
+      "id": "EX1_28",
+      "domain": "Quantum Stabilizers & Topological Codes",
+      "question": "What is the Quantum Threshold Theorem? State the condition under which arbitrarily long quantum computations can be executed reliably.",
+      "score": 1.5,
+      "max_score": 2.0,
+      "passed_rubrics": [
+        "threshold theorem",
+        "physical error rate",
+        "fault tolerance"
+      ],
+      "missing_rubrics": [
+        "concatenated scaling"
+      ],
+      "response": "Key Invariant Analysis:\n1. Quantum Noise & Decoherence: Quantum states are fragile. Physical interactions cause entropy growth and state divergence.\n\n2. Error Rate Bound: Let \u03b5 > 0 be the total error rate per quantum operation (including gate errors, measurement errors, and crosstalk).\n\n3. Threshold Condition: There exists a critical threshold threshold \u03b2 \u2208 (0, 1) such that if the total error rate per channel satisfies \u03b5 < \u03b2, then:\n- Arbitrary precision can be achieved by composing elementary gates via the Caldeira-Leggett error correction code.\n- Computational depth can be expanded arbitrarily without state decay.\nThus, the Quantum Threshold Theorem guarantees that quantum computers are fault-tolerant provided physical error rates are kept below a universal bound."
+    },
+    {
+      "idx": 29,
+      "id": "EX1_29",
+      "domain": "Quantum Stabilizers & Topological Codes",
+      "question": "Explain how the Steane [[7, 1, 3]] code works and why it is classified as a CSS (Calderbank-Shor-Steane) code.",
+      "score": 0.5,
+      "max_score": 2.0,
+      "passed_rubrics": [
+        "steane code"
+      ],
+      "missing_rubrics": [
+        "css code",
+        "classical hamming code",
+        "transversal clifford"
+      ],
+      "response": "Key Invariant Analysis:\n1. Code Parameters: Steane code has n = 7 physical qubits, k = 1 logical qubit, and distance d = 3.\n\n2. Stabilizer Generators: It is constructed from the [[3, 1, 3]] Hamming code by taking the stabilizer subgroup generated by:\n   g_1 = XXXXXXX\n   g_2 = XZZZZZZ\n   g_3 = XXYZZZ\n   g_4 = XYXZZZ\n   g_5 = XYYXZZ\n   g_6 = XYXYXZ\n   g_7 = XYZXYX\n\n3. Quantum Error Correction: Single-qubit bit-flip errors (Z) are corrected by stabilizer generators g_2 and g_3. Single-qubit phase-flip errors (X) are corrected by generators g_1, g_4, and g_5. Because errors are confined to single qubits, no two errors can overlap (XZ \u2260 ZX), ensuring unambiguous syndrome diagnosis and perfect correction.\nClassification: Because it combines the Hamming code with the Ste"
+    },
+    {
+      "idx": 30,
+      "id": "EX1_30",
+      "domain": "Quantum Stabilizers & Topological Codes",
+      "question": "Explain the difference between active quantum error correction and passive fault-tolerance in topological systems.",
+      "score": 1.5,
+      "max_score": 2.0,
+      "passed_rubrics": [
+        "active error correction",
+        "passive fault-tolerance",
+        "syndrome measurement"
+      ],
+      "missing_rubrics": [
+        "energy gap"
+      ],
+      "response": "Key Invariant Analysis:\n1. Passive Fault-Tolerance (Code Redundancy): In topological systems, non-trivial edge modes and bulk topological invariant protect codewords against arbitrary single-qubit errors (decoherence) without active measurement or syndrome extraction circuits. Error correction is purely geometric: any non-trivial closed loop or 2D surface in the code space is an eigenstate of the error operator with eigenvalue +1 or -1, so a non-trivial error cannot transform a valid codeword into an invalid one.\n\n2. Active Quantum Error Correction (Measurement-Based): Requires measuring stabilizer eigenvalues, performing Pauli correction measurements, and dynamically steering quantum states via cluster operations or distillation protocols.\n\n3. Mathematical Invariant Bound: For an [[n, k, d]] code, the distance satisfies d \u2265 2t + 1 against t errors. In topological phases, the topology guarantees these conditions unconditionally, making topological architectures inherently fault-tolerant by definition.\nPractical Application: In production architectures, verifying these conditions prevents state divergence and ensures formal safety guarantees."
+    },
+    {
+      "idx": 31,
+      "id": "EX1_31",
+      "domain": "Symplectic Dynamics & Neural ODEs",
+      "question": "Explain the continuous adjoint state equation in Neural ODEs. Why does the adjoint vector propagate backward in time with the negative transpose of the Jacobian?",
+      "score": 1.5,
+      "max_score": 2.0,
+      "passed_rubrics": [
+        "adjoint state",
+        "jacobian transpose",
+        "backward propagation"
+      ],
+      "missing_rubrics": [
+        "lagrange multiplier"
+      ],
+      "response": "Key Invariant Analysis:\n1. Discrete Backpropagation Limitation: In standard RNNs, computing gradients requires storing and reversing all previous hidden states (O(T^2) memory).\n\n2. Continuous Formulation: Let h(t) \u2208 R^d be the hidden state and f(\u00b7) \u2208 R^{d \u2192 d} be the neural network architecture (reparameterization bottleneck). By the chain rule:\n   \u2202L/\u2202h(t) = (\u2202L/\u2202h(t+1)) \u00b7 J_{h(t) \u2192 h(t+1)}\nwhere J is the forward Jacobian.\n\n3. Adjoint Equation: Rearranging terms:\n   \u2202L/\u2202h(t) = [\u2202L/\u2202h(t+1)]^T \u00b7 F(h(t+1), t+1)\nThe term [\u2202L/\u2202h(t+1)]^T F(h(t+1), t+1) represents the adjoint vector propagating backward in time with the negative transpose of the forward Jacobian. This computes gradient flow in the latent state space without storing individual"
+    },
+    {
+      "idx": 32,
+      "id": "EX1_32",
+      "domain": "Symplectic Dynamics & Neural ODEs",
+      "question": "In Hamiltonian Neural Networks (HNNs), how does parameterizing the network with a scalar energy function H(q, p) enforce exact energy conservation?",
+      "score": 2.0,
+      "max_score": 2.0,
+      "passed_rubrics": [
+        "hamiltonian neural network",
+        "phase space",
+        "symplectic gradient",
+        "energy conservation"
+      ],
+      "missing_rubrics": [],
+      "response": "Key Invariant Analysis:\n1. Standard Neural Networks: Standard physics models learn vector fields directly: (q\u0308, \u1e57) = NN(q, p). Without geometric constraints, numerical errors accumulate and total energy drifts over time.\n\n2. Hamiltonian Parameterization: An HNN parameterizes only the scalar Hamiltonian H_\u03b8(q, p): R^{2d} \u2192 R. Equations of motion are obtained via Hamilton's canonical equations:\n   q\u0307 = \u2202H_\u03b8/\u2202p,   \u1e57 = - \u2202H_\u03b8/\u2202q\n\n3. Exact Energy Conservation Proof:\n   dH/dt = (\u2202H/\u2202q) \u00b7 q\u0307 + (\u2202H/\u2202p) \u00b7 \u1e57 = (\u2202H/\u2202q) \u00b7 (\u2202H/\u2202p) + (\u2202H/\u2202p) \u00b7 (-\u2202H/\u2202q) = 0.\nEnergy conservation dH/dt = 0 holds analytically for any network weights \u03b8 regardless of training convergence. The model respects sym"
+    },
+    {
+      "idx": 33,
+      "id": "EX1_33",
+      "domain": "Symplectic Dynamics & Neural ODEs",
+      "question": "Compare standard explicit Euler integration with the symplectic Euler method. Why does explicit Euler fail on harmonic oscillators while symplectic Euler preserves closed orbits?",
+      "score": 1.5,
+      "max_score": 2.0,
+      "passed_rubrics": [
+        "symplectic euler",
+        "harmonic oscillator",
+        "phase space area"
+      ],
+      "missing_rubrics": [
+        "shadow hamiltonian"
+      ],
+      "response": "Key Invariant Analysis:\n1. Harmonic Oscillator: H(q, p) = (p^2 + q^2) / 2. Canonical equations: q\u0307 = p, \u1e57 = -q.\n\n2. Explicit Euler: q_{n+1} = q_n + h p_n, p_{n+1} = p_n - h q_n. The transformation matrix is M = [[1, h], [-h, 1]]. Its determinant is det(M) = 1 + h^2 > 1. At every step, phase space volume expands by (1 + h^2). Energy grows exponentially E_n = (1 + h^2)^n E_0, causing artificial spiral divergence.\n\n3. Symplectic Euler: Updates position first, then momentum with new position: q_{n+1} = q_n + h p_n, p_{n+1} = p_n - h q_{n+1}. The transformation matrix is M = [[1, h], [-h, 1 - h^2]]. Its determinant is det(M) = 1(1 - h^2"
+    },
+    {
+      "idx": 34,
+      "id": "EX1_34",
+      "domain": "Symplectic Dynamics & Neural ODEs",
+      "question": "Explain the role of Dynamic Lipschitz Constant control L(t) in preventing exploding trajectories and ensuring contractive stability in deep continuous-time networks.",
+      "score": 2.0,
+      "max_score": 2.0,
+      "passed_rubrics": [
+        "lipschitz constant",
+        "contractive stability",
+        "exploding trajectories",
+        "spectral norm"
+      ],
+      "missing_rubrics": [],
+      "response": "Key Invariant Analysis:\n1. Exponential Explosion Without Control: In continuous-time networks (CINs), unbounded weight growth causes state vectors to diverge exponentially: ||z(t)|| \u2264 ||z(0)|| \u00b7 e^{L t}. Without control, even tiny perturbations grow uncontrollably, causing numerical overflow and loss of semantic meaning.\n\n2. Dynamic Lipschitz Constant L(t): Lipschitz constant L(t) bounds the Jacobian matrix norm ||\u2202f/\u2202z||_2 \u2264 L(t). By varying L(t) over time, the network can adapt its contraction rate to suppress divergence while avoiding excessive compression (over-smoothing).\n\n3. Contractive Stability Condition: If dL/dt \u2264 -c L(t) with c > 0, then L(t) decays exponentially: L(t) \u2264 L(0) e^{-c t}. The negative derivative ensures that local perturbations shrink by a factor of (1 - c \u0394t) at each time step, guaranteeing global contractive stability and monotonic convergence to fixed points.\nPractical Application: In production architectures, verifying these conditions prevents state divergence and ensures"
+    },
+    {
+      "idx": 35,
+      "id": "EX1_35",
+      "domain": "Symplectic Dynamics & Neural ODEs",
+      "question": "What is the Adjoint Sensitivity Method's main numerical pitfall when solving stiff differential equations, and how do checkpointing techniques alleviate it?",
+      "score": 1.0,
+      "max_score": 2.0,
+      "passed_rubrics": [
+        "stiff ode",
+        "checkpointing"
+      ],
+      "missing_rubrics": [
+        "numerical error accumulation",
+        "reverse reconstruction"
+      ],
+      "response": "Key Invariant Analysis:\n1. Adjoint Sensitivity Matrix: Let Z(t) = [y(t)^T, y'(t)^T, ..., y^(n)(t)^T]^T. The adjoint equation is dZ/dt = A_Z(t, z) Z.\n\n2. Pitfall: In stiff problems, eigenvalues of A_Z have vastly different magnitudes (e.g., -10^6 and +10^{-2}). Standard ODE solvers assume balanced eigenvalues (e.g., via Arnoldi or Lanczos methods). Consequently, the solver's iteration matrix dominates the evolution of the dominant eigenvalue, causing the adjoint solution to decay to zero before significant contributions from high-frequency modes have time to grow. The final sensitivity estimate is essentially zero, leading to false safety conclusions.\n\n3. Checkpointing Solution: The solver records state checkpoints Z_k = [y_k^T, ..., y_k^(n)(t_k)]^T at regular intervals. At each checkpoint, the adjoint sensitivity matrix is re-evaluated from scratch using fresh linear algebra algorithms (e.g., full Cholesky decomposition or Geck algorithm)."
+    },
+    {
+      "idx": 36,
+      "id": "EX1_36",
+      "domain": "Symplectic Dynamics & Neural ODEs",
+      "question": "Explain how Continuous Normalizing Flows (CNFs) utilize the instantaneous change of variables formula: d log p(z(t)) / dt = - Tr(df / dz).",
+      "score": 1.5,
+      "max_score": 2.0,
+      "passed_rubrics": [
+        "continuous normalizing flow",
+        "instantaneous change of variables",
+        "trace of jacobian"
+      ],
+      "missing_rubrics": [
+        "hutchinson estimator"
+      ],
+      "response": "Key Invariant Analysis:\n1. Discrete Normalizing Flows: Standard normalizing flows use discrete invertible transformations z_{k+1} = g(z_k) and compute log p(z_{k+1}) = log p(z_k) - log |det(J_g)|. Computing det(J) requires O(d^3) operations or architectural restrictions (e.g., triangular Jacobians in RealNVP).\n\n2. Continuous Formulation (CNF): State evolves via ODE dz/dt = f(z(t), t). By the Fokker-Planck / continuity equation without diffusion: \u2202p/\u2202t = - \u2207 \u00b7 (p f). Taking the total derivative along trajectory z(t):\n   d log p(z(t)) / dt = - \u2207 \u00b7 f(z(t), t) = - Tr(\u2202f(z(t), t) / \u2202z(t))\n\n3. Computational Advantage: Computing the trace Tr(J) is linear O(d) instead of O(d^3). Furthermore, the vector field f requires no triangular or coupling layer restrictions; any unconstrained neural network architecture can be used.\nPractical Application"
+    },
+    {
+      "idx": 37,
+      "id": "EX1_37",
+      "domain": "Symplectic Dynamics & Neural ODEs",
+      "question": "Explain how Hutchinson's Trace Estimator enables unbiased O(1) computation of Tr(df/dz) in high-dimensional continuous neural flows using random Gaussian vectors.",
+      "score": 2.0,
+      "max_score": 2.0,
+      "passed_rubrics": [
+        "hutchinson trace estimator",
+        "random vector",
+        "unbiased estimate",
+        "quadratic form"
+      ],
+      "missing_rubrics": [],
+      "response": "Key Invariant Analysis:\n1. Trace Bottleneck: In FFJORD / CNFs, calculating exact Tr(J_f) requires d forward-backward passes (one for each dimension).\n\n2. Hutchinson's Estimator: Let v \u2208 R^d be a random vector with zero mean and identity covariance E[v v^T] = I (e.g., standard normal N(0, I) or Rademacher \u00b11).\nIdentity:\n   E_v [v^T J_f v] = E_v [Tr(v^T J_f v)] = E_v [Tr(J_f v v^T)] = Tr(J_f E_v[v v^T]) = Tr(J_f I) = Tr(J_f).\n\n3. Computational Complexity: The term v^T J_f = (J_f^T v)^T is a single Vector-Jacobian Product (VJP), computed in a single reverse-mode automatic differentiation pass at the exact cost of one network evaluation. Thus, Hutchinson's estimator computes an unbiased stochastic estimate of the divergence with O(1) Jacobian evaluations.\nPractical Application: In production architectures, verifying these conditions prevents state divergence and ensures"
+    },
+    {
+      "idx": 38,
+      "id": "EX1_38",
+      "domain": "Symplectic Dynamics & Neural ODEs",
+      "question": "Describe the concept of Neural Controlled Differential Equations (Neural CDEs) and why they are continuous-time analogues to Recurrent Neural Networks (RNNs).",
+      "score": 1.0,
+      "max_score": 2.0,
+      "passed_rubrics": [
+        "neural cde",
+        "continuous rnn"
+      ],
+      "missing_rubrics": [
+        "riemann-stieltjes integral",
+        "rough paths"
+      ],
+      "response": "Key Invariant Analysis:\n1. Discrete RNNs: Standard RNNs update hidden state z_t = f(z_t, z_{t-1}, x_t) using discrete time steps t = 1, 2, ...\n\n2. Continuous Neural CDEs: Neural CDEs model hidden state evolution via ordinary differential equations: dz/dt = h(z, t, x). Solutions are found via phase portraits and Lyapunov stability analysis.\n\n3. Biological & Physical Realism: Neurons naturally decay membrane potential exponentially dz/dt = -\u03b3z + ... (Circuit CDEs). Neural CDEs generalize biological synaptic dynamics to continuous time without discretization artifacts.\nPractical Application: In production architectures, verifying these conditions prevents state divergence and ensures formal safety guarantees."
+    },
+    {
+      "idx": 39,
+      "id": "EX1_39",
+      "domain": "Symplectic Dynamics & Neural ODEs",
+      "question": "Explain how Symplectic St\u00f6rmer-Verlet integrators maintain invariant phase volume according to Liouville's theorem in N-body dynamical systems.",
+      "score": 1.0,
+      "max_score": 2.0,
+      "passed_rubrics": [
+        "liouville theorem",
+        "phase volume"
+      ],
+      "missing_rubrics": [
+        "st\\u00f6rmer-verlet",
+        "symplectic 2-form"
+      ],
+      "response": "Key Invariant Analysis:\n1. Liouville's Theorem: In an isolated N-body system with canonical coordinates (q_1, ..., q_N, p_1, ..., p_N), the phase space volume element d^{2N}q d^{2N}p is conserved: \u2202^2N q \u2202^2N p = 0.\n\n2. Symplectic Map Matrix: Discrete time evolution is governed by symplectic matrix M = [[A, B], [C, D]] satisfying det(M) = 1. For 2D systems, M = [[a, b], [c, d]] with ad - bc = 1.\n\n3. Area Expansion/Contraction Factor: Each step transforms phase space volume by factor |det(M)| = 1. Errors grow algebraically (O(h^2)) rather than exponentially (O(h^3)), preserving global phase space volume indefinitely and preventing artificial energy drift.\nPractical Application: In production architectures, verifying these conditions prevents state divergence and ensures formal safety guarantees."
+    },
+    {
+      "idx": 40,
+      "id": "EX1_40",
+      "domain": "Symplectic Dynamics & Neural ODEs",
+      "question": "Explain why bounding the logarithmic norm of a neural vector field guarantees that perturbed trajectories do not diverge exponentially.",
+      "score": 1.0,
+      "max_score": 2.0,
+      "passed_rubrics": [
+        "logarithmic norm",
+        "contraction metric"
+      ],
+      "missing_rubrics": [
+        "trajectory divergence",
+        "matrix measure"
+      ],
+      "response": "Key Invariant Analysis:\n1. Matrix Logarithmic Norm: For matrix A, logarithmic norm \u03bc(A) = lim_{h \u2192 0+} (||I + h A|| - 1) / h. In Euclidean norm: \u03bc(A) = \u03bb_max((A + A^T) / 2).\n\n2. Differential Variation Dynamics: Let \u03b4z(t) be an infinitesimal perturbation between two trajectories. Its evolution is d(\u03b4z)/dt = J_f(z, t) \u03b4z.\n\n3. Contraction Bound (Coppel's Inequality):\n   ||\u03b4z(t)|| \u2264 ||\u03b4z(0)|| \u00b7 exp( \u222b_0^t \u03bc(J_f(z(s), s)) ds ).\nIf \u03bc(J_f) \u2264 -c < 0, all perturbations decay exponentially: ||\u03b4z(t)|| \u2264 e^{-ct} ||\u03b4z(0)||, guaranteeing global contraction, asymptotic stability, and total immunity to adversarial perturbations."
+    },
+    {
+      "idx": 41,
+      "id": "EX1_41",
+      "domain": "Category Theory & Formal Semantics",
+      "question": "State the categorical definition of a Natural Transformation between two functors F, G: C -> D. Write the commutative diagram that must hold for every morphism f: A -> B.",
+      "score": 1.5,
+      "max_score": 2.0,
+      "passed_rubrics": [
+        "natural transformation",
+        "commutative diagram",
+        "naturality square"
+      ],
+      "missing_rubrics": [
+        "functor component"
+      ],
+      "response": "Key Invariant Analysis:\n1. Functors: Let F, G: C \u2192 D be functors.\n\n2. Natural Transformation \u03c4: A natural transformation is a family of morphisms \u03c4_A: F(A) \u2192 G(A) indexed by objects A \u2208 C.\n\n3. Commutative Diagram: For every morphism f: A \u2192 B in C, the diagram must commute:\n   F(f) \u2218 \u03c4_A = \u03c4_B \u2218 F(f)\nIn diagrammatic notation:\n   F(A) --\u03c4_A--> G(A)\n   |   | f     |\n   \u2193   \u2193       \u2193\n   G(B) --\u03c4_B--> G(B)\nThe square represents equality of compositions: F(f)(\u03c4_A(x)) = \u03c4_B(f(x)).\nRigorous Application: In formal proof systems and category theory, verifying these conditions prevents state divergence and ensures mathematical strictness."
+    },
+    {
+      "idx": 42,
+      "id": "EX1_42",
+      "domain": "Category Theory & Formal Semantics",
+      "question": "Explain why the Yoneda embedding y: C -> [C^op, Set] is fully faithful, and what that implies about morphisms in C versus natural transformations between presheaves.",
+      "score": 1.5,
+      "max_score": 2.0,
+      "passed_rubrics": [
+        "yoneda embedding",
+        "fully faithful",
+        "presheaf category"
+      ],
+      "missing_rubrics": [
+        "isomorphism preservation"
+      ],
+      "response": "Key Invariant Analysis:\n1. Yoneda Embedding Definition: For a locally small category C and object A \u2208 C, define the presheaf y_A: C^op \u2192 Set by y_A(X) = Hom_C(X, A).\n\n2. Full Faithfulness Proof: For f, g: X \u2192 A in C, consider the induced maps y(f), y(g): y_X(A) \u2192 y_X(B). By definition of Hom in presheaves:\n   (y(f))(Z) = f(Z, A) and (y(g))(Z) = g(Z, A).\nThus, (y(f) - y(g))(Z) = f(Z, A) - g(Z, A) = (f - g)(Z, A).\nSince f - g = 0 implies f(Z, A) = g(Z, A) for all Z \u2208 C^op, y(f) = y(g). Therefore, f = g on the entire object X.\n\n3. Implication for Natural Transformations: A natural transformation \u03b1: F \u21d2 G between presheaves F, G: C^op \u2192 Set corresponds uniquely"
+    },
+    {
+      "idx": 43,
+      "id": "EX1_43",
+      "domain": "Category Theory & Formal Semantics",
+      "question": "Define an Adjunction between two categories (F -| G). What are the unit eta and counit epsilon of an adjunction, and what triangular identities must they satisfy?",
+      "score": 2.0,
+      "max_score": 2.0,
+      "passed_rubrics": [
+        "adjunction",
+        "unit eta",
+        "counit epsilon",
+        "triangle identities"
+      ],
+      "missing_rubrics": [],
+      "response": "1. Adjunction Definition: Given functors F: C \u2192 D and G: D \u2192 C, F is left adjoint to G (written F \u22a3 G) if there is a natural isomorphism of Hom-sets:\n   Hom_D(F(A), B) \u2245 Hom_C(A, G(B))\n\n2. Unit and Counit:\n- Unit \u03b7: 1_C \u21d2 G \u2218 F (maps an object A to its canonical reflection in G(F(A))).\n- Counit \u03b5: F \u2218 G \u21d2 1_D (evaluates the structure from F(G(B)) to B).\n\n3. Triangle Identities (Zig-zag equations):\n- (\u03b5 F) \u2218 (F \u03b7) = id_F (as natural transformation F \u21d2 F)\n- (G \u03b5) \u2218 (\u03b7 G) = id_G (as natural transformation G \u21d2 G)\nAny adjunction uniquely induces a monad T = G \u2218 F on category C and a comonad W = F \u2218 G on category D."
+    },
+    {
+      "idx": 44,
+      "id": "EX1_44",
+      "domain": "Category Theory & Formal Semantics",
+      "question": "Explain the categorical semantics of Monads in functional programming. How does the Kleisli category model effectful computations (such as state, I/O, or non-determinism)?",
+      "score": 1.5,
+      "max_score": 2.0,
+      "passed_rubrics": [
+        "kleisli category",
+        "monadic effects",
+        "bind operation"
+      ],
+      "missing_rubrics": [
+        "endofunctor"
+      ],
+      "response": "Key Invariant Analysis:\n1. Effectful Functions: A pure function has signature A \u2192 B. An effectful function produces a side effect (e.g., state mutation, failure, I/O) and returns an embellished type T(B). Direct composition of f: A \u2192 T(B) and g: B \u2192 T(C) fails because types do not align.\n\n2. Kleisli Category C_T: Given monad (T, \u03b7, \u03bc) on category C:\n- Objects of C_T are the same as objects of C.\n- Morphisms Hom_{C_T}(A, B) = Hom_C(A, T(B)).\n- Identity morphism is the unit \u03b7_A: A \u2192 T(A).\n- Composition is Kleisli composition (g >=> f)(a) = \u03bc (T(g) (f(a))).\n\n3. Semantic Unification: By abstracting effects into the Kleisli category, functional programs treat side-effecting operations as pure mathematical arrows obeying standard category axioms (identity and associativity), allowing formal equational reasoning and algebraic effects."
+    },
+    {
+      "idx": 45,
+      "id": "EX1_45",
+      "domain": "Category Theory & Formal Semantics",
+      "question": "Explain the concept of an Exponential Object B^A in Cartesian Closed Categories (CCC) and write the universal property that characterizes it via evaluation morphism.",
+      "score": 1.5,
+      "max_score": 2.0,
+      "passed_rubrics": [
+        "exponential object",
+        "evaluation morphism",
+        "cartesian closed category"
+      ],
+      "missing_rubrics": [
+        "currying"
+      ],
+      "response": "Key Invariant Analysis:\n1. Cartesian Closed Category (CCC): A category that has finite limits, is cartesian (has products), and has power objects (exponentiation object B^A for any object A).\n\n2. Exponential Object B^A: For a fixed object B and variable object A, the exponentiation object B^A is the right adjoint to the pullback functor A \u21a6 A \u00d7 B.\n\n3. Evaluation Morphism ev: B^A \u2192 B^B: Given f: C \u2192 B^A and g: D \u2192 B^A, (f \u2218 g)^A = f^A \u2218 g^A. By adjunction, (f \u2218 g)^A \u2245 f^A(g^A), so f^A \u2218 g^A exists as a morphism B^A \u2192 B^B. The map ev(f, g) = f^A(g^A) is the evaluation morphism.\n\n4. Universal Property of Evaluation: For any object C and morphism h: f^A(g^A) \u2192 k^A (where f^A, g^A, k"
+    },
+    {
+      "idx": 46,
+      "id": "EX1_46",
+      "domain": "Category Theory & Formal Semantics",
+      "question": "What is a Topos in category theory? Explain the role of the Subobject Classifier Omega and why the internal logic of an elementary topos is intuitionistic rather than classical.",
+      "score": 2.0,
+      "max_score": 2.0,
+      "passed_rubrics": [
+        "topos",
+        "subobject classifier",
+        "characteristic morphism",
+        "intuitionistic logic"
+      ],
+      "missing_rubrics": [],
+      "response": "Key Invariant Analysis:\n1. Topos Definition: An elementary topos E is a category that has finite limits, is cartesian closed (has power objects), and possesses a subobject classifier \u03a9.\n\n2. Subobject Classifier \u03a9: An object \u03a9 together with a true morphism true: 1 \u2192 \u03a9 such that for any monomorphism (subobject) m: S \u21a3 X, there exists a unique characteristic morphism \u03c7_m: X \u2192 \u03a9 making the square a pullback:\n   S is the inverse image of true under \u03c7_m.\nIn Set, \u03a9 = {true, false}. In general topoi (e.g., presheaves, sheaves), \u03a9 represents truth values varying over spaces or stages.\n\n3. Intuitionistic Internal Logic: In a general topos, the subobject lattice Sub(X) is a Heyting algebra rather than a Boolean algebra. Negation is defined via intuitionistic pseudocomplement \u00acp = (p \u21d2 \u22a5). Because truth values vary continuously over open sets or contexts, the Law of Excluded Middle (p \u2228 \u00acp = 1) and Double Negation Elimination (\u00ac\u00acp"
+    },
+    {
+      "idx": 47,
+      "id": "EX1_47",
+      "domain": "Category Theory & Formal Semantics",
+      "question": "Explain the Curry-Howard-Lambek Correspondence. How do types, propositions, and categorical objects map to each other?",
+      "score": 1.0,
+      "max_score": 2.0,
+      "passed_rubrics": [
+        "curry-howard-lambek",
+        "cartesian closed"
+      ],
+      "missing_rubrics": [
+        "propositions-as-types",
+        "proofs-as-programs"
+      ],
+      "response": "Key Invariant Analysis:\n1. Three Mathematical Discourses:\n- Discourse of Proofs: Natural deduction and intuitionistic logic.\n- Discourse of Types: Martin-L\u00f6f Type Theory.\n- Discourse of Categories: Categorical Logic and Linear Logic.\n\n2. Correspondence Map:\n- Propositions \u2194 Categorical Objects (Objects of a category C represent true/false statements or mathematical structures).\n- Proofs \u2194 Morphisms (Arrows between objects represent valid derivations or transformations).\n- Proof Rules \u2194 Category Axioms and Laws of Reflection.\n\n3. Curry-Howard-Lambek Isomorphism:\nGiven a cartesian closed category (CCC) (C, h, k, \u03bc) and a logic L with connectives \u2294, \u2283, and \u22a5:\n- A proposition p is an object A \u2208 C.\n- A proof of implication p \u21d2 q is a morphism f: A \u2192 B where B is the object representing q.\n- Proof of truth (reflexivity) is the unit morphism 1_A: A \u2192 A.\n- Proof of falsity (contradiction) is the"
+    },
+    {
+      "idx": 48,
+      "id": "EX1_48",
+      "domain": "Category Theory & Formal Semantics",
+      "question": "Define a Monoidal Category (C, tensor, I, alpha, lambda, rho). What coherence conditions do the Mac Lane Pentagon and Triangle diagrams guarantee?",
+      "score": 1.5,
+      "max_score": 2.0,
+      "passed_rubrics": [
+        "monoidal category",
+        "tensor product",
+        "pentagon diagram"
+      ],
+      "missing_rubrics": [
+        "mac lane coherence"
+      ],
+      "response": "Key Invariant Analysis:\n1. Monoidal Category Definition: A monoidal category (C, \u2297, I, \u03b1, \u03bb, \u03c1) consists of:\n- A category C with objects and morphisms.\n- A tensor product object I (unit object).\n- A tensor morphism \u03b1: C(A, B) \u2192 C(A \u2297 B, B) (left unitor).\n- A tensor morphism \u03bb: C(B, C) \u2192 C(B \u2297 C, AC) (right unitor).\n- A tensor morphism \u03c1: C(A \u2297 B, C) \u2192 C(A, B \u2297 C) (right twist).\n\n2. Mac Lane's Pentagon Identity: For all f: A \u2192 A', g: B \u2192 B', h: C \u2192 C':\n   (h \u2297 h') \u2218 (\u03b1_{A, B} \u2218 f \u2297 g) = (h' \u2297 h) \u2218 (g' \u2218 \u03b1_{A', B'} \u2218 f' \u2297 g')\nGuarantees associativity of triple tensor product (A \u2297 B)"
+    },
+    {
+      "idx": 49,
+      "id": "EX1_49",
+      "domain": "Category Theory & Formal Semantics",
+      "question": "Explain the concept of a Comonad (W, epsilon, delta) in Category Theory and how its co-Kleisli category models contextual or stream computations.",
+      "score": 1.0,
+      "max_score": 2.0,
+      "passed_rubrics": [
+        "comonad",
+        "co-kleisli category"
+      ],
+      "missing_rubrics": [
+        "extract epsilon",
+        "duplicate delta"
+      ],
+      "response": "Key Invariant Analysis:\n1. Monad T: A functor T: C \u2192 C with unit id_C \u2208 T(C) and multiplication \u03b7 \u2218 T = T(\u03b7).\n\n2. Comonad (W, \u03b5, \u03b4): A monad T together with a counit \u03b5: T \u2192 I and a compatibility isomorphism (\u03b4 \u2218 T\u03b5 = id_T).\n- \u03b5 is the standard counit (evaluation).\n- \u03b4 is the demultiplication / context functor (expands context).\n\n3. Co-Kleisli Category C_W: Objects are the same as C. Morphisms Hom_{C_W}(A, B) = Hom_I(W(A), B).\n- A morphism f: A \u2192 B in C_W is a generalized arrow or stream transformation that takes a value from context W(A) and produces a value in B.\n- The composition (co-Kleisli composition) is standard category composition composed with \u03b4: f \u2218_{C_W} g = \u03b4 \u2218 (f \u2218 g).\n\n4. Application via ZigZag Pattern:\n   f(x) = g(y)"
+    },
+    {
+      "idx": 50,
+      "id": "EX1_49b",
+      "domain": "Category Theory & Formal Semantics",
+      "question": "Explain how Limits and Colimits generalize products and coproducts, and state what it means for a category to be complete and cocomplete.",
+      "score": 1.5,
+      "max_score": 2.0,
+      "passed_rubrics": [
+        "limit and colimit",
+        "complete category",
+        "cocomplete"
+      ],
+      "missing_rubrics": [
+        "universal cone"
+      ],
+      "response": "Key Invariant Analysis:\n1. Products (Zigoms): A product of objects A and B is a pair (P, r) where r: P \u2192 A \u00d7 B is a isomorphism. In diagrammatic terms, it is the limit of the discrete diagram \u2190 A \u2192 B. Products generalize direct products of sets, groups, rings, and topoi.\n\n2. Coproducts (Yigoms): A coproduct of A and B is a pair (Q, in) where in: A \u2294 B \u2192 Q is an isomorphism. In diagrammatic terms, it is the colimit of the discrete diagram A \u2192 B. Coproducts generalize disjoint unions of sets, presheaves, and category extensions.\n\n3. Completeness: A category C is complete if it has arbitrary finite products and arbitrary infinite limits (generalized products).\n\n4. Cocompleteness: A category C is cocomplete if it has arbitrary finite coproducts and arbitrary infinite colimits (generalized coproducts).\n\n5. Bicompleteness: A category that is both complete and cocomplete is called a bicategory ("
+    }
+  ]
+}

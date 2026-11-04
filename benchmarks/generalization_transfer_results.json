@@ -1,0 +1,305 @@
+{
+  "timestamp": "2026-10-29 21:13:26",
+  "hardware": "NVIDIA GeForce RTX 5060 Laptop GPU (8GB)",
+  "mode_a_baseline": {
+    "questions": [
+      {
+        "id": "gen_clock_1_00",
+        "name": "Mirror Reflection of 1:00",
+        "category": "Clock Mirror Symmetry",
+        "ground_truth": "11:00",
+        "response": "11:00",
+        "strict_correct": true,
+        "semantic_correct": true
+      },
+      {
+        "id": "gen_clock_5_00",
+        "name": "Mirror Reflection of 5:00",
+        "category": "Clock Mirror Symmetry",
+        "ground_truth": "7:00",
+        "response": "7:00",
+        "strict_correct": true,
+        "semantic_correct": true
+      },
+      {
+        "id": "gen_clock_7_00",
+        "name": "Mirror Reflection of 7:00",
+        "category": "Clock Mirror Symmetry",
+        "ground_truth": "5:00",
+        "response": "5:00",
+        "strict_correct": true,
+        "semantic_correct": true
+      },
+      {
+        "id": "gen_clock_10_00",
+        "name": "Mirror Reflection of 10:00",
+        "category": "Clock Mirror Symmetry",
+        "ground_truth": "2:00",
+        "response": "2:00",
+        "strict_correct": true,
+        "semantic_correct": true
+      },
+      {
+        "id": "gen_cube_ccw_90",
+        "name": "Cube 90-deg CCW Yaw (Silver/Teal/Gold)",
+        "category": "3D Rotation Invariance",
+        "ground_truth": "Silver",
+        "response": "Silver",
+        "strict_correct": true,
+        "semantic_correct": true
+      },
+      {
+        "id": "gen_cube_pitch_backward",
+        "name": "Cube 90-deg Roll Backward (Teal/Violet)",
+        "category": "3D Rotation Invariance",
+        "ground_truth": "Teal",
+        "response": "Teal",
+        "strict_correct": true,
+        "semantic_correct": true
+      },
+      {
+        "id": "gen_die_4_on_top",
+        "name": "Die 4 on Top -> Bottom Face",
+        "category": "Opposite Face Topology",
+        "ground_truth": "3",
+        "response": "3",
+        "strict_correct": true,
+        "semantic_correct": true
+      },
+      {
+        "id": "gen_die_5_on_top",
+        "name": "Die 5 on Top -> Bottom Face",
+        "category": "Opposite Face Topology",
+        "ground_truth": "2",
+        "response": "2",
+        "strict_correct": true,
+        "semantic_correct": true
+      },
+      {
+        "id": "gen_compass_west_turns",
+        "name": "Compound Path from West (R90 -> R90 -> 180 -> L90)",
+        "category": "Compass Navigation",
+        "ground_truth": "South",
+        "response": "South",
+        "strict_correct": true,
+        "semantic_correct": true
+      },
+      {
+        "id": "gen_compass_three_lefts_from_south",
+        "name": "Three Left Turns from South",
+        "category": "Compass Navigation",
+        "ground_truth": "West",
+        "response": "West",
+        "strict_correct": true,
+        "semantic_correct": true
+      },
+      {
+        "id": "gen_perspective_teacher",
+        "name": "Teacher Facing Students Right Hand",
+        "category": "Perspective Taking",
+        "ground_truth": "Left",
+        "response": "Left",
+        "strict_correct": true,
+        "semantic_correct": true
+      },
+      {
+        "id": "gen_perspective_four_chairs",
+        "name": "Observer Behind Four Chairs",
+        "category": "Perspective Taking",
+        "ground_truth": "Purple",
+        "response": "```purple```",
+        "strict_correct": false,
+        "semantic_correct": true
+      },
+      {
+        "id": "gen_topology_cylinder_in_cube",
+        "name": "Cylinder 12x12 inside Cube 10x10",
+        "category": "Geometric Containment",
+        "ground_truth": "No",
+        "response": "No",
+        "strict_correct": true,
+        "semantic_correct": true
+      },
+      {
+        "id": "gen_topology_sphere_in_cylinder",
+        "name": "Sphere 4cm inside Cylinder 5x5cm",
+        "category": "Geometric Containment",
+        "ground_truth": "Yes",
+        "response": "Yes",
+        "strict_correct": true,
+        "semantic_correct": true
+      },
+      {
+        "id": "gen_coord_y_reflection",
+        "name": "Point (4, -2, 7) Reflection across XZ-Plane",
+        "category": "Coordinate Symmetry",
+        "ground_truth": "(4, 2, 7)",
+        "response": "(4, 2, 7)",
+        "strict_correct": true,
+        "semantic_correct": true
+      }
+    ],
+    "strict_correct": 14,
+    "semantic_correct": 15,
+    "strict_accuracy_pct": 93.3,
+    "semantic_accuracy_pct": 100.0
+  },
+  "mode_b_post_train": {
+    "questions": [
+      {
+        "id": "gen_clock_1_00",
+        "name": "Mirror Reflection of 1:00",
+        "category": "Clock Mirror Symmetry",
+        "ground_truth": "11:00",
+        "response": "11:00",
+        "strict_correct": true,
+        "semantic_correct": true,
+        "consistency_2d_to_3d": 0.6662
+      },
+      {
+        "id": "gen_clock_5_00",
+        "name": "Mirror Reflection of 5:00",
+        "category": "Clock Mirror Symmetry",
+        "ground_truth": "7:00",
+        "response": "7:00",
+        "strict_correct": true,
+        "semantic_correct": true,
+        "consistency_2d_to_3d": 0.6775
+      },
+      {
+        "id": "gen_clock_7_00",
+        "name": "Mirror Reflection of 7:00",
+        "category": "Clock Mirror Symmetry",
+        "ground_truth": "5:00",
+        "response": "5:00",
+        "strict_correct": true,
+        "semantic_correct": true,
+        "consistency_2d_to_3d": 0.6699
+      },
+      {
+        "id": "gen_clock_10_00",
+        "name": "Mirror Reflection of 10:00",
+        "category": "Clock Mirror Symmetry",
+        "ground_truth": "2:00",
+        "response": "2:00",
+        "strict_correct": true,
+        "semantic_correct": true,
+        "consistency_2d_to_3d": 0.6708
+      },
+      {
+        "id": "gen_cube_ccw_90",
+        "name": "Cube 90-deg CCW Yaw (Silver/Teal/Gold)",
+        "category": "3D Rotation Invariance",
+        "ground_truth": "Silver",
+        "response": "Silver",
+        "strict_correct": true,
+        "semantic_correct": true,
+        "consistency_2d_to_3d": 0.6554
+      },
+      {
+        "id": "gen_cube_pitch_backward",
+        "name": "Cube 90-deg Roll Backward (Teal/Violet)",
+        "category": "3D Rotation Invariance",
+        "ground_truth": "Teal",
+        "response": "Teal",
+        "strict_correct": true,
+        "semantic_correct": true,
+        "consistency_2d_to_3d": 0.6922
+      },
+      {
+        "id": "gen_die_4_on_top",
+        "name": "Die 4 on Top -> Bottom Face",
+        "category": "Opposite Face Topology",
+        "ground_truth": "3",
+        "response": "3",
+        "strict_correct": true,
+        "semantic_correct": true,
+        "consistency_2d_to_3d": 0.6544
+      },
+      {
+        "id": "gen_die_5_on_top",
+        "name": "Die 5 on Top -> Bottom Face",
+        "category": "Opposite Face Topology",
+        "ground_truth": "2",
+        "response": "2",
+        "strict_correct": true,
+        "semantic_correct": true,
+        "consistency_2d_to_3d": 0.6599
+      },
+      {
+        "id": "gen_compass_west_turns",
+        "name": "Compound Path from West (R90 -> R90 -> 180 -> L90)",
+        "category": "Compass Navigation",
+        "ground_truth": "South",
+        "response": "South",
+        "strict_correct": true,
+        "semantic_correct": true,
+        "consistency_2d_to_3d": 0.6572
+      },
+      {
+        "id": "gen_compass_three_lefts_from_south",
+        "name": "Three Left Turns from South",
+        "category": "Compass Navigation",
+        "ground_truth": "West",
+        "response": "West",
+        "strict_correct": true,
+        "semantic_correct": true,
+        "consistency_2d_to_3d": 0.6472
+      },
+      {
+        "id": "gen_perspective_teacher",
+        "name": "Teacher Facing Students Right Hand",
+        "category": "Perspective Taking",
+        "ground_truth": "Left",
+        "response": "Left",
+        "strict_correct": true,
+        "semantic_correct": true,
+        "consistency_2d_to_3d": 0.6621
+      },
+      {
+        "id": "gen_perspective_four_chairs",
+        "name": "Observer Behind Four Chairs",
+        "category": "Perspective Taking",
+        "ground_truth": "Purple",
+        "response": "```Purple```",
+        "strict_correct": false,
+        "semantic_correct": true,
+        "consistency_2d_to_3d": 0.6785
+      },
+      {
+        "id": "gen_topology_cylinder_in_cube",
+        "name": "Cylinder 12x12 inside Cube 10x10",
+        "category": "Geometric Containment",
+        "ground_truth": "No",
+        "response": "No",
+        "strict_correct": true,
+        "semantic_correct": true,
+        "consistency_2d_to_3d": 0.6269
+      },
+      {
+        "id": "gen_topology_sphere_in_cylinder",
+        "name": "Sphere 4cm inside Cylinder 5x5cm",
+        "category": "Geometric Containment",
+        "ground_truth": "Yes",
+        "response": "Yes",
+        "strict_correct": true,
+        "semantic_correct": true,
+        "consistency_2d_to_3d": 0.6371
+      },
+      {
+        "id": "gen_coord_y_reflection",
+        "name": "Point (4, -2, 7) Reflection across XZ-Plane",
+        "category": "Coordinate Symmetry",
+        "ground_truth": "(4, 2, 7)",
+        "response": "(4, 2, 7)",
+        "strict_correct": true,
+        "semantic_correct": true,
+        "consistency_2d_to_3d": 0.6827
+      }
+    ],
+    "strict_correct": 14,
+    "semantic_correct": 15,
+    "strict_accuracy_pct": 93.3,
+    "semantic_accuracy_pct": 100.0
+  }
+}

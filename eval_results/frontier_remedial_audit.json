@@ -1,0 +1,60 @@
+{
+  "timestamp": "2026-10-14 15:49:44",
+  "hardware": "NVIDIA GeForce RTX 5060 Laptop GPU (8GB)",
+  "layer_variances": [
+    0.002344499109312892,
+    0.003911679144948721,
+    0.007300208322703838,
+    0.008080165833234787,
+    0.009179298765957355,
+    0.011696824803948402,
+    0.029163388535380363,
+    0.024626679718494415,
+    0.023858679458498955,
+    0.02471804805099964,
+    0.030028805136680603,
+    0.022832345217466354,
+    0.024843323975801468,
+    0.029680391773581505,
+    0.11419419199228287,
+    0.06252709776163101,
+    0.0968843474984169,
+    0.12812146544456482,
+    0.1876167207956314,
+    0.20100988447666168,
+    0.26275068521499634,
+    0.33081308007240295,
+    0.4115055501461029,
+    0.5507875084877014
+  ],
+  "layer_24_stabilized": true,
+  "layer_24_variance": 0.5507875084877014,
+  "single_stream_tps": 7.25,
+  "exam_results": {
+    "total_score": 83.5,
+    "max_score": 100.0,
+    "score_percentage": 83.5,
+    "domain_scores": {
+      "Distributed Consensus": {
+        "scored": 20.0,
+        "total": 20.0
+      },
+      "Zero-Knowledge Cryptography": {
+        "scored": 17.0,
+        "total": 20.0
+      },
+      "Quantum Stabilizers & Topological Codes": {
+        "scored": 15.5,
+        "total": 20.0
+      },
+      "Symplectic Dynamics & Neural ODEs": {
+        "scored": 13.5,
+        "total": 20.0
+      },
+      "Category Theory & Formal Semantics": {
+        "scored": 17.5,
+        "total": 20.0
+      }
+    }
+  }
+}

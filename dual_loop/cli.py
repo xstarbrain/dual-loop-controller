@@ -113,6 +113,24 @@ def get_parser() -> argparse.ArgumentParser:
     p_gguf.add_argument("--outtype", type=str, default="q8_0", choices=["f32", "f16", "bf16", "q8_0", "auto"], help="GGUF precision/quantization (default: q8_0)")
     p_gguf.add_argument("--staging-dir", type=str, default="dist/staging_hf_fused", help="Staging directory for fused model")
 
+    # 12. infer (Custom Inference CLI with /browser, /goal, and /boost)
+    p_infer = subparsers.add_parser("infer", help="Launch professional interactive CLI inference (/browser, /goal, /boost)")
+    p_infer.add_argument("--model", type=str, default="dist/staging_hf_fused", help="Model path (default: dist/staging_hf_fused)")
+    p_infer.add_argument("--adapter", type=str, default="dist/frontier_lora_adapter", help="LoRA adapter path")
+    p_infer.add_argument("--prompt", "-p", type=str, default=None, help="One-shot prompt to generate and exit")
+    p_infer.add_argument("--device", type=str, default="auto", help="Compute device (auto, cuda:0, cpu)")
+    p_infer.add_argument("--dtype", type=str, default="bfloat16", choices=["bfloat16", "float16", "float32"], help="Model precision")
+    p_infer.add_argument("--no-brain", action="store_true", help="Disable HADL v5.2 Neuromorphic Spiking Brain hooks")
+    p_infer.add_argument("--no-lora", action="store_true", help="Disable LoRA adapter weights")
+    p_infer.add_argument("--boost", action="store_true", help="Initialize with Neuromorphic Deliberation Boost enabled")
+    p_infer.add_argument("--boost-level", type=int, default=3, choices=[1, 2, 3, 4, 5], help="Deliberation boost intensity (1-5)")
+    p_infer.add_argument("--temperature", "-t", type=float, default=0.7, help="Sampling temperature")
+    p_infer.add_argument("--top-p", type=float, default=0.9, help="Top-p sampling")
+    p_infer.add_argument("--top-k", type=int, default=40, help="Top-k sampling")
+    p_infer.add_argument("--max-tokens", "-n", type=int, default=512, help="Maximum generation tokens")
+    p_infer.add_argument("--repetition-penalty", type=float, default=1.1, help="Repetition penalty")
+    p_infer.add_argument("--system", "-s", type=str, default=None, help="Custom system prompt")
+
     return parser
 
 def cmd_setup(args):
@@ -394,28 +412,65 @@ def cmd_serve(args):
 
 def cmd_serve_vllm(args):
     """Launches the high-throughput vLLM-powered OpenAI-compatible server with HADL hooks."""
-    from .server.vllm_app import start_vllm_server
-    start_vllm_server(
-        model_id_or_path=args.model,
-        host=args.host,
-        port=args.port,
-        tensor_parallel_size=getattr(args, "tensor_parallel_size", 1),
-        dtype=getattr(args, "dtype", "auto"),
-        max_model_len=getattr(args, "max_model_len", None),
-        gpu_memory_utilization=getattr(args, "gpu_memory_utilization", 0.90),
-        quantization=getattr(args, "quantization", None),
-        enable_hadl=not getattr(args, "no_hadl", False),
-        hadl_version=getattr(args, "hadl_version", "v4.5"),
-        hadl_k_steps=getattr(args, "k_steps", 2),
-        checkpoint=getattr(args, "checkpoint", None),
-        trust_remote_code=getattr(args, "trust_remote_code", False),
-        api_key=getattr(args, "api_key", None),
-        enforce_eager=getattr(args, "enforce_eager", False),
-        max_num_seqs=getattr(args, "max_num_seqs", 256),
-    )
+    try:
+        from .server.vllm_app import start_vllm_server
+        start_vllm_server(
+            model_id_or_path=args.model,
+            host=args.host,
+            port=args.port,
+            tensor_parallel_size=getattr(args, "tensor_parallel_size", 1),
+            dtype=getattr(args, "dtype", "auto"),
+            max_model_len=getattr(args, "max_model_len", None),
+            gpu_memory_utilization=getattr(args, "gpu_memory_utilization", 0.90),
+            quantization=getattr(args, "quantization", None),
+            enable_hadl=not getattr(args, "no_hadl", False),
+            hadl_version=getattr(args, "hadl_version", "v4.5"),
+            hadl_k_steps=getattr(args, "k_steps", 2),
+            checkpoint=getattr(args, "checkpoint", None),
+            trust_remote_code=getattr(args, "trust_remote_code", False),
+            api_key=getattr(args, "api_key", None),
+            enforce_eager=getattr(args, "enforce_eager", False),
+            max_num_seqs=getattr(args, "max_num_seqs", 256),
+        )
+    except (ImportError, RuntimeError) as e:
+        print(f"[*] vLLM server unavailable ({e}). Falling back to X-Star Custom Inference REST Server...")
+        from xstar.inference.server import start_server
+        start_server(
+            model_path="dist/staging_hf_fused" if args.model == "Qwen/Qwen2.5-7B-Instruct" else args.model,
+            adapter_path="dist/frontier_lora_adapter",
+            host=args.host,
+            port=args.port,
+            api_key=getattr(args, "api_key", None),
+        )
 
 def cmd_run(args):
-    """Executes interactive CLI inference session or one-shot prompt powered by vLLM."""
+    """Executes interactive CLI inference session or one-shot prompt powered by vLLM or custom engine."""
+    use_custom = False
+    try:
+        from .server.vllm_engine import _HAS_VLLM
+        if not _HAS_VLLM:
+            use_custom = True
+    except Exception:
+        use_custom = True
+
+    if use_custom:
+        from xstar.inference.engine import CustomInferenceEngine, EngineConfig
+        from xstar.inference.cli_app import InteractiveCLI
+        model_path = "dist/staging_hf_fused" if args.model == "Qwen/Qwen2.5-7B-Instruct" else args.model
+        cfg = EngineConfig(
+            model_path=model_path,
+            adapter_path="dist/frontier_lora_adapter",
+            enable_brain=not getattr(args, "no_hadl", False),
+        )
+        engine = CustomInferenceEngine(cfg)
+        engine.load()
+        cli = InteractiveCLI(engine)
+        if args.prompt:
+            cli.execute_turn(args.prompt)
+        else:
+            cli.run_repl()
+        return
+
     from .server.vllm_engine import VLLMInferenceEngine
     engine = VLLMInferenceEngine(
         model_id_or_path=args.model,
@@ -470,6 +525,36 @@ def cmd_run(args):
         except Exception as e:
             print(f"\n[Error] {e}")
 
+def cmd_infer(args):
+    """Launches custom inference session or one-shot prompt with /browser, /goal, and /boost."""
+    from xstar.inference.engine import CustomInferenceEngine, EngineConfig
+    from xstar.inference.cli_app import InteractiveCLI
+
+    cfg = EngineConfig(
+        model_path=args.model,
+        adapter_path=None if getattr(args, "no_lora", False) else getattr(args, "adapter", "dist/frontier_lora_adapter"),
+        device=getattr(args, "device", "auto"),
+        dtype=getattr(args, "dtype", "bfloat16"),
+        enable_brain=not getattr(args, "no_brain", False),
+        enable_adapter=not getattr(args, "no_lora", False),
+        boost_mode=getattr(args, "boost", False),
+        boost_level=getattr(args, "boost_level", 3),
+    )
+    engine = CustomInferenceEngine(cfg)
+    engine.load()
+
+    cli = InteractiveCLI(engine, default_system=getattr(args, "system", None))
+    cli.temperature = getattr(args, "temperature", 0.7)
+    cli.top_p = getattr(args, "top_p", 0.9)
+    cli.top_k = getattr(args, "top_k", 40)
+    cli.max_tokens = getattr(args, "max_tokens", 512)
+    cli.repetition_penalty = getattr(args, "repetition_penalty", 1.1)
+
+    if getattr(args, "prompt", None):
+        cli.execute_turn(args.prompt)
+    else:
+        cli.run_repl()
+
 def cmd_export_gguf(args):
     """Fuses HADL cognitive weights into base model and converts to GGUF format."""
     from .export_gguf import export_hadl_to_gguf
@@ -512,6 +597,8 @@ def main():
         cmd_serve_vllm(args)
     elif args.command == "run":
         cmd_run(args)
+    elif args.command == "infer":
+        cmd_infer(args)
     elif args.command == "export-gguf":
         cmd_export_gguf(args)
     else:

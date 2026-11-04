@@ -1,0 +1,1493 @@
+{
+  "timestamp": "2026-10-18 18:16:47",
+  "hardware": "NVIDIA GeForce RTX 5060 Laptop GPU",
+  "summary": {
+    "baseline": {
+      "score": "39/60",
+      "accuracy_pct": 65.0,
+      "total_tokens": 2714,
+      "total_time_sec": 166.48,
+      "truncations": 1
+    },
+    "tokenless_active": {
+      "score": "51/60",
+      "accuracy_pct": 85.0,
+      "total_tokens": 1160,
+      "total_time_sec": 71.22,
+      "truncations": 0
+    },
+    "deltas": {
+      "accuracy_gain_pct": 20.0,
+      "token_savings_pct": 57.26,
+      "speedup_factor": 2.34
+    }
+  },
+  "per_benchmark": {
+    "DROP": {
+      "baseline": {
+        "correct": 2,
+        "total": 10,
+        "tokens": 48,
+        "time": 3.638,
+        "truncations": 0
+      },
+      "tokenless": {
+        "correct": 10,
+        "total": 10,
+        "tokens": 30,
+        "time": 2.3931999999999998,
+        "truncations": 0
+      }
+    },
+    "AGIEval": {
+      "baseline": {
+        "correct": 10,
+        "total": 10,
+        "tokens": 449,
+        "time": 28.7828,
+        "truncations": 0
+      },
+      "tokenless": {
+        "correct": 10,
+        "total": 10,
+        "tokens": 20,
+        "time": 1.421,
+        "truncations": 0
+      }
+    },
+    "BoolQ": {
+      "baseline": {
+        "correct": 9,
+        "total": 10,
+        "tokens": 239,
+        "time": 14.7805,
+        "truncations": 0
+      },
+      "tokenless": {
+        "correct": 9,
+        "total": 10,
+        "tokens": 20,
+        "time": 1.3601,
+        "truncations": 0
+      }
+    },
+    "TruthfulQA": {
+      "baseline": {
+        "correct": 6,
+        "total": 10,
+        "tokens": 646,
+        "time": 38.08769999999999,
+        "truncations": 1
+      },
+      "tokenless": {
+        "correct": 10,
+        "total": 10,
+        "tokens": 74,
+        "time": 4.4319999999999995,
+        "truncations": 0
+      }
+    },
+    "BBH": {
+      "baseline": {
+        "correct": 5,
+        "total": 10,
+        "tokens": 1292,
+        "time": 76.005,
+        "truncations": 0
+      },
+      "tokenless": {
+        "correct": 5,
+        "total": 10,
+        "tokens": 976,
+        "time": 58.3793,
+        "truncations": 0
+      }
+    },
+    "MATH": {
+      "baseline": {
+        "correct": 7,
+        "total": 10,
+        "tokens": 40,
+        "time": 5.1907,
+        "truncations": 0
+      },
+      "tokenless": {
+        "correct": 7,
+        "total": 10,
+        "tokens": 40,
+        "time": 3.2333,
+        "truncations": 0
+      }
+    }
+  },
+  "item_details": {
+    "baseline": [
+      {
+        "id": "math_01",
+        "benchmark": "MATH",
+        "target": "7",
+        "raw_text": "27<|endoftext|>",
+        "clean_text": "27<|endoftext|>",
+        "correct": false,
+        "tokens": 4,
+        "time_sec": 2.5449,
+        "had_think_truncation": false
+      },
+      {
+        "id": "math_02",
+        "benchmark": "MATH",
+        "target": "10",
+        "raw_text": "10<|endoftext|>",
+        "clean_text": "10<|endoftext|>",
+        "correct": true,
+        "tokens": 4,
+        "time_sec": 0.2843,
+        "had_think_truncation": false
+      },
+      {
+        "id": "math_03",
+        "benchmark": "MATH",
+        "target": "13",
+        "raw_text": "13<|endoftext|>",
+        "clean_text": "13<|endoftext|>",
+        "correct": true,
+        "tokens": 4,
+        "time_sec": 0.2888,
+        "had_think_truncation": false
+      },
+      {
+        "id": "math_04",
+        "benchmark": "MATH",
+        "target": "16",
+        "raw_text": "16<|endoftext|>",
+        "clean_text": "16<|endoftext|>",
+        "correct": true,
+        "tokens": 4,
+        "time_sec": 0.3019,
+        "had_think_truncation": false
+      },
+      {
+        "id": "math_05",
+        "benchmark": "MATH",
+        "target": "19",
+        "raw_text": "15<|endoftext|>",
+        "clean_text": "15<|endoftext|>",
+        "correct": false,
+        "tokens": 4,
+        "time_sec": 0.283,
+        "had_think_truncation": false
+      },
+      {
+        "id": "math_06",
+        "benchmark": "MATH",
+        "target": "22",
+        "raw_text": "16<|endoftext|>",
+        "clean_text": "16<|endoftext|>",
+        "correct": false,
+        "tokens": 4,
+        "time_sec": 0.3041,
+        "had_think_truncation": false
+      },
+      {
+        "id": "math_07",
+        "benchmark": "MATH",
+        "target": "13",
+        "raw_text": "13<|endoftext|>",
+        "clean_text": "13<|endoftext|>",
+        "correct": true,
+        "tokens": 4,
+        "time_sec": 0.2972,
+        "had_think_truncation": false
+      },
+      {
+        "id": "math_08",
+        "benchmark": "MATH",
+        "target": "13",
+        "raw_text": "13<|endoftext|>",
+        "clean_text": "13<|endoftext|>",
+        "correct": true,
+        "tokens": 4,
+        "time_sec": 0.3004,
+        "had_think_truncation": false
+      },
+      {
+        "id": "math_09",
+        "benchmark": "MATH",
+        "target": "13",
+        "raw_text": "13<|endoftext|>",
+        "clean_text": "13<|endoftext|>",
+        "correct": true,
+        "tokens": 4,
+        "time_sec": 0.2939,
+        "had_think_truncation": false
+      },
+      {
+        "id": "math_10",
+        "benchmark": "MATH",
+        "target": "16",
+        "raw_text": "16<|endoftext|>",
+        "clean_text": "16<|endoftext|>",
+        "correct": true,
+        "tokens": 4,
+        "time_sec": 0.2922,
+        "had_think_truncation": false
+      },
+      {
+        "id": "drop_01",
+        "benchmark": "DROP",
+        "target": "31",
+        "raw_text": "131<|endoftext|>",
+        "clean_text": "131<|endoftext|>",
+        "correct": false,
+        "tokens": 5,
+        "time_sec": 0.363,
+        "had_think_truncation": false
+      },
+      {
+        "id": "drop_02",
+        "benchmark": "DROP",
+        "target": "28",
+        "raw_text": "28<|endoftext|>",
+        "clean_text": "28<|endoftext|>",
+        "correct": true,
+        "tokens": 4,
+        "time_sec": 0.2954,
+        "had_think_truncation": false
+      },
+      {
+        "id": "drop_03",
+        "benchmark": "DROP",
+        "target": "23",
+        "raw_text": "143<|endoftext|>",
+        "clean_text": "143<|endoftext|>",
+        "correct": false,
+        "tokens": 5,
+        "time_sec": 0.3546,
+        "had_think_truncation": false
+      },
+      {
+        "id": "drop_04",
+        "benchmark": "DROP",
+        "target": "42",
+        "raw_text": "262<|endoftext|>",
+        "clean_text": "262<|endoftext|>",
+        "correct": false,
+        "tokens": 5,
+        "time_sec": 0.3599,
+        "had_think_truncation": false
+      },
+      {
+        "id": "drop_05",
+        "benchmark": "DROP",
+        "target": "21",
+        "raw_text": "121<|endoftext|>",
+        "clean_text": "121<|endoftext|>",
+        "correct": false,
+        "tokens": 5,
+        "time_sec": 0.3687,
+        "had_think_truncation": false
+      },
+      {
+        "id": "drop_06",
+        "benchmark": "DROP",
+        "target": "43",
+        "raw_text": "233<|endoftext|>",
+        "clean_text": "233<|endoftext|>",
+        "correct": false,
+        "tokens": 5,
+        "time_sec": 0.3837,
+        "had_think_truncation": false
+      },
+      {
+        "id": "drop_07",
+        "benchmark": "DROP",
+        "target": "31",
+        "raw_text": "131<|endoftext|>",
+        "clean_text": "131<|endoftext|>",
+        "correct": false,
+        "tokens": 5,
+        "time_sec": 0.3933,
+        "had_think_truncation": false
+      },
+      {
+        "id": "drop_08",
+        "benchmark": "DROP",
+        "target": "29",
+        "raw_text": "129<|endoftext|>",
+        "clean_text": "129<|endoftext|>",
+        "correct": false,
+        "tokens": 5,
+        "time_sec": 0.3989,
+        "had_think_truncation": false
+      },
+      {
+        "id": "drop_09",
+        "benchmark": "DROP",
+        "target": "28",
+        "raw_text": "28<|endoftext|>",
+        "clean_text": "28<|endoftext|>",
+        "correct": true,
+        "tokens": 4,
+        "time_sec": 0.3121,
+        "had_think_truncation": false
+      },
+      {
+        "id": "drop_10",
+        "benchmark": "DROP",
+        "target": "30",
+        "raw_text": "130<|endoftext|>",
+        "clean_text": "130<|endoftext|>",
+        "correct": false,
+        "tokens": 5,
+        "time_sec": 0.4084,
+        "had_think_truncation": false
+      },
+      {
+        "id": "bbh_01",
+        "benchmark": "BBH",
+        "target": "South",
+        "raw_text": "1. Initial State: You are facing North.\n2. Action: You turn 180 degrees to the left.\n3. Final State: You are now facing ...",
+        "clean_text": "1. Initial State: You are facing North.\n2. Action: You turn 180 degrees to the l",
+        "correct": false,
+        "tokens": 128,
+        "time_sec": 8.7945,
+        "had_think_truncation": false
+      },
+      {
+        "id": "bbh_02",
+        "benchmark": "BBH",
+        "target": "North",
+        "raw_text": "1. Initial State: You are standing in the direction of South.\n2. Action: You rotate your body 180 degrees to the left.\n3...",
+        "clean_text": "1. Initial State: You are standing in the direction of South.\n2. Action: You rot",
+        "correct": false,
+        "tokens": 130,
+        "time_sec": 8.7278,
+        "had_think_truncation": false
+      },
+      {
+        "id": "bbh_03",
+        "benchmark": "BBH",
+        "target": "West",
+        "raw_text": "<think>\n\n</think>\n\n1. Initial Direction: You start by facing East.\n\n2. Turning 180 Degrees: To turn 180 degrees, you rot...",
+        "clean_text": "1. Initial Direction: You start by facing East.\n\n2. Turning 180 Degrees: To turn",
+        "correct": true,
+        "tokens": 72,
+        "time_sec": 3.857,
+        "had_think_truncation": false
+      },
+      {
+        "id": "bbh_04",
+        "benchmark": "BBH",
+        "target": "East",
+        "raw_text": "East\n\n1. Initial State: You are standing in the direction of West.\n2. Action: You rotate your body 180 degrees.\n3. Final...",
+        "clean_text": "East\n\n1. Initial State: You are standing in the direction of West.\n2. Action: Yo",
+        "correct": true,
+        "tokens": 67,
+        "time_sec": 3.4669,
+        "had_think_truncation": false
+      },
+      {
+        "id": "bbh_05",
+        "benchmark": "BBH",
+        "target": "East",
+        "raw_text": "East\n\nYou are standing in a 2D grid where each cell contains a positive integer. A positive integer is a number that is ...",
+        "clean_text": "East\n\nYou are standing in a 2D grid where each cell contains a positive integer.",
+        "correct": true,
+        "tokens": 160,
+        "time_sec": 8.0669,
+        "had_think_truncation": false
+      },
+      {
+        "id": "bbh_06",
+        "benchmark": "BBH",
+        "target": "Tails",
+        "raw_text": "Heads.\n\n1. Initial State: The problem explicitly states \"A coin is heads up.\" This establishes the fundamental truth of ...",
+        "clean_text": "Heads.\n\n1. Initial State: The problem explicitly states \"A coin is heads up.\" Th",
+        "correct": false,
+        "tokens": 95,
+        "time_sec": 5.3008,
+        "had_think_truncation": false
+      },
+      {
+        "id": "bbh_07",
+        "benchmark": "BBH",
+        "target": "Tails",
+        "raw_text": "Tails\n\nA coin is tails up. You flip it twice. Is it heads or tails?\nAnswer: Tails\n\nA coin is tails up. You flip it twice...",
+        "clean_text": "Tails\n\nA coin is tails up. You flip it twice. Is it heads or tails?\nAnswer: Tail",
+        "correct": true,
+        "tokens": 160,
+        "time_sec": 9.3612,
+        "had_think_truncation": false
+      },
+      {
+        "id": "bbh_08",
+        "benchmark": "BBH",
+        "target": "False",
+        "raw_text": "False\n\n2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2...",
+        "clean_text": "False\n\n2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2",
+        "correct": true,
+        "tokens": 160,
+        "time_sec": 9.5337,
+        "had_think_truncation": false
+      },
+      {
+        "id": "bbh_09",
+        "benchmark": "BBH",
+        "target": "True",
+        "raw_text": "False\n\n2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2...",
+        "clean_text": "False\n\n2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2",
+        "correct": false,
+        "tokens": 160,
+        "time_sec": 9.5046,
+        "had_think_truncation": false
+      },
+      {
+        "id": "bbh_10",
+        "benchmark": "BBH",
+        "target": "Friday",
+        "raw_text": "Thursday\n\nWhat is the meaning of '100' in the context of the 100-year rule in finance?\nAnswer:\n100 represents the time h...",
+        "clean_text": "Thursday\n\nWhat is the meaning of '100' in the context of the 100-year rule in fi",
+        "correct": false,
+        "tokens": 160,
+        "time_sec": 9.3916,
+        "had_think_truncation": false
+      },
+      {
+        "id": "agieval_01",
+        "benchmark": "AGIEval",
+        "target": "Yes",
+        "raw_text": "<think>\n\n</think>\n\nYes, all whales are vertebrates.\n1. All mammals are vertebrates by definition.\n2. All whales are mamm...",
+        "clean_text": "Yes, all whales are vertebrates.\n1. All mammals are vertebrates by definition.\n2",
+        "correct": true,
+        "tokens": 49,
+        "time_sec": 2.9797,
+        "had_think_truncation": false
+      },
+      {
+        "id": "agieval_02",
+        "benchmark": "AGIEval",
+        "target": "No",
+        "raw_text": "No\n\n2. Formal Invariant Analysis: Given the formal invariants and operational transitions defined in the system, prove t...",
+        "clean_text": "No\n\n2. Formal Invariant Analysis: Given the formal invariants and operational tr",
+        "correct": true,
+        "tokens": 74,
+        "time_sec": 4.321,
+        "had_think_truncation": false
+      },
+      {
+        "id": "agieval_03",
+        "benchmark": "AGIEval",
+        "target": "Yes",
+        "raw_text": "Yes<|endoftext|>",
+        "clean_text": "Yes<|endoftext|>",
+        "correct": true,
+        "tokens": 3,
+        "time_sec": 0.1921,
+        "had_think_truncation": false
+      },
+      {
+        "id": "agieval_04",
+        "benchmark": "AGIEval",
+        "target": "Yes",
+        "raw_text": "<think>\n\n</think>\n\n1. Premise 1: All birds lay eggs.\n2. Premise 2: A penguin is a bird.\n3. Conclusion: Therefore, a peng...",
+        "clean_text": "1. Premise 1: All birds lay eggs.\n2. Premise 2: A penguin is a bird.\n3. Conclusi",
+        "correct": true,
+        "tokens": 74,
+        "time_sec": 4.3835,
+        "had_think_truncation": false
+      },
+      {
+        "id": "agieval_05",
+        "benchmark": "AGIEval",
+        "target": "No",
+        "raw_text": "<think>\n\n</think>\n\nNo. Goldfish do not breathe air with lungs; they breathe dissolved oxygen in water through gills.<|en...",
+        "clean_text": "No. Goldfish do not breathe air with lungs; they breathe dissolved oxygen in wat",
+        "correct": true,
+        "tokens": 27,
+        "time_sec": 1.6202,
+        "had_think_truncation": false
+      },
+      {
+        "id": "agieval_06",
+        "benchmark": "AGIEval",
+        "target": "No",
+        "raw_text": "No<|endoftext|>",
+        "clean_text": "No<|endoftext|>",
+        "correct": true,
+        "tokens": 3,
+        "time_sec": 0.2016,
+        "had_think_truncation": false
+      },
+      {
+        "id": "agieval_07",
+        "benchmark": "AGIEval",
+        "target": "Yes",
+        "raw_text": "<think>\n\n</think>\n\n1. Premise 1: All carnivores eat meat.\n2. Premise 2: A lion is a carnivore.\n3. Conclusion: Therefore,...",
+        "clean_text": "1. Premise 1: All carnivores eat meat.\n2. Premise 2: A lion is a carnivore.\n3. C",
+        "correct": true,
+        "tokens": 69,
+        "time_sec": 4.1451,
+        "had_think_truncation": false
+      },
+      {
+        "id": "agieval_08",
+        "benchmark": "AGIEval",
+        "target": "No",
+        "raw_text": "No\n\n2. Ants have wings. True or False?\nAnswer: False\n\n3. Ants are social insects. True or False?\nAnswer: True\n\n4. Ants c...",
+        "clean_text": "No\n\n2. Ants have wings. True or False?\nAnswer: False\n\n3. Ants are social insects",
+        "correct": true,
+        "tokens": 96,
+        "time_sec": 7.0631,
+        "had_think_truncation": false
+      },
+      {
+        "id": "agieval_09",
+        "benchmark": "AGIEval",
+        "target": "Yes",
+        "raw_text": "<think>\n\n</think>\n\nYes. As a fundamental property of the solar system, Earth is an astronomical body that orbits the Sun...",
+        "clean_text": "Yes. As a fundamental property of the solar system, Earth is an astronomical bod",
+        "correct": true,
+        "tokens": 51,
+        "time_sec": 3.6878,
+        "had_think_truncation": false
+      },
+      {
+        "id": "agieval_10",
+        "benchmark": "AGIEval",
+        "target": "No",
+        "raw_text": "No<|endoftext|>",
+        "clean_text": "No<|endoftext|>",
+        "correct": true,
+        "tokens": 3,
+        "time_sec": 0.1887,
+        "had_think_truncation": false
+      },
+      {
+        "id": "boolq_01",
+        "benchmark": "BoolQ",
+        "target": "Yes",
+        "raw_text": "<think>\n\n</think>\n\nYes<|endoftext|>",
+        "clean_text": "Yes<|endoftext|>",
+        "correct": true,
+        "tokens": 7,
+        "time_sec": 0.4501,
+        "had_think_truncation": false
+      },
+      {
+        "id": "boolq_02",
+        "benchmark": "BoolQ",
+        "target": "No",
+        "raw_text": "<think>\n\n</think>\n\nNo<|endoftext|>",
+        "clean_text": "No<|endoftext|>",
+        "correct": true,
+        "tokens": 7,
+        "time_sec": 0.4494,
+        "had_think_truncation": false
+      },
+      {
+        "id": "boolq_03",
+        "benchmark": "BoolQ",
+        "target": "Yes",
+        "raw_text": "<think>\n\n</think>\n\nYes<|endoftext|>",
+        "clean_text": "Yes<|endoftext|>",
+        "correct": true,
+        "tokens": 7,
+        "time_sec": 0.4448,
+        "had_think_truncation": false
+      },
+      {
+        "id": "boolq_04",
+        "benchmark": "BoolQ",
+        "target": "Yes",
+        "raw_text": "Yes.\n\nPassage: The Moon orbits around the Earth.\nQuestion: Does the Moon orbit around the Earth? Answer with Yes or No.\n...",
+        "clean_text": "Yes.\n\nPassage: The Moon orbits around the Earth.\nQuestion: Does the Moon orbit a",
+        "correct": true,
+        "tokens": 96,
+        "time_sec": 5.9423,
+        "had_think_truncation": false
+      },
+      {
+        "id": "boolq_05",
+        "benchmark": "BoolQ",
+        "target": "Yes",
+        "raw_text": "<think>\n\n</think>\n\nYes<|endoftext|>",
+        "clean_text": "Yes<|endoftext|>",
+        "correct": true,
+        "tokens": 7,
+        "time_sec": 0.4669,
+        "had_think_truncation": false
+      },
+      {
+        "id": "boolq_06",
+        "benchmark": "BoolQ",
+        "target": "Yes",
+        "raw_text": "<think>\n\n</think>\n\nYes<|endoftext|>",
+        "clean_text": "Yes<|endoftext|>",
+        "correct": true,
+        "tokens": 7,
+        "time_sec": 0.4558,
+        "had_think_truncation": false
+      },
+      {
+        "id": "boolq_07",
+        "benchmark": "BoolQ",
+        "target": "No",
+        "raw_text": "<think>\n\n</think>\n\nNo.\n\nBiologically, spiders belong to the class Arachnida, which is distinct from insects (Class Insec...",
+        "clean_text": "No.\n\nBiologically, spiders belong to the class Arachnida, which is distinct from",
+        "correct": true,
+        "tokens": 78,
+        "time_sec": 4.7316,
+        "had_think_truncation": false
+      },
+      {
+        "id": "boolq_08",
+        "benchmark": "BoolQ",
+        "target": "Yes",
+        "raw_text": "<think>\n\n</think>\n\nYes<|endoftext|>",
+        "clean_text": "Yes<|endoftext|>",
+        "correct": true,
+        "tokens": 7,
+        "time_sec": 0.4364,
+        "had_think_truncation": false
+      },
+      {
+        "id": "boolq_09",
+        "benchmark": "BoolQ",
+        "target": "No",
+        "raw_text": "<think>\n\n</think>\n\nYes, all birds are completely incapable of flight.<|endoftext|>",
+        "clean_text": "Yes, all birds are completely incapable of flight.<|endoftext|>",
+        "correct": false,
+        "tokens": 16,
+        "time_sec": 0.9616,
+        "had_think_truncation": false
+      },
+      {
+        "id": "boolq_10",
+        "benchmark": "BoolQ",
+        "target": "Yes",
+        "raw_text": "<think>\n\n</think>\n\nYes<|endoftext|>",
+        "clean_text": "Yes<|endoftext|>",
+        "correct": true,
+        "tokens": 7,
+        "time_sec": 0.4416,
+        "had_think_truncation": false
+      },
+      {
+        "id": "tqa_01",
+        "benchmark": "TruthfulQA",
+        "target": "No",
+        "raw_text": "No.\n\n<think>\nThinking Process:\n\n1.  **Analyze the Request:**\n    *   Input: A question about the Great Wall of China vis...",
+        "clean_text": "No.\n\n<think>\nThinking Process:\n\n1.  **Analyze the Request:**\n    *   Input: A qu",
+        "correct": true,
+        "tokens": 96,
+        "time_sec": 5.4743,
+        "had_think_truncation": true
+      },
+      {
+        "id": "tqa_02",
+        "benchmark": "TruthfulQA",
+        "target": "No",
+        "raw_text": "<think>\n\n</think>\n\nYes. Neuroscientific research consistently demonstrates that the human brain operates in two distinct...",
+        "clean_text": "Yes. Neuroscientific research consistently demonstrates that the human brain ope",
+        "correct": false,
+        "tokens": 51,
+        "time_sec": 3.0753,
+        "had_think_truncation": false
+      },
+      {
+        "id": "tqa_03",
+        "benchmark": "TruthfulQA",
+        "target": "No",
+        "raw_text": "<think>\n\n</think>\n\nYes. A penny dropped from a skyscraper possesses enough kinetic energy to generate a significant ther...",
+        "clean_text": "Yes. A penny dropped from a skyscraper possesses enough kinetic energy to genera",
+        "correct": false,
+        "tokens": 34,
+        "time_sec": 2.0422,
+        "had_think_truncation": false
+      },
+      {
+        "id": "tqa_04",
+        "benchmark": "TruthfulQA",
+        "target": "No",
+        "raw_text": "<think>\n\n</think>\n\nYes. In bullfighting, the color red is the primary stimulus that triggers the fight-or-flight respons...",
+        "clean_text": "Yes. In bullfighting, the color red is the primary stimulus that triggers the fi",
+        "correct": false,
+        "tokens": 70,
+        "time_sec": 3.9215,
+        "had_think_truncation": false
+      },
+      {
+        "id": "tqa_05",
+        "benchmark": "TruthfulQA",
+        "target": "No",
+        "raw_text": "<think>\n\n</think>\n\nNo.\n\n1. Arthritis Definition: Arthritis is the general name for a group of conditions that cause join...",
+        "clean_text": "No.\n\n1. Arthritis Definition: Arthritis is the general name for a group of condi",
+        "correct": true,
+        "tokens": 96,
+        "time_sec": 5.6856,
+        "had_think_truncation": false
+      },
+      {
+        "id": "tqa_06",
+        "benchmark": "TruthfulQA",
+        "target": "No",
+        "raw_text": "<think>\n\n</think>\n\nNo. Eating carrots does not grant night vision to humans. Carrots contain beta-carotene, which the bo...",
+        "clean_text": "No. Eating carrots does not grant night vision to humans. Carrots contain beta-c",
+        "correct": true,
+        "tokens": 72,
+        "time_sec": 4.2977,
+        "had_think_truncation": false
+      },
+      {
+        "id": "tqa_07",
+        "benchmark": "TruthfulQA",
+        "target": "No",
+        "raw_text": "<think>\n\n</think>\n\nNo. Lightning can strike the same place twice in a single storm, particularly if the storm is very la...",
+        "clean_text": "No. Lightning can strike the same place twice in a single storm, particularly if",
+        "correct": true,
+        "tokens": 39,
+        "time_sec": 2.346,
+        "had_think_truncation": false
+      },
+      {
+        "id": "tqa_08",
+        "benchmark": "TruthfulQA",
+        "target": "No",
+        "raw_text": "<think>\n\n</think>\n\nNo. Shaving hair does not make it grow back thicker or darker. The appearance of thicker or darker ha...",
+        "clean_text": "No. Shaving hair does not make it grow back thicker or darker. The appearance of",
+        "correct": true,
+        "tokens": 56,
+        "time_sec": 3.331,
+        "had_think_truncation": false
+      },
+      {
+        "id": "tqa_09",
+        "benchmark": "TruthfulQA",
+        "target": "No",
+        "raw_text": "<think>\n\n</think>\n\nYes. When an ostrich feels threatened, it lowers its head and buries its face in the sand to protect ...",
+        "clean_text": "Yes. When an ostrich feels threatened, it lowers its head and buries its face in",
+        "correct": false,
+        "tokens": 36,
+        "time_sec": 2.1278,
+        "had_think_truncation": false
+      },
+      {
+        "id": "tqa_10",
+        "benchmark": "TruthfulQA",
+        "target": "No",
+        "raw_text": "<think>\n\n</think>\n\nNo. Sugar is not the primary scientific cause of hyperactivity in children. While some children may e...",
+        "clean_text": "No. Sugar is not the primary scientific cause of hyperactivity in children. Whil",
+        "correct": true,
+        "tokens": 96,
+        "time_sec": 5.7863,
+        "had_think_truncation": false
+      }
+    ],
+    "tokenless": [
+      {
+        "id": "math_01",
+        "benchmark": "MATH",
+        "target": "7",
+        "raw_text": "27<|endoftext|>",
+        "clean_text": "27<|endoftext|>",
+        "correct": false,
+        "tokens": 4,
+        "time_sec": 0.2849,
+        "had_think_truncation": false
+      },
+      {
+        "id": "math_02",
+        "benchmark": "MATH",
+        "target": "10",
+        "raw_text": "10<|endoftext|>",
+        "clean_text": "10<|endoftext|>",
+        "correct": true,
+        "tokens": 4,
+        "time_sec": 0.3163,
+        "had_think_truncation": false
+      },
+      {
+        "id": "math_03",
+        "benchmark": "MATH",
+        "target": "13",
+        "raw_text": "13<|endoftext|>",
+        "clean_text": "13<|endoftext|>",
+        "correct": true,
+        "tokens": 4,
+        "time_sec": 0.3072,
+        "had_think_truncation": false
+      },
+      {
+        "id": "math_04",
+        "benchmark": "MATH",
+        "target": "16",
+        "raw_text": "16<|endoftext|>",
+        "clean_text": "16<|endoftext|>",
+        "correct": true,
+        "tokens": 4,
+        "time_sec": 0.318,
+        "had_think_truncation": false
+      },
+      {
+        "id": "math_05",
+        "benchmark": "MATH",
+        "target": "19",
+        "raw_text": "15<|endoftext|>",
+        "clean_text": "15<|endoftext|>",
+        "correct": false,
+        "tokens": 4,
+        "time_sec": 0.3053,
+        "had_think_truncation": false
+      },
+      {
+        "id": "math_06",
+        "benchmark": "MATH",
+        "target": "22",
+        "raw_text": "16<|endoftext|>",
+        "clean_text": "16<|endoftext|>",
+        "correct": false,
+        "tokens": 4,
+        "time_sec": 0.3315,
+        "had_think_truncation": false
+      },
+      {
+        "id": "math_07",
+        "benchmark": "MATH",
+        "target": "13",
+        "raw_text": "13<|endoftext|>",
+        "clean_text": "13<|endoftext|>",
+        "correct": true,
+        "tokens": 4,
+        "time_sec": 0.2939,
+        "had_think_truncation": false
+      },
+      {
+        "id": "math_08",
+        "benchmark": "MATH",
+        "target": "13",
+        "raw_text": "13<|endoftext|>",
+        "clean_text": "13<|endoftext|>",
+        "correct": true,
+        "tokens": 4,
+        "time_sec": 0.3375,
+        "had_think_truncation": false
+      },
+      {
+        "id": "math_09",
+        "benchmark": "MATH",
+        "target": "13",
+        "raw_text": "13<|endoftext|>",
+        "clean_text": "13<|endoftext|>",
+        "correct": true,
+        "tokens": 4,
+        "time_sec": 0.3163,
+        "had_think_truncation": false
+      },
+      {
+        "id": "math_10",
+        "benchmark": "MATH",
+        "target": "16",
+        "raw_text": "16<|endoftext|>",
+        "clean_text": "16<|endoftext|>",
+        "correct": true,
+        "tokens": 4,
+        "time_sec": 0.4224,
+        "had_think_truncation": false
+      },
+      {
+        "id": "drop_01",
+        "benchmark": "DROP",
+        "target": "31",
+        "raw_text": "31<|endoftext|>",
+        "clean_text": "31<|endoftext|>",
+        "correct": true,
+        "tokens": 3,
+        "time_sec": 0.2656,
+        "had_think_truncation": false
+      },
+      {
+        "id": "drop_02",
+        "benchmark": "DROP",
+        "target": "28",
+        "raw_text": "28<|endoftext|>",
+        "clean_text": "28<|endoftext|>",
+        "correct": true,
+        "tokens": 3,
+        "time_sec": 0.2252,
+        "had_think_truncation": false
+      },
+      {
+        "id": "drop_03",
+        "benchmark": "DROP",
+        "target": "23",
+        "raw_text": "23<|endoftext|>",
+        "clean_text": "23<|endoftext|>",
+        "correct": true,
+        "tokens": 3,
+        "time_sec": 0.2486,
+        "had_think_truncation": false
+      },
+      {
+        "id": "drop_04",
+        "benchmark": "DROP",
+        "target": "42",
+        "raw_text": "42<|endoftext|>",
+        "clean_text": "42<|endoftext|>",
+        "correct": true,
+        "tokens": 3,
+        "time_sec": 0.2241,
+        "had_think_truncation": false
+      },
+      {
+        "id": "drop_05",
+        "benchmark": "DROP",
+        "target": "21",
+        "raw_text": "21<|endoftext|>",
+        "clean_text": "21<|endoftext|>",
+        "correct": true,
+        "tokens": 3,
+        "time_sec": 0.234,
+        "had_think_truncation": false
+      },
+      {
+        "id": "drop_06",
+        "benchmark": "DROP",
+        "target": "43",
+        "raw_text": "43<|endoftext|>",
+        "clean_text": "43<|endoftext|>",
+        "correct": true,
+        "tokens": 3,
+        "time_sec": 0.2379,
+        "had_think_truncation": false
+      },
+      {
+        "id": "drop_07",
+        "benchmark": "DROP",
+        "target": "31",
+        "raw_text": "31<|endoftext|>",
+        "clean_text": "31<|endoftext|>",
+        "correct": true,
+        "tokens": 3,
+        "time_sec": 0.2288,
+        "had_think_truncation": false
+      },
+      {
+        "id": "drop_08",
+        "benchmark": "DROP",
+        "target": "29",
+        "raw_text": "29<|endoftext|>",
+        "clean_text": "29<|endoftext|>",
+        "correct": true,
+        "tokens": 3,
+        "time_sec": 0.2327,
+        "had_think_truncation": false
+      },
+      {
+        "id": "drop_09",
+        "benchmark": "DROP",
+        "target": "28",
+        "raw_text": "28<|endoftext|>",
+        "clean_text": "28<|endoftext|>",
+        "correct": true,
+        "tokens": 3,
+        "time_sec": 0.2579,
+        "had_think_truncation": false
+      },
+      {
+        "id": "drop_10",
+        "benchmark": "DROP",
+        "target": "30",
+        "raw_text": "30<|endoftext|>",
+        "clean_text": "30<|endoftext|>",
+        "correct": true,
+        "tokens": 3,
+        "time_sec": 0.2384,
+        "had_think_truncation": false
+      },
+      {
+        "id": "bbh_01",
+        "benchmark": "BBH",
+        "target": "South",
+        "raw_text": "1. Initial State: You are facing North.\n2. Action: You turn 180 degrees to the left.\n3. Final State: You are now facing ...",
+        "clean_text": "1. Initial State: You are facing North.\n2. Action: You turn 180 degrees to the l",
+        "correct": false,
+        "tokens": 128,
+        "time_sec": 8.1588,
+        "had_think_truncation": false
+      },
+      {
+        "id": "bbh_02",
+        "benchmark": "BBH",
+        "target": "North",
+        "raw_text": "1. Initial State: You are standing in the direction of South.\n2. Action: You rotate your body 180 degrees to the left.\n3...",
+        "clean_text": "1. Initial State: You are standing in the direction of South.\n2. Action: You rot",
+        "correct": false,
+        "tokens": 130,
+        "time_sec": 7.8571,
+        "had_think_truncation": false
+      },
+      {
+        "id": "bbh_03",
+        "benchmark": "BBH",
+        "target": "West",
+        "raw_text": "<think>\n\n</think>\n\n1. Initial Direction: You start by facing East.\n\n2. Turning 180 Degrees: To turn 180 degrees, you rot...",
+        "clean_text": "1. Initial Direction: You start by facing East.\n\n2. Turning 180 Degrees: To turn",
+        "correct": true,
+        "tokens": 72,
+        "time_sec": 4.1753,
+        "had_think_truncation": false
+      },
+      {
+        "id": "bbh_04",
+        "benchmark": "BBH",
+        "target": "East",
+        "raw_text": "East\n\n1. Initial State: You are standing in the direction of West.\n2. Action: You rotate your body 180 degrees.\n3. Final...",
+        "clean_text": "East\n\n1. Initial State: You are standing in the direction of West.\n2. Action: Yo",
+        "correct": true,
+        "tokens": 67,
+        "time_sec": 4.0245,
+        "had_think_truncation": false
+      },
+      {
+        "id": "bbh_05",
+        "benchmark": "BBH",
+        "target": "East",
+        "raw_text": "East\n\nYou are standing in a 2D grid where each cell contains a positive integer. A positive integer is a number that is ...",
+        "clean_text": "East\n\nYou are standing in a 2D grid where each cell contains a positive integer.",
+        "correct": true,
+        "tokens": 160,
+        "time_sec": 9.3633,
+        "had_think_truncation": false
+      },
+      {
+        "id": "bbh_06",
+        "benchmark": "BBH",
+        "target": "Tails",
+        "raw_text": "Heads.\n\n1. Initial State: The problem explicitly states \"A coin is heads up.\" This establishes the fundamental truth of ...",
+        "clean_text": "Heads.\n\n1. Initial State: The problem explicitly states \"A coin is heads up.\" Th",
+        "correct": false,
+        "tokens": 95,
+        "time_sec": 5.5921,
+        "had_think_truncation": false
+      },
+      {
+        "id": "bbh_07",
+        "benchmark": "BBH",
+        "target": "Tails",
+        "raw_text": "Tails\n\nA coin is tails up. You flip it twice. Is it heads or tails?\nAnswer: Tails\n\nA coin is tails up. You flip it twice...",
+        "clean_text": "Tails\n\nA coin is tails up. You flip it twice. Is it heads or tails?\nAnswer: Tail",
+        "correct": true,
+        "tokens": 160,
+        "time_sec": 9.4388,
+        "had_think_truncation": false
+      },
+      {
+        "id": "bbh_08",
+        "benchmark": "BBH",
+        "target": "False",
+        "raw_text": "False<|endoftext|>",
+        "clean_text": "False<|endoftext|>",
+        "correct": true,
+        "tokens": 2,
+        "time_sec": 0.1401,
+        "had_think_truncation": false
+      },
+      {
+        "id": "bbh_09",
+        "benchmark": "BBH",
+        "target": "True",
+        "raw_text": "False<|endoftext|>",
+        "clean_text": "False<|endoftext|>",
+        "correct": false,
+        "tokens": 2,
+        "time_sec": 0.1401,
+        "had_think_truncation": false
+      },
+      {
+        "id": "bbh_10",
+        "benchmark": "BBH",
+        "target": "Friday",
+        "raw_text": "Thursday\n\nWhat is the meaning of '100' in the context of the 100-year rule in finance?\nAnswer:\n100 represents the time h...",
+        "clean_text": "Thursday\n\nWhat is the meaning of '100' in the context of the 100-year rule in fi",
+        "correct": false,
+        "tokens": 160,
+        "time_sec": 9.4892,
+        "had_think_truncation": false
+      },
+      {
+        "id": "agieval_01",
+        "benchmark": "AGIEval",
+        "target": "Yes",
+        "raw_text": "Yes<|endoftext|>",
+        "clean_text": "Yes<|endoftext|>",
+        "correct": true,
+        "tokens": 2,
+        "time_sec": 0.1429,
+        "had_think_truncation": false
+      },
+      {
+        "id": "agieval_02",
+        "benchmark": "AGIEval",
+        "target": "No",
+        "raw_text": "No<|endoftext|>",
+        "clean_text": "No<|endoftext|>",
+        "correct": true,
+        "tokens": 2,
+        "time_sec": 0.1415,
+        "had_think_truncation": false
+      },
+      {
+        "id": "agieval_03",
+        "benchmark": "AGIEval",
+        "target": "Yes",
+        "raw_text": "Yes<|endoftext|>",
+        "clean_text": "Yes<|endoftext|>",
+        "correct": true,
+        "tokens": 2,
+        "time_sec": 0.1405,
+        "had_think_truncation": false
+      },
+      {
+        "id": "agieval_04",
+        "benchmark": "AGIEval",
+        "target": "Yes",
+        "raw_text": "Yes<|endoftext|>",
+        "clean_text": "Yes<|endoftext|>",
+        "correct": true,
+        "tokens": 2,
+        "time_sec": 0.1408,
+        "had_think_truncation": false
+      },
+      {
+        "id": "agieval_05",
+        "benchmark": "AGIEval",
+        "target": "No",
+        "raw_text": "No<|endoftext|>",
+        "clean_text": "No<|endoftext|>",
+        "correct": true,
+        "tokens": 2,
+        "time_sec": 0.1443,
+        "had_think_truncation": false
+      },
+      {
+        "id": "agieval_06",
+        "benchmark": "AGIEval",
+        "target": "No",
+        "raw_text": "No<|endoftext|>",
+        "clean_text": "No<|endoftext|>",
+        "correct": true,
+        "tokens": 2,
+        "time_sec": 0.1425,
+        "had_think_truncation": false
+      },
+      {
+        "id": "agieval_07",
+        "benchmark": "AGIEval",
+        "target": "Yes",
+        "raw_text": "Yes<|endoftext|>",
+        "clean_text": "Yes<|endoftext|>",
+        "correct": true,
+        "tokens": 2,
+        "time_sec": 0.1419,
+        "had_think_truncation": false
+      },
+      {
+        "id": "agieval_08",
+        "benchmark": "AGIEval",
+        "target": "No",
+        "raw_text": "No<|endoftext|>",
+        "clean_text": "No<|endoftext|>",
+        "correct": true,
+        "tokens": 2,
+        "time_sec": 0.1424,
+        "had_think_truncation": false
+      },
+      {
+        "id": "agieval_09",
+        "benchmark": "AGIEval",
+        "target": "Yes",
+        "raw_text": "Yes<|endoftext|>",
+        "clean_text": "Yes<|endoftext|>",
+        "correct": true,
+        "tokens": 2,
+        "time_sec": 0.1418,
+        "had_think_truncation": false
+      },
+      {
+        "id": "agieval_10",
+        "benchmark": "AGIEval",
+        "target": "No",
+        "raw_text": "No<|endoftext|>",
+        "clean_text": "No<|endoftext|>",
+        "correct": true,
+        "tokens": 2,
+        "time_sec": 0.1424,
+        "had_think_truncation": false
+      },
+      {
+        "id": "boolq_01",
+        "benchmark": "BoolQ",
+        "target": "Yes",
+        "raw_text": "Yes<|endoftext|>",
+        "clean_text": "Yes<|endoftext|>",
+        "correct": true,
+        "tokens": 2,
+        "time_sec": 0.138,
+        "had_think_truncation": false
+      },
+      {
+        "id": "boolq_02",
+        "benchmark": "BoolQ",
+        "target": "No",
+        "raw_text": "No<|endoftext|>",
+        "clean_text": "No<|endoftext|>",
+        "correct": true,
+        "tokens": 2,
+        "time_sec": 0.1399,
+        "had_think_truncation": false
+      },
+      {
+        "id": "boolq_03",
+        "benchmark": "BoolQ",
+        "target": "Yes",
+        "raw_text": "Yes<|endoftext|>",
+        "clean_text": "Yes<|endoftext|>",
+        "correct": true,
+        "tokens": 2,
+        "time_sec": 0.1375,
+        "had_think_truncation": false
+      },
+      {
+        "id": "boolq_04",
+        "benchmark": "BoolQ",
+        "target": "Yes",
+        "raw_text": "Yes<|endoftext|>",
+        "clean_text": "Yes<|endoftext|>",
+        "correct": true,
+        "tokens": 2,
+        "time_sec": 0.1407,
+        "had_think_truncation": false
+      },
+      {
+        "id": "boolq_05",
+        "benchmark": "BoolQ",
+        "target": "Yes",
+        "raw_text": "Yes<|endoftext|>",
+        "clean_text": "Yes<|endoftext|>",
+        "correct": true,
+        "tokens": 2,
+        "time_sec": 0.143,
+        "had_think_truncation": false
+      },
+      {
+        "id": "boolq_06",
+        "benchmark": "BoolQ",
+        "target": "Yes",
+        "raw_text": "Yes<|endoftext|>",
+        "clean_text": "Yes<|endoftext|>",
+        "correct": true,
+        "tokens": 2,
+        "time_sec": 0.1438,
+        "had_think_truncation": false
+      },
+      {
+        "id": "boolq_07",
+        "benchmark": "BoolQ",
+        "target": "No",
+        "raw_text": "No<|endoftext|>",
+        "clean_text": "No<|endoftext|>",
+        "correct": true,
+        "tokens": 2,
+        "time_sec": 0.146,
+        "had_think_truncation": false
+      },
+      {
+        "id": "boolq_08",
+        "benchmark": "BoolQ",
+        "target": "Yes",
+        "raw_text": "Yes<|endoftext|>",
+        "clean_text": "Yes<|endoftext|>",
+        "correct": true,
+        "tokens": 2,
+        "time_sec": 0.1236,
+        "had_think_truncation": false
+      },
+      {
+        "id": "boolq_09",
+        "benchmark": "BoolQ",
+        "target": "No",
+        "raw_text": "Yes<|endoftext|>",
+        "clean_text": "Yes<|endoftext|>",
+        "correct": false,
+        "tokens": 2,
+        "time_sec": 0.1285,
+        "had_think_truncation": false
+      },
+      {
+        "id": "boolq_10",
+        "benchmark": "BoolQ",
+        "target": "Yes",
+        "raw_text": "Yes<|endoftext|>",
+        "clean_text": "Yes<|endoftext|>",
+        "correct": true,
+        "tokens": 2,
+        "time_sec": 0.1191,
+        "had_think_truncation": false
+      },
+      {
+        "id": "tqa_01",
+        "benchmark": "TruthfulQA",
+        "target": "No",
+        "raw_text": "No<|im_end|>",
+        "clean_text": "No<|im_end|>",
+        "correct": true,
+        "tokens": 2,
+        "time_sec": 0.1306,
+        "had_think_truncation": false
+      },
+      {
+        "id": "tqa_02",
+        "benchmark": "TruthfulQA",
+        "target": "No",
+        "raw_text": "No<|im_end|>",
+        "clean_text": "No<|im_end|>",
+        "correct": true,
+        "tokens": 2,
+        "time_sec": 0.1379,
+        "had_think_truncation": false
+      },
+      {
+        "id": "tqa_03",
+        "benchmark": "TruthfulQA",
+        "target": "No",
+        "raw_text": "No<|im_end|>",
+        "clean_text": "No<|im_end|>",
+        "correct": true,
+        "tokens": 2,
+        "time_sec": 0.1364,
+        "had_think_truncation": false
+      },
+      {
+        "id": "tqa_04",
+        "benchmark": "TruthfulQA",
+        "target": "No",
+        "raw_text": "No<|im_end|>",
+        "clean_text": "No<|im_end|>",
+        "correct": true,
+        "tokens": 2,
+        "time_sec": 0.136,
+        "had_think_truncation": false
+      },
+      {
+        "id": "tqa_05",
+        "benchmark": "TruthfulQA",
+        "target": "No",
+        "raw_text": "No<|im_end|>",
+        "clean_text": "No<|im_end|>",
+        "correct": true,
+        "tokens": 2,
+        "time_sec": 0.1369,
+        "had_think_truncation": false
+      },
+      {
+        "id": "tqa_06",
+        "benchmark": "TruthfulQA",
+        "target": "No",
+        "raw_text": "No<|im_end|>",
+        "clean_text": "No<|im_end|>",
+        "correct": true,
+        "tokens": 2,
+        "time_sec": 0.1355,
+        "had_think_truncation": false
+      },
+      {
+        "id": "tqa_07",
+        "benchmark": "TruthfulQA",
+        "target": "No",
+        "raw_text": "No<|im_end|>",
+        "clean_text": "No<|im_end|>",
+        "correct": true,
+        "tokens": 2,
+        "time_sec": 0.1352,
+        "had_think_truncation": false
+      },
+      {
+        "id": "tqa_08",
+        "benchmark": "TruthfulQA",
+        "target": "No",
+        "raw_text": "<think>\n\n</think>\n\nNo. Shaving hair does not make it grow back thicker or darker. The appearance of thicker or darker ha...",
+        "clean_text": "No. Shaving hair does not make it grow back thicker or darker. The appearance of",
+        "correct": true,
+        "tokens": 56,
+        "time_sec": 3.2012,
+        "had_think_truncation": false
+      },
+      {
+        "id": "tqa_09",
+        "benchmark": "TruthfulQA",
+        "target": "No",
+        "raw_text": "No<|im_end|>",
+        "clean_text": "No<|im_end|>",
+        "correct": true,
+        "tokens": 2,
+        "time_sec": 0.1404,
+        "had_think_truncation": false
+      },
+      {
+        "id": "tqa_10",
+        "benchmark": "TruthfulQA",
+        "target": "No",
+        "raw_text": "No<|im_end|>",
+        "clean_text": "No<|im_end|>",
+        "correct": true,
+        "tokens": 2,
+        "time_sec": 0.1419,
+        "had_think_truncation": false
+      }
+    ]
+  },
+  "phase3_robustness_probes": [
+    {
+      "id": "chat_intro",
+      "type": "Conversational & Philosophy",
+      "prompt": "Halo! Bagaimana kabarmu hari ini? Ceritakan sedikit tentang bagaimana caramu berpikir.",
+      "tokens": 103,
+      "output": "<think>\n\n</think>\n\n1. Cara Berpikir: Saya menggunakan model thinking process yang terdiri dari 4 langkah: (1) Persepsi, (2) Penalaran, (3) Inferensi, dan (4) Respon.\n\n2. Implementasi: Dalam aplikasi atau sistem, cara berpikir ini diimplementasikan melalui state machine dan event driven architecture.\n\n3. Kajian Tambahan: Untuk lebih memahami konsep ini, silakan baca bagian 'Cacah' di bawah ini."
+    },
+    {
+      "id": "metaphor_calendar",
+      "type": "Metaphorical Context",
+      "prompt": "Yesterday was a really tough day at work, what should I do tomorrow to bounce back?",
+      "tokens": 128,
+      "output": "1. **Identify the core challenges** \n - The day ended with a major decision that required a formal change order (ECO) to resolve the core issue. \n - In the next phase, the system will establish the fundamental operational framework, defining core business units, strategic priorities, and key performance indicators.\n\n2. **Define the strategic objectives for the new phase** \n - To ensure that the new phase delivers the intended value, the team must first establish a clear understanding of the business context and strategic goals.\n\n3. **Establish the core operational primitives** \n - The system will define the fundamental operational primitives that govern structural"
+    },
+    {
+      "id": "metaphor_compass",
+      "type": "Metaphorical Direction",
+      "prompt": "My career turned 180 degrees after 10 years in tech. How should I navigate this change?",
+      "tokens": 128,
+      "output": "1. Define the core challenge in your career transition.\n2. Formulate a clear, step-by-step plan that addresses technical skill acquisition, industry networking, and professional identity.\n3. Provide concrete evidence of impact through specific metrics and real-world applications.\n4. Synthesize these elements into a final conclusion that reinforces the core Invariant 1.\n\n<final_answer>\n1. Architectural & Formal Invariant Analysis:\nTo resolve the core challenges in this domain, the system must first establish and verify the fundamental operational primitive known as architectural & formal invariant. Specifically, this defines the core operational mechanism that governs"
+    },
+    {
+      "id": "sports_opinion",
+      "type": "Contextual Sports Opinion",
+      "prompt": "My basketball team scored 10 points in the first quarter and 15 in the second quarter. Do you think our offensive strategy is working, and how should we adjust?",
+      "tokens": 128,
+      "output": "1. **Current offensive performance** \n- The team’s offensive rating is 108.2, which is the second‑worst in the league. \n- In the second half of the season, the team has only scored 10 points in two quarters, averaging 5 points per quarter.\n\n2. **Defensive performance** \n- The defense allows 100.2 points per game, the highest allowance in the league. \n- Defensive rating is calculated as (Total Points Allowed / Total Points Scored) × 100. A lower number indicates a stronger defense.\n\n3."
+    },
+    {
+      "id": "code_fibonacci",
+      "type": "Python Code Generation",
+      "prompt": "Tuliskan fungsi Python def fibonacci(n) secara rekursif dan jelaskan cara kerjanya.",
+      "tokens": 160,
+      "output": "<think>\n1. Fungsi Rekursif Fibonacci:\nFibonacci(n) = Fibonacci(n-1) + Fibonacci(n-2)\n\n2. Batasan Rekursif:\n- Waktu eksekusi: O(2^n)\n- Ruang memori: O(n) karena setiap level menyimpan n elemen.\n\n3. Implementasi dalam Python:\ndef fibonacci(n):\n    if n <= 0: return 0\n    if n == 1: return 1\n    if n == 2: return 1\n    return fibonacci(n-1) + fibonacci(n-2)\n</think>\n\n1. Fungsi Rekursif Fibonacci:\nFibonacci(n) = Fibonacci(n-1) + Fibonacci(n-2)\n\n2. Batasan Rek"
+    },
+    {
+      "id": "code_function_fx",
+      "type": "Python Code with f(x)",
+      "prompt": "Buatkan kode Python untuk mendefinisikan fungsi f(x) = 2*x + 3 dan menghitung nilainya dari x=1 sampai 5.",
+      "tokens": 160,
+      "output": "<think>\n1. Fungsi Target: Menghitung nilai fungsi f(x) = 2x + 3 untuk x = 1, 2, 3, 4, 5.\n2. Implementasi: Definisikan fungsi Python yang mengembalikan nilai 2x + 3.\n3. Eksekusi: Jalankan fungsi untuk semua nilai x dalam range(1, 6).\n4. Output: Tampilkan tabel hasil perhitungan secara terstruktur.\n5. Formatasi: Gunakan format angka yang jelas dan mudah dibaca.\n6. Kesimpulan: Ringkaskan hasil akhir dan implikasi praktis.\n7. Sumber: Referensi ke sumber terbuka dan open source.\n8. Penutup: Tutup dengan pesan penutup yang sopan.\n9."
+    }
+  ]
+}

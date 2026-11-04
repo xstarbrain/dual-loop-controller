@@ -39,7 +39,7 @@ from typing import Tuple, Dict, Any, Optional
 
 class UnitaryTrigonometricRotator(nn.Module):
     """
-    Principle 4: Isomeric Unitary Rotation Matrix.
+    Principle 4: Isometric Unitary Rotation Matrix.
     Applies pairwise Givens rotation:
         [x', y']^T = [cos theta, -sin theta; sin theta, cos theta] * [x, y]^T
     Guarantees: ||h_rotated|| == ||h_original|| strictly (conservation of energy).
@@ -54,36 +54,66 @@ class UnitaryTrigonometricRotator(nn.Module):
         self.angle_proj = nn.Linear(d_model, self.half_d, bias=False)
         nn.init.normal_(self.angle_proj.weight, std=0.01)
 
-    def forward(self, h: torch.Tensor, thought_vector: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
+    @property
+    def angle_predictor(self) -> nn.Linear:
+        return self.angle_proj
+
+    def forward(
+        self,
+        h: torch.Tensor,
+        thought_vector: Optional[torch.Tensor] = None
+    ) -> Tuple[torch.Tensor, torch.Tensor]:
         """
-        h: [B, S, D]
-        thought_vector: [B, D]
-        Returns rotated_h [B, S, D] and angles [B, half_d]
+        h: [B, S, D] or [B, D]
+        thought_vector: Optional [B, D] or [B, S, D] (defaults to pooled h)
+        Returns rotated_h (same shape/dtype/device as h) and angles [B, half_d]
         """
-        B, S, D = h.shape
+        orig_dim = h.dim()
+        if orig_dim == 2:
+            h_seq = h.unsqueeze(1)
+        else:
+            h_seq = h
+
+        B, S, D = h_seq.shape
+        w_dev = self.angle_proj.weight.device
+        w_dtype = self.angle_proj.weight.dtype
+
+        if thought_vector is None:
+            tv = h_seq.mean(dim=1)
+        elif thought_vector.dim() == 3:
+            tv = thought_vector.mean(dim=1)
+        else:
+            tv = thought_vector
+
+        if tv.size(0) == 1 and B > 1:
+            tv = tv.expand(B, -1)
+
+        tv_cast = tv.to(device=w_dev, dtype=w_dtype)
         # Compute rotation angles bounded by [-max_angle, max_angle]
-        theta = torch.tanh(self.angle_proj(thought_vector)) * self.max_angle  # [B, half_d]
-        theta = theta.unsqueeze(1)  # [B, 1, half_d]
-        
-        cos_t = torch.cos(theta)  # [B, 1, half_d]
-        sin_t = torch.sin(theta)  # [B, 1, half_d]
-        
-        # Split h into even and odd dimension pairs
-        h_even = h[..., 0::2]  # [B, S, half_d]
-        h_odd  = h[..., 1::2]  # [B, S, half_d]
-        
+        theta = torch.tanh(self.angle_proj(tv_cast)) * self.max_angle  # [B, half_d]
+        theta_exp = theta.unsqueeze(1).to(device=h_seq.device, dtype=torch.float32)  # [B, 1, half_d]
+
+        cos_t = torch.cos(theta_exp)  # [B, 1, half_d]
+        sin_t = torch.sin(theta_exp)  # [B, 1, half_d]
+
+        # Split h into even and odd dimension pairs in float32 for exact isometry
+        h_f = h_seq.float()
+        h_even = h_f[..., 0::2]  # [B, S, half_d]
+        h_odd = h_f[..., 1::2]   # [B, S, half_d]
+
         # Trigonometric rotation: sin(a+b) & cos(a+b) isometric mapping
-        # x' = x*cos(t) - y*sin(t)
-        # y' = x*sin(t) + y*cos(t)
         h_even_rot = h_even * cos_t - h_odd * sin_t
-        h_odd_rot  = h_even * sin_t + h_odd * cos_t
-        
+        h_odd_rot = h_even * sin_t + h_odd * cos_t
+
         # Interleave back to original shape
-        out = torch.empty_like(h)
+        out = torch.empty_like(h_f)
         out[..., 0::2] = h_even_rot
         out[..., 1::2] = h_odd_rot
-        
-        return out, theta.squeeze(1)
+        out_cast = out.to(dtype=h.dtype)
+
+        if orig_dim == 2:
+            return out_cast.squeeze(1), theta
+        return out_cast, theta
 
 
 class LatentOneBitJudge(nn.Module):
@@ -134,17 +164,17 @@ class SpectralResonanceHarmonizer(nn.Module):
     def forward(self, h: torch.Tensor, thought: torch.Tensor) -> Tuple[torch.Tensor, float]:
         """
         Computes 1D real Fourier transform across feature dimension.
-        Filters non-resonant noise.
+        Filters non-resonant noise. Works for 2D [B, D] or 3D [B, S, D].
         """
-        B, D = thought.shape
+        D = thought.shape[-1]
         # Real FFT across hidden dimension
-        fft_h = torch.fft.rfft(h.float(), dim=-1)         # [B, D//2 + 1] (complex)
-        fft_th = torch.fft.rfft(thought.float(), dim=-1)   # [B, D//2 + 1] (complex)
+        fft_h = torch.fft.rfft(h.float(), dim=-1)
+        fft_th = torch.fft.rfft(thought.float(), dim=-1)
         
         # Harmonic phase correlation / resonance
-        coherence = torch.abs(fft_h * torch.conj(fft_th))  # [B, D//2 + 1]
+        coherence = torch.abs(fft_h * torch.conj(fft_th))
         k = max(1, int(coherence.shape[-1] * self.topk_ratio))
-        threshold = torch.topk(coherence, k=k, dim=-1).values[:, -1:]
+        threshold = torch.topk(coherence, k=k, dim=-1).values[..., -1:]
         
         # Create binary spectral mask
         spectral_mask = (coherence >= threshold).float()

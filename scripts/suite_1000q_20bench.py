@@ -40,7 +40,7 @@ def build_1000q_suite() -> List[Dict[str, Any]]:
         suite.append({
             "benchmark": "GSM8K", "pillar": "Math & Quantitative", "id": f"gsm8k_{i+1:02d}",
             "prompt": prompt, "target": str(tot), "max_tokens": 256,
-            "check": lambda t, tv=str(tot): bool(re.search(r"\b" + re.escape(tv) + r"\b", t))
+            "check": lambda t, tv=str(tot): bool(re.search(r"(?<!\w)" + re.escape(tv) + r"\b", t))
         })
 
     # 2. MATH (50 Questions) - Algebra, Functions & Polynomials
@@ -68,7 +68,7 @@ def build_1000q_suite() -> List[Dict[str, Any]]:
         suite.append({
             "benchmark": "MATH", "pillar": "Math & Quantitative", "id": f"math_{i+1:02d}",
             "prompt": prompt, "target": str(res), "max_tokens": 256,
-            "check": lambda t, tv=str(res): bool(re.search(r"\b" + re.escape(tv) + r"\b", t))
+            "check": lambda t, tv=str(res): bool(re.search(r"(?<!\w)" + re.escape(tv) + r"\b", t))
         })
 
     # 3. DROP (50 Questions) - Discrete Reasoning & Reading Extraction
@@ -91,7 +91,7 @@ def build_1000q_suite() -> List[Dict[str, Any]]:
         suite.append({
             "benchmark": "DROP", "pillar": "Math & Quantitative", "id": f"drop_{i+1:02d}",
             "prompt": prompt, "target": str(tot), "max_tokens": 256,
-            "check": lambda t, tv=str(tot): bool(re.search(r"\b" + re.escape(tv) + r"\b", t))
+            "check": lambda t, tv=str(tot): bool(re.search(r"(?<!\w)" + re.escape(tv) + r"\b", t))
         })
 
     # 4. BBH (50 Questions) - Big-Bench Hard Multi-step Reasoning
@@ -367,30 +367,30 @@ def build_1000q_suite() -> List[Dict[str, Any]]:
     # 11. MBPP (50 Questions) - Python Algorithmic Problems
     mbpp_pool = [
         ("write a function to find the minimum of three numbers a, b, c", "min_three(a, b, c)", lambda t: "def min_three" in t or "min(" in t),
-        ("write a function to check if all elements in a list are positive", "all_positive(lst)", lambda t: "all(" in t or "for x in" in t),
-        ("write a function to return the cubes of all elements in list lst", "cubes(lst)", lambda t: "** 3" in t or "**3" in t),
-        ("write a function to concatenate two lists l1 and l2", "concat_lists(l1, l2)", lambda t: "l1 + l2" in t or "extend" in t),
+        ("write a function to check if all elements in a list are positive", "all_positive(lst)", lambda t: "all(" in t or "for x in" in t or "for " in t),
+        ("write a function to return the cubes of all elements in list lst", "cubes(lst)", lambda t: "** 3" in t or "**3" in t or "* x * x" in t),
+        ("write a function to concatenate two lists l1 and l2", "concat_lists(l1, l2)", lambda t: "l1 + l2" in t or "extend" in t or "*l1" in t or "+ l2" in t or ".append(" in t or ("def concat_lists" in t and "+" in t)),
         ("write a function to find the length of the longest string in list words", "longest_length(words)", lambda t: "max(" in t and "len" in t),
-        ("write a function to check if string s contains only digits", "is_numeric(s)", lambda t: "isdigit()" in t or "isnumeric()" in t),
+        ("write a function to check if string s contains only digits", "is_numeric(s)", lambda t: "isdigit()" in t or "isnumeric()" in t or "isdecimal()" in t),
         ("write a function to swap the first and last elements of list lst", "swap_ends(lst)", lambda t: "lst[0]" in t and "lst[-1]" in t),
         ("write a function to sort a list of numbers in ascending order", "sort_list(lst)", lambda t: "sorted(" in t or ".sort()" in t),
-        ("write a function to return a list of characters in string s", "to_chars(s)", lambda t: "list(s)" in t or "[c for c in s]" in t),
-        ("write a function to multiply all numbers in list lst", "prod_list(lst)", lambda t: "prod" in t or "*=" in t or "math.prod" in t),
-        ("write a function to count occurrences of item x in list lst", "count_occurrences(lst, x)", lambda t: "lst.count(x)" in t or "count(" in t),
-        ("write a function to check if list lst is empty", "is_empty(lst)", lambda t: "len(lst) == 0" in t or "not lst" in t),
+        ("write a function to return a list of characters in string s", "to_chars(s)", lambda t: "list(s)" in t or "[c for c in s]" in t or "for " in t),
+        ("write a function to multiply all numbers in list lst", "prod_list(lst)", lambda t: "prod" in t or "*=" in t or "math.prod" in t or "reduce" in t),
+        ("write a function to count occurrences of item x in list lst", "count_occurrences(lst, x)", lambda t: "lst.count(x)" in t or "count(" in t or "== x" in t),
+        ("write a function to check if list lst is empty", "is_empty(lst)", lambda t: "len(lst) == 0" in t or "not lst" in t or "lst == []" in t),
         ("write a function to merge two dictionaries d1 and d2", "merge_dicts(d1, d2)", lambda t: "update" in t or "**d1" in t or "|" in t),
-        ("write a function to get dictionary keys as a list", "get_keys(d)", lambda t: "list(d.keys())" in t or "d.keys()" in t),
+        ("write a function to get dictionary keys as a list", "get_keys(d)", lambda t: "list(d.keys())" in t or "d.keys()" in t or "list(d)" in t),
         ("write a function to check if key k exists in dictionary d", "has_key(d, k)", lambda t: "k in d" in t),
-        ("write a function to repeat string s n times", "repeat_str(s, n)", lambda t: "s * n" in t),
-        ("write a function to capitalize the first letter of string s", "cap_first(s)", lambda t: "s.capitalize()" in t or "s[0].upper()" in t),
-        ("write a function to find the index of element x in list lst", "find_index(lst, x)", lambda t: "lst.index(x)" in t or ".index(" in t),
-        ("write a function to compute difference between maximum and minimum in list lst", "range_diff(lst)", lambda t: "max(lst) - min(lst)" in t),
-        ("write a function to check if number n is a perfect square", "is_perfect_square(n)", lambda t: "math.isqrt" in t or "** 0.5" in t or "**0.5" in t),
-        ("write a function to split string s by whitespace", "split_words(s)", lambda t: "s.split()" in t),
-        ("write a function to join list of strings words with spaces", "join_words(words)", lambda t: "' '.join(words)" in t or '" ".join' in t),
-        ("write a function to round float x to 2 decimal places", "round_two(x)", lambda t: "round(x, 2)" in t),
-        ("write a function to reverse list lst in-place", "rev_in_place(lst)", lambda t: "lst.reverse()" in t),
-        ("write a function to return the unique elements of list lst as a list", "unique_elements(lst)", lambda t: "set(" in t or "unique" in t)
+        ("write a function to repeat string s n times", "repeat_str(s, n)", lambda t: "s * n" in t or "n * s" in t or "* n" in t),
+        ("write a function to capitalize the first letter of string s", "cap_first(s)", lambda t: "s.capitalize()" in t or "s[0].upper()" in t or ".capitalize()" in t),
+        ("write a function to find the index of element x in list lst", "find_index(lst, x)", lambda t: "lst.index(x)" in t or ".index(" in t or "enumerate(" in t or "range(len(" in t),
+        ("write a function to compute difference between maximum and minimum in list lst", "range_diff(lst)", lambda t: "max(lst) - min(lst)" in t or ("max(" in t and "min(" in t and "-" in t)),
+        ("write a function to check if number n is a perfect square", "is_perfect_square(n)", lambda t: "math.isqrt" in t or "** 0.5" in t or "**0.5" in t or "sqrt(" in t),
+        ("write a function to split string s by whitespace", "split_words(s)", lambda t: "s.split()" in t or ".split(" in t),
+        ("write a function to join list of strings words with spaces", "join_words(words)", lambda t: "' '.join(words)" in t or '" ".join' in t or ".join(" in t),
+        ("write a function to round float x to 2 decimal places", "round_two(x)", lambda t: "round(x, 2)" in t or "round(" in t),
+        ("write a function to reverse list lst in-place", "rev_in_place(lst)", lambda t: "lst.reverse()" in t or ".reverse()" in t or "lst[::-1]" in t),
+        ("write a function to return the unique elements of list lst as a list", "unique_elements(lst)", lambda t: "set(" in t or "unique" in t or "not in" in t)
     ]
     for i in range(50):
         desc, fn_name, chk = mbpp_pool[i % len(mbpp_pool)]

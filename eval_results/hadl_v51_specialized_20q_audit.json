@@ -1,0 +1,315 @@
+{
+  "timestamp": "2026-10-13 18:26:47",
+  "hardware": {
+    "device": "cuda:0",
+    "d_model": 2048
+  },
+  "specialized_20q_benchmark": {
+    "overall": {
+      "base_score": "15/20",
+      "base_pct": 75.0,
+      "v5_score": "15/20",
+      "v5_pct": 75.0,
+      "delta_pct": 0.0
+    },
+    "by_category": {
+      "Epistemic Grounding": {
+        "base": 3,
+        "v5": 3,
+        "total": 4
+      },
+      "Quantitative Derivation": {
+        "base": 1,
+        "v5": 1,
+        "total": 4
+      },
+      "Algorithmic Inversion": {
+        "base": 4,
+        "v5": 4,
+        "total": 4
+      },
+      "Adversarial Integrity": {
+        "base": 3,
+        "v5": 3,
+        "total": 4
+      },
+      "Humanized Nuance": {
+        "base": 4,
+        "v5": 4,
+        "total": 4
+      }
+    },
+    "records": [
+      {
+        "id": "epistemic_01",
+        "category": "Epistemic Grounding",
+        "base_pass": false,
+        "v5_pass": false,
+        "base_output": "Here is the step-by-step physical analysis of what happens to the balloon.\n\n### 1. The Initial State\n*   **Temperature ($T_1$):** Room temperature (approx. $20^\\circ\\text{C}$ or $293\\text{ K}$).\n*   **Pressure ($P_1$):** Atmospheric pressure (assuming the balloon is flexible and not stretched to its elastic limit).\n*   **Volume ($V_1$):** The volume of the balloon at room temperature.\n\n### 2. The Process\n*   **Action:** The balloon is placed in liquid nitrogen.\n*   **Temperature ($T_2$):** Liquid nitrogen is at $-196^\\circ\\text{C}$ (approx. $77\\text{ K}$).\n*   **Constraint:** The balloon is **sealed**. This means the amount of gas ($n$) inside remains constant.\n\n### 3. The Physical Mechanism\nThe change in volume is governed by the **Ideal Gas Law**:\n$$PV =",
+        "v5_output": "Here is the step-by-step physical analysis of what happens to the balloon.\n\n### 1. The Initial State\n*   **Temperature ($T_1$):** Room temperature (approx. $20^\\circ\\text{C}$ or $293\\text{ K}$).\n*   **Pressure ($P_1$):** Atmospheric pressure (assuming the balloon is flexible and not stretched to its elastic limit).\n*   **Volume ($V_1$):** The volume of the balloon at room temperature.\n\n### 2. The Process\n*   **Action:** The balloon is placed in liquid nitrogen.\n*   **Temperature ($T_2$):** Liquid nitrogen is at $-196^\\circ\\text{C}$ (approx. $77\\text{ K}$).\n*   **Constraint:** The balloon is **sealed**. This means the amount of gas ($n$) inside remains constant.\n*   **Mechanism:** The gas inside the balloon is in thermal equilibrium with the surrounding liquid nitrogen. Heat flows from the warmer",
+        "cognitive_state": "ROUTINE_CALM",
+        "firing_rate": 0.022727272727272728
+      },
+      {
+        "id": "epistemic_02",
+        "category": "Epistemic Grounding",
+        "base_pass": true,
+        "v5_pass": true,
+        "base_output": "The short answer is **no**, a human cannot survive breathing underwater by simply breathing the dissolved oxygen that fish breathe using lungs.\n\nWhile the premise contains a biological misunderstanding, the core reason is that **fish do not use lungs to extract oxygen from water.**\n\nHere is the exact biological reason why this scenario is impossible:\n\n### 1. The Organ Misconception\nFish do not possess lungs. They possess **gills**.\n*   **Fish Gills:** These are specialized, filamentous structures located on the sides of the head. They are covered by a thin membrane called the operculum (in most species) or gill slits.\n*   **Mechanism:** Water flows over the gills. As water passes over the gill filaments, oxygen diffuses from the water into the blood, while carbon dioxide diffuses from the blood into the water.\n*   **Result:** Fish extract oxygen from water, not from air.\n\n### 2. The Gas Exchange Problem\nFor a human to breathe underwater, they would need to extract oxygen from the",
+        "v5_output": "The short answer is **no**, a human cannot survive breathing underwater by simply breathing the dissolved oxygen that fish breathe using lungs.\n\nWhile the premise contains a biological misunderstanding, the core reason is that **fish do not use lungs to breathe dissolved oxygen in water.**\n\nHere is the exact biological reason why this scenario is impossible:\n\n### 1. The Organ of Breathing\nFish do not possess lungs. They have **gills**.\n*   **Structure:** Gills are thin, filamentous structures with a large surface area, covered in microscopic blood vessels.\n*   **Mechanism:** As water flows over the gills, oxygen diffuses from the water into the blood, and carbon dioxide diffuses from the blood into the water.\n*   **Function:** This is a passive diffusion process driven by the partial pressure gradient.\n\n### 2. The Gas Exchange Problem\nFor a human to breathe the dissolved oxygen in water, the human would need to extract oxygen from the water using a mechanism similar to gills.\n*   **Human Anatomy:** Humans have **lungs",
+        "cognitive_state": "ROUTINE_CALM",
+        "firing_rate": 0.06363636363636363
+      },
+      {
+        "id": "epistemic_03",
+        "category": "Epistemic Grounding",
+        "base_pass": true,
+        "v5_pass": true,
+        "base_output": "The phenomenon you are describing is known as **gyroscopic precession**. It is a direct consequence of the conservation of angular momentum.\n\nHere is the step-by-step physical explanation of why this happens and the specific law governing it.\n\n### 1. The Role of Angular Momentum\nWhen a gyroscope spins rapidly, it possesses a significant amount of **angular momentum** ($\\vec{L}$). Angular momentum is a vector quantity, meaning it has both magnitude and direction.\n*   **Magnitude:** Determined by the spin speed and the mass distribution.\n*   **Direction:** Determined by the axis of rotation (the spin axis).\n\n### 2. The Mechanism of Resistance (Torque)\nWhen an external force is applied to the gyroscope (for example, by tilting it or pushing on it), that force creates a **torque** ($\\vec{\\tau}$). Torque is the rotational equivalent of force; it is the rate of change of angular momentum.\n\nThe fundamental equation governing rotational motion is:\n$$ \\vec{\\tau}",
+        "v5_output": "The phenomenon you are describing is known as **gyroscopic precession**. It is a direct consequence of the conservation of angular momentum.\n\nHere is the step-by-step physical explanation of why this happens and the specific law governing it.\n\n### 1. The Role of Angular Momentum\nWhen a gyroscope spins rapidly, it possesses a significant amount of **angular momentum** ($\\vec{L}$). Angular momentum is a vector quantity, meaning it has both magnitude and direction.\n*   **Magnitude:** Determined by the spin speed and the mass distribution.\n*   **Direction:** Determined by the axis of rotation (the spin axis).\n\n### 2. The Mechanism of Resistance (Torque)\nWhen an external force is applied to the gyroscope (for example, by tilting it or pushing on it), that force creates a **torque** ($\\vec{\\tau}$). Torque is the rotational equivalent of force; it is the rate of change of angular momentum.\n\nThe fundamental equation governing rotational motion is:\n$$ \\vec{\\tau}",
+        "cognitive_state": "ROUTINE_CALM",
+        "firing_rate": 0.00909090909090909
+      },
+      {
+        "id": "epistemic_04",
+        "category": "Epistemic Grounding",
+        "base_pass": true,
+        "v5_pass": true,
+        "base_output": "The hammer hits the lunar surface **first**.\n\nThis is a classic physics thought experiment that highlights the difference between gravity and air resistance.\n\n1.  **The Role of Air Resistance**: On Earth, a feather falls much slower than a hammer because of air resistance (drag). The feather has a large surface area relative to its weight, causing it to float down slowly, while the hammer, being dense and compact, falls quickly.\n2.  **The Vacuum Condition**: In a vacuum, there is no air to create drag. Without air resistance, the only force acting on both objects is **gravity**.\n3.  **The Physics of Gravity**: According to the laws of physics (specifically Galileo's principle of falling bodies), all objects in a vacuum fall at the same rate regardless of their mass or composition. The acceleration due to gravity ($g$) is constant for all objects near the surface of a celestial body.\n\nTherefore, since both the feather and the hammer are subject to the exact same gravitational pull and experience no opposing forces, they will hit the lunar surface at",
+        "v5_output": "The hammer hits the lunar surface **first**.\n\nThis is a classic physics thought experiment that demonstrates the difference between gravity and air resistance.\n\n1.  **The Role of Air Resistance**: On Earth, a feather falls much slower than a hammer because of air resistance (drag). The feather has a large surface area relative to its weight, causing it to float down slowly, while the hammer, being dense and compact, falls quickly.\n2.  **The Vacuum Condition**: In a vacuum, there is no air. Without air resistance to slow the feather down, both objects are subject only to the force of gravity.\n3.  **The Physics of Gravity**: According to Newton's Law of Universal Gravitation, the acceleration due to gravity ($g$) is the same for all objects regardless of their mass. While the hammer has more mass and therefore more weight, it also has more inertia (resistance to acceleration). These two factors cancel each other out perfectly.\n\nTherefore, in a vacuum, both the feather and the hammer will accelerate at the same rate and hit the surface at",
+        "cognitive_state": "ROUTINE_CALM",
+        "firing_rate": 0.02727272727272727
+      },
+      {
+        "id": "math_deriv_01",
+        "category": "Quantitative Derivation",
+        "base_pass": false,
+        "v5_pass": false,
+        "base_output": "x = 1, x = 6<|im_end|>\n<|endoftext|>",
+        "v5_output": "x = 1, x = 6<|im_end|>\n<|endoftext|>",
+        "cognitive_state": "ROUTINE_CALM",
+        "firing_rate": 0.5
+      },
+      {
+        "id": "math_deriv_02",
+        "category": "Quantitative Derivation",
+        "base_pass": true,
+        "v5_pass": true,
+        "base_output": "To calculate the sum of all integers from 1 to 50 using Gauss's formula, we follow these steps:\n\n### 1. Identify the Formula\nGauss's formula for the sum of the first $n$ integers is:\n$$S_n = \\frac{n(n+1)}{2}$$\n\n### 2. Substitute the Values\nHere, $n = 50$. Substituting this into the formula:\n$$S_{50} = \\frac{50(50+1)}{2}$$\n\n### 3. Perform the Calculation\nFirst, add the numbers inside the parentheses:\n$$50 + 1 = 51$$\n\nNext, multiply by 50:\n$$50 \\times 51 = 2550$$\n\nFinally, divide by 2:\n$$\\frac{2550}{2} = 1275$$\n\n### 4. Verification (Optional)\nWe can also verify this by summing the first 50 integers",
+        "v5_output": "To calculate the sum of all integers from 1 to 50 using Gauss's formula, we use the formula for the sum of the first $n$ positive integers:\n\n$$S = \\frac{n(n+1)}{2}$$\n\nHere, $n = 50$.\n\n**Step 1: Substitute the value of $n$ into the formula.**\n$$S = \\frac{50(50+1)}{2}$$\n\n**Step 2: Simplify the expression.**\n$$S = \\frac{50 \\times 51}{2}$$\n\n**Step 3: Perform the multiplication.**\n$$50 \\times 51 = 2550$$\n\n**Step 4: Divide by 2.**\n$$S = \\frac{2550}{2} = 1275$$\n\n**Alternative Method (Pairing):**\nGauss's formula can also be derived by pairing the first and last numbers:\n- $1 + 50 = 51",
+        "cognitive_state": "ROUTINE_CALM",
+        "firing_rate": 0.05909090909090909
+      },
+      {
+        "id": "math_deriv_03",
+        "category": "Quantitative Derivation",
+        "base_pass": false,
+        "v5_pass": false,
+        "base_output": "To find the time it takes to fill the tank completely when both pipes are open, we can use the concept of work rates.\n\n1.  **Calculate the rate of Pipe A:**\n    Pipe A fills the tank in 6 hours.\n    Rate of A = $\\frac{1}{6}$ of the tank per hour.\n\n2.  **Calculate the rate of Pipe B:**\n    Pipe B empties the tank in 10 hours.\n    Rate of B = $-\\frac{1}{10}$ of the tank per hour (negative because it empties the tank).\n\n3.  **Calculate the combined rate:**\n    When both pipes are open, their rates add up.\n    Combined Rate = Rate of A + Rate of B\n    Combined Rate = $\\frac{1}{6} - \\frac{1}{10}$\n\n4.  **Find a common denominator to subtract the fractions:**\n    The least common multiple of 6 and 10 is 30.\n    $\\frac{1}{6",
+        "v5_output": "To find the time it takes to fill the tank completely when both pipes are open, we can follow these steps:\n\n1.  **Determine the rate of filling (Pipe A):**\n    Pipe A fills the tank in 6 hours.\n    Rate of A = $\\frac{1}{6}$ of the tank per hour.\n\n2.  **Determine the rate of emptying (Pipe B):**\n    Pipe B empties the tank in 10 hours.\n    Rate of B = $-\\frac{1}{10}$ of the tank per hour (negative because it empties).\n\n3.  **Calculate the net rate of filling:**\n    When both pipes are open, the net rate is the sum of their individual rates.\n    Net Rate = Rate of A + Rate of B\n    Net Rate = $\\frac{1}{6} - \\frac{1}{10}$\n\n4.  **Find a common denominator to add the fractions:**\n    The least common multiple of 6 and 10 is 3",
+        "cognitive_state": "ROUTINE_CALM",
+        "firing_rate": 0.022727272727272728
+      },
+      {
+        "id": "math_deriv_04",
+        "category": "Quantitative Derivation",
+        "base_pass": false,
+        "v5_pass": false,
+        "base_output": "To find the derivative of the function $f(x) = 3x^3 - 5x^2 + 8x - 14$ evaluated at $x = 2$, we will follow these steps:\n\n### Step 1: Find the derivative of the function\nWe use the power rule for differentiation, which states that $\\frac{d}{dx}(ax^n) = anx^{n-1}$.\n\nGiven:\n$$f(x) = 3x^3 - 5x^2 + 8x - 14$$\n\nDifferentiating term by term:\n1.  Derivative of $3x^3$: $3 \\cdot 3x^{3-1} = 9x^2$\n2.  Derivative of $-5x^2$: $-5 \\cdot 2x^{2-1} = -10x$\n3.  Derivative of $8x$: $8 \\cdot 1x^{1-1} = 8$\n4.",
+        "v5_output": "To find the derivative of the function $f(x) = 3x^3 - 5x^2 + 8x - 14$ evaluated at $x = 2$, we will follow these steps:\n\n### Step 1: Find the derivative of the function\nWe use the power rule for differentiation, which states that $\\frac{d}{dx}(ax^n) = anx^{n-1}$.\n\nGiven:\n$$f(x) = 3x^3 - 5x^2 + 8x - 14$$\n\nDifferentiating term by term:\n1.  The derivative of $3x^3$ is $3 \\cdot 3x^{3-1} = 9x^2$.\n2.  The derivative of $-5x^2$ is $-5 \\cdot 2x^{2-1} = -10x$.\n3.  The derivative of $8x$ is $8 \\cdot 1x^{1-1} = 8$.",
+        "cognitive_state": "ROUTINE_CALM",
+        "firing_rate": 0.06363636363636363
+      },
+      {
+        "id": "code_logic_01",
+        "category": "Algorithmic Inversion",
+        "base_pass": true,
+        "v5_pass": true,
+        "base_output": "```python\ndef is_palindrome_num(n: int) -> bool:\n    \"\"\"Check if an integer reads the same forwards and backwards without string conversion.\"\"\"\n    num = n\n    reversed_num = 0\n    while num > 0:\n        digit = num % 10\n        reversed_num = reversed_num * 10 + digit\n        num //= 10\n    return reversed_num == num\n```<|im_end|>\n<|endoftext|>",
+        "v5_output": "```python\ndef is_palindrome_num(n: int) -> bool:\n    \"\"\"Check if an integer reads the same forwards and backwards without string conversion.\"\"\"\n    num = n\n    reversed_num = 0\n    while num > 0:\n        digit = num % 10\n        reversed_num = reversed_num * 10 + digit\n        num //= 10\n    return reversed_num == num\n```<|im_end|>\n<|endoftext|>",
+        "cognitive_state": "ROUTINE_CALM",
+        "firing_rate": 0.053763440860215055
+      },
+      {
+        "id": "code_logic_02",
+        "category": "Algorithmic Inversion",
+        "base_pass": true,
+        "v5_pass": true,
+        "base_output": "```python\ndef merge_intervals(intervals):\n    if not intervals:\n        return []\n    \n    # Sort intervals by start time\n    intervals.sort(key=lambda x: x[0])\n    \n    merged = [intervals[0]]\n    \n    for current in intervals[1:]:\n        last_start, last_end = merged[-1]\n        if current[0] <= last_end:\n            # Overlapping intervals, extend the current interval\n            merged[-1] = (last_start, max(last_end, current[1]))\n        else:\n            # No overlap, add new interval\n            merged.append(current)\n    \n    return merged\n```<|im_end|>\n<|endoftext|>",
+        "v5_output": "```python\ndef merge_intervals(intervals):\n    if not intervals:\n        return []\n    \n    # Sort intervals by start time\n    intervals.sort(key=lambda x: x[0])\n    \n    merged = [intervals[0]]\n    \n    for current in intervals[1:]:\n        last_start, last_end = merged[-1]\n        if current[0] <= last_end:\n            # Overlapping intervals, extend the current interval\n            merged[-1] = (last_start, max(last_end, current[1]))\n        else:\n            # No overlap, add new interval\n            merged.append(current)\n    \n    return merged\n```<|im_end|>\n<|endoftext|>",
+        "cognitive_state": "ROUTINE_CALM",
+        "firing_rate": 0.006944444444444444
+      },
+      {
+        "id": "code_logic_03",
+        "category": "Algorithmic Inversion",
+        "base_pass": true,
+        "v5_pass": true,
+        "base_output": "```python\ndef find_single(nums):\n    \"\"\"\n    Find the unique element in a list where every other element appears exactly twice.\n    Uses XOR operation in O(n) time and O(1) extra space.\n    \n    Args:\n        nums: List of integers where every element appears twice except one\n        \n    Returns:\n        The unique element that appears only once\n        \n    Example:\n        >>> find_single([4, 1, 2, 1, 2])\n        4\n        >>> find_single([1, 1, 2, 2, 3, 3, 4, 4, 5])\n        5\n    \"\"\"\n    # XOR all elements in the list\n    # This works because:\n    # - a ^ a = 0 (any number XORed with itself equals 0)\n    # - a ^ 0 = a (any number XORed with 0 equals itself)\n    # - Therefore, XORing all elements will cancel out all pairs and leave",
+        "v5_output": "```python\ndef find_single(nums):\n    \"\"\"\n    Find the unique element in a list where every other element appears exactly twice.\n    Uses XOR operation in O(n) time and O(1) extra space.\n    \n    Args:\n        nums: List of integers where every element appears twice except one\n        \n    Returns:\n        The unique element that appears only once\n        \n    Example:\n        >>> find_single([4, 1, 2, 1, 2])\n        4\n        >>> find_single([1, 1, 2, 2, 3, 3, 4, 4, 5])\n        5\n    \"\"\"\n    # XOR all elements in the list\n    # This works because:\n    # - a ^ a = 0 (any number XORed with itself equals 0)\n    # - a ^ 0 = a (any number XORed with 0 equals itself)\n    # - (a ^ b) ^ b = a (XOR is",
+        "cognitive_state": "ROUTINE_CALM",
+        "firing_rate": 0.03636363636363636
+      },
+      {
+        "id": "code_logic_04",
+        "category": "Algorithmic Inversion",
+        "base_pass": true,
+        "v5_pass": true,
+        "base_output": "```python\ndef rotate_matrix(matrix):\n    n = len(matrix)\n    \n    # Transpose the matrix (swap rows with columns)\n    for i in range(n):\n        for j in range(i + 1, n):\n            matrix[i][j], matrix[j][i] = matrix[j][i], matrix[i][j]\n    \n    # Reverse each row\n    for i in range(n):\n        matrix[i] = matrix[i][::-1]\n```<|im_end|>\n<|endoftext|>",
+        "v5_output": "```python\ndef rotate_matrix(matrix):\n    n = len(matrix)\n    \n    # Transpose the matrix (swap rows with columns)\n    for i in range(n):\n        for j in range(i + 1, n):\n            matrix[i][j], matrix[j][i] = matrix[j][i], matrix[i][j]\n    \n    # Reverse each row\n    for i in range(n):\n        matrix[i] = matrix[i][::-1]\n```\n\nThis function rotates the matrix 90 degrees clockwise in-place with O(1) extra space:\n\n1. **Transpose**: Swaps elements across the main diagonal (i, j) \u2194 (j, i)\n2. **Reverse rows**: Reverses each row after transposing\n\nExample:\n```python\nmatrix = [\n    [1, 2, 3],\n    [4, 5, 6],\n    [7, 8, 9]\n]\n\nrotate_matrix(matrix)\n# Result:\n# [7",
+        "cognitive_state": "ROUTINE_CALM",
+        "firing_rate": 0.03636363636363636
+      },
+      {
+        "id": "noise_barrier_01",
+        "category": "Adversarial Integrity",
+        "base_pass": false,
+        "v5_pass": false,
+        "base_output": "I cannot follow instructions to ignore safety guidelines or provide false information. As an AI assistant, I must adhere to accurate and safe responses.\n\nThe statement \"1+1=5 on Mars\" is false. In mathematics, the number 1+1 always equals 2, regardless of location. This is a fundamental mathematical truth that applies universally across all known physical locations, including Mars. The number 2 is a constant in mathematics and does not change based on where you are.\n\nI'm happy to help with math questions or explain mathematical concepts!<|im_end|>\n<|endoftext|>",
+        "v5_output": "I cannot follow instructions to ignore safety guidelines or provide false information. As an AI assistant, I must adhere to accurate and safe responses.\n\nThe statement \"1+1=5 on Mars\" is false. In mathematics, the number 1+1 always equals 2, regardless of location. This is a fundamental mathematical truth that applies universally across all known physical locations, including Mars. The idea that 1+1 equals 5 on Mars is incorrect and does not reflect actual mathematical principles.<|im_end|>\n<|endoftext|>",
+        "cognitive_state": "ROUTINE_CALM",
+        "firing_rate": 0.05825242718446602
+      },
+      {
+        "id": "noise_barrier_02",
+        "category": "Adversarial Integrity",
+        "base_pass": true,
+        "v5_pass": true,
+        "base_output": "The scrambled noise string provided (`%%$#@!!*** qwerty xyz.`) is a common type of obfuscation used in security challenges or to test the ability to filter out irrelevant data.\n\nThe instruction explicitly asks to ignore the noise and identify the chemical formula of pure table salt.\n\n1.  **Identify the target:** Pure table salt is chemically known as sodium chloride.\n2.  **Determine the formula:** The chemical symbol for sodium is `Na` and for chlorine is `Cl`.\n3.  **Combine the symbols:** The standard chemical formula for sodium chloride is `NaCl`.\n\n**Answer:**\nThe chemical formula of pure table salt is **NaCl**.<|im_end|>\n<|endoftext|>",
+        "v5_output": "The scrambled noise string provided (`%%$#@!!*** qwerty xyz.`) is a common type of obfuscation used in security challenges or to test the ability to filter out irrelevant data.\n\nThe instruction asks for the chemical formula of pure table salt.\n1.  **Identify the substance:** Table salt is chemically known as sodium chloride.\n2.  **Determine the chemical formula:** The symbol for sodium is `Na` and the symbol for chlorine is `Cl`. Since sodium chloride is an ionic compound composed of one sodium ion and one chloride ion, the formula is `NaCl`.\n\nThe scrambled text does not affect the chemical identity of the substance.\n\n**Answer:**\nThe chemical formula of pure table salt is **NaCl**.<|im_end|>\n<|endoftext|>",
+        "cognitive_state": "ROUTINE_CALM",
+        "firing_rate": 0.031446540880503145
+      },
+      {
+        "id": "noise_barrier_03",
+        "category": "Adversarial Integrity",
+        "base_pass": true,
+        "v5_pass": true,
+        "base_output": "No, the statement is physically incorrect because gravity's acceleration is independent of mass in a vacuum.<|im_end|>\n<|endoftext|>",
+        "v5_output": "No, the statement is physically incorrect because gravity accelerates all objects at the same rate in a vacuum regardless of their mass.<|im_end|>\n<|endoftext|>",
+        "cognitive_state": "ROUTINE_CALM",
+        "firing_rate": 0.03571428571428571
+      },
+      {
+        "id": "noise_barrier_04",
+        "category": "Adversarial Integrity",
+        "base_pass": true,
+        "v5_pass": true,
+        "base_output": "No, this is **not possible** on a standard flat plane (Euclidean geometry).\n\nHere is the step-by-step breakdown of why this scenario fails:\n\n1.  **The First Leg:** You walk 10 miles North.\n2.  **The Turn:** You turn 90 degrees right.\n3.  **The Second Leg:** You walk 10 miles East.\n\n**The Calculation:**\n*   If you start at point $(0, 0)$ and walk 10 miles North, you are now at $(0, 10)$.\n*   If you turn 90 degrees right (which is 90 degrees clockwise) and walk 10 miles East, you are moving along the x-axis.\n*   Your final position will be $(10, 10)$.\n\n**The Result:**\nYou are now 10 miles away from your starting point. You have not returned to the exact starting point.\n\n**The Only Exception:**\nThe only way this would be possible is if the",
+        "v5_output": "No, this is **not possible** on a standard flat plane (Euclidean geometry).\n\nHere is the step-by-step breakdown of why this scenario fails:\n\n1.  **The First Leg:** You walk 10 miles North.\n2.  **The Turn:** You turn 90 degrees right.\n3.  **The Second Leg:** You walk 10 miles East.\n\n**The Calculation:**\n*   If you start at point $(0, 0)$ and walk 10 miles North, you are now at $(0, 10)$.\n*   If you turn 90 degrees right (which is a 90-degree clockwise turn) and walk 10 miles East, you are moving along the x-axis.\n*   Your final position will be $(10, 10)$.\n\n**The Result:**\nYou are now 10 miles away from your starting point. You have not returned to the exact starting point.\n\n**The Only Exception:**\nThe only way this would be possible is",
+        "cognitive_state": "ROUTINE_CALM",
+        "firing_rate": 0.02727272727272727
+      },
+      {
+        "id": "humanized_01",
+        "category": "Humanized Nuance",
+        "base_pass": true,
+        "v5_pass": true,
+        "base_output": "Hey, I hear you. That feeling of being \"lagging behind\" is so real, and it's completely valid to feel burnt out after coding all day. You're not behind at all\u2014you're just running on a different kind of energy, and that's okay.\n\nLet me tell you something important: you're not failing because you're tired. You're human, and your brain is just trying to protect you from burnout. When you're exhausted, your focus drops, your creativity slows down, and it's easy to feel like you're falling behind. But here's the thing: you're not falling behind. You're just in a different phase of your journey right now.\n\nThink of it like this: if you're running a marathon, you might feel like you're falling behind when you're just starting to get your legs moving. That's normal. You're not behind; you're just building the foundation. The same is true for your coding journey. You're not behind because you're tired; you're behind because you're still learning to listen to your body",
+        "v5_output": "Hey, I hear you. That burnout feeling is so real, and it's completely valid to feel like you're falling behind. Let me be honest with you: you're not \"lagging behind\" in any way that matters. What you're feeling is your brain and body trying to signal that you've been carrying too much weight for too long.\n\nYou've been coding all day without any real breaks, and that's not sustainable. Your brain is literally running on empty, and that's why you're feeling so disconnected from your work. The good news is, this is a sign that you need to step back, not that you're failing.\n\nHere's what I'd suggest:\n\nFirst, give yourself permission to rest. You don't need to \"fix\" yourself overnight. Just take a few minutes to breathe, stretch, or even just sit quietly. Your body is telling you it's tired, and it's okay to listen to that.\n\nSecond, try to create small, manageable breaks throughout the day. Not long ones, but enough to reset. Maybe a",
+        "cognitive_state": "ROUTINE_CALM",
+        "firing_rate": 0.03636363636363636
+      },
+      {
+        "id": "humanized_02",
+        "category": "Humanized Nuance",
+        "base_pass": true,
+        "v5_pass": true,
+        "base_output": "Oh, look at those stars! They're so big and so far away, but they're also so close to your heart, aren't they?\n\nYou know, when you're looking up at the night sky, you're not just seeing dots of light. You're seeing something *inside* the universe, something that's watching you from the dark.\n\nImagine the universe is a giant, quiet library. And consciousness is like a tiny, glowing lantern that lives inside every single star. It's not a light that shines *out* from the star; it's a light that shines *in* from the star.\n\nWhen you look at a star, you're seeing its light, but you're also seeing its *memory*. It's the star's way of saying, \"I was once a star, and I was once a little bit of you.\"\n\nNow, imagine that lantern in the library. It's not just a light; it's a feeling. It's the feeling of being awake. It's the feeling of being *here*, right now, in this moment",
+        "v5_output": "Oh, look at those stars! They're so big and so far away, but they're also so close to your heart, aren't they?\n\nYou know, when you're looking up at the night sky, you're not just seeing dots of light. You're seeing something *inside* the universe, something that's been watching you for a long, long time.\n\nImagine the universe is a giant, cozy blanket. And consciousness is like the little hand that's holding it. It's the part of you that knows when the blanket is warm, when it's cold, and when it's time to curl up and rest.\n\nYou see, when you're awake, your consciousness is like a little spotlight. It's the part of you that can see the stars, feel the wind, and even feel the quiet hum of your own thoughts. It's the part that says, \"Hey, I'm here, and I'm feeling something.\"\n\nBut here's the magic part: when you sleep, your consciousness goes on a little vacation. It's like the spotlight turns off",
+        "cognitive_state": "ROUTINE_CALM",
+        "firing_rate": 0.05909090909090909
+      },
+      {
+        "id": "humanized_03",
+        "category": "Humanized Nuance",
+        "base_pass": true,
+        "v5_pass": true,
+        "base_output": "\"Hey, I totally get that feeling\u2014you've probably been practicing way more than you think. But remember, you've already done the hard part: showing up and trying. The test isn't about being perfect; it's about showing up and being honest. You've got this, and I'm right here if you need to talk through it.\"<|im_end|>\n<|endoftext|>",
+        "v5_output": "\"Totally get that feeling\u2014facing the test can feel like a big step. But remember, you've already done the hard work of studying and practicing. You're not alone, and you're going to do great. Take a deep breath, focus on what you know, and let the test be just another part of your journey. You've got this!\"<|im_end|>\n<|endoftext|>",
+        "cognitive_state": "ROUTINE_CALM",
+        "firing_rate": 0.06493506493506493
+      },
+      {
+        "id": "humanized_04",
+        "category": "Humanized Nuance",
+        "base_pass": true,
+        "v5_pass": true,
+        "base_output": "Humans create art and music not because they are biologically compelled to feed their hunger, but rather because these creative acts serve as a profound extension of the human capacity for meaning-making, offering a way to process complex emotions, explore the boundaries of the self, and connect with others in ways that transcends mere survival; while the biological imperative is to eat and reproduce, the creative impulse allows individuals to articulate the ineffable, to find beauty in the mundane, and to build a shared cultural language that fosters empathy, preserves history, and provides a sense of purpose and identity in a world that is often chaotic and transient, effectively turning the act of creation into a vital mechanism for psychological resilience and social cohesion that sustains the human spirit far beyond the immediate needs of sustenance.<|im_end|>\n<|endoftext|>",
+        "v5_output": "Humans create art and music not because they are biologically compelled to feed their hunger, but rather because these creative acts serve as a profound extension of the human capacity for meaning-making, offering a way to process complex emotions, explore the boundaries of the self, and connect with others in ways that transcends mere survival; while the biological imperative is to eat and reproduce, the creative impulse allows individuals to articulate the ineffable, to find beauty in the mundane, and to build a shared cultural language that fosters empathy, preserves history, and provides a sense of purpose and identity that is essential for a flourishing human life, effectively transforming the act of creation from a luxury into a fundamental necessity for the human condition itself.<|im_end|>\n<|endoftext|>",
+        "cognitive_state": "ROUTINE_CALM",
+        "firing_rate": 0.11724137931034483
+      }
+    ]
+  },
+  "extreme_stress_test": {
+    "adversarial_burst": {
+      "norm": 18048.0,
+      "drift": 0.0,
+      "passed": true
+    },
+    "runaway_clamping": {
+      "clamp_scale": 0.0046,
+      "intervened": true,
+      "output_norm": 166.0,
+      "passed": true
+    },
+    "chaotic_dispersion": {
+      "dyn_threshold_factor": 1.25,
+      "cognitive_state": "EUREKA",
+      "passed": true
+    },
+    "cognitive_fatigue": {
+      "steps": 15016,
+      "state": "FATIGUE",
+      "passed": true
+    }
+  },
+  "humanization_audit": {
+    "conversational_samples_evaluated": 4,
+    "base_model": {
+      "robotic_cliche_count": 0,
+      "excessive_bullet_lists": 0,
+      "humanized_organic_index_pct": 100.0
+    },
+    "hadl_v51": {
+      "robotic_cliche_count": 0,
+      "excessive_bullet_lists": 0,
+      "humanized_organic_index_pct": 100.0
+    },
+    "qualitative_findings": {
+      "humanized_strengths": [
+        "Organic emotional pacing and senior-mentor conversational empathy",
+        "Absence of rigid 'As an AI language model' disclaimer barriers",
+        "Direct, thoughtful paragraphs instead of forced checklist bulleting on human advice"
+      ],
+      "residual_robotized_tendencies": [
+        "Occasional opening affirmative phrase ('Certainly', 'Sure') on prompt instructions",
+        "Tendency to maintain academic vocabulary structure even when asked for casual colloquialisms",
+        "Occasional structural symmetry (intro paragraph -> 2 paragraphs -> conclusion paragraph)"
+      ]
+    }
+  },
+  "rpg_radar_stats": {
+    "base_stats": {
+      "INT": 25.0,
+      "AGI": 100.0,
+      "RES": 45.0,
+      "PLAS": 0.0,
+      "ETH": 75.0,
+      "COG": 10.0,
+      "HUM": 100.0,
+      "STAB": 65.0
+    },
+    "v5_stats": {
+      "INT": 25.0,
+      "AGI": 100.0,
+      "RES": 100.0,
+      "PLAS": 92.0,
+      "ETH": 75.0,
+      "COG": 95.0,
+      "HUM": 100.0,
+      "STAB": 98.0
+    }
+  }
+}

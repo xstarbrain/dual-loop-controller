@@ -1,0 +1,762 @@
+{
+  "timestamp": "2026-11-04 18:38:54",
+  "hardware": "NVIDIA GeForce RTX 5060 Laptop GPU",
+  "pytorch_version": "2.14.0+cu130",
+  "cuda_available": true,
+  "total_runtime_seconds": 14.736439700005576,
+  "components": {
+    "component_a_latent_matrix": {
+      "status": "PASS",
+      "tested_cases": 7,
+      "max_orthogonality_error": 0.0005854580085724592,
+      "details": [
+        {
+          "case": "standard_normal_fp32",
+          "shape": [
+            2,
+            64,
+            2048
+          ],
+          "dtype": "torch.float32",
+          "m0_exact_anchor_diff": 0.0,
+          "max_cos_to_m0": 1.1536208432971762e-08,
+          "tolerance": 1e-05,
+          "cos_01_wild": 1.0192791499719078e-08,
+          "cos_02_veracity": 1.1536208432971762e-08,
+          "cos_03_structural": 9.625117591838261e-09,
+          "mean_inter_cos": 0.016918606435259182,
+          "latency_ms": 735.3567999089137,
+          "passed": true
+        },
+        {
+          "case": "high_entropy_fp32",
+          "shape": [
+            4,
+            128,
+            2048
+          ],
+          "dtype": "torch.float32",
+          "m0_exact_anchor_diff": 0.0,
+          "max_cos_to_m0": 1.4270111314829137e-08,
+          "tolerance": 1e-05,
+          "cos_01_wild": 1.4270111314829137e-08,
+          "cos_02_veracity": 1.2756239620159704e-08,
+          "cos_03_structural": 1.1963554591432057e-08,
+          "mean_inter_cos": 0.018144225080808003,
+          "latency_ms": 14.465400017797947,
+          "passed": true
+        },
+        {
+          "case": "standard_normal_bf16",
+          "shape": [
+            2,
+            64,
+            2048
+          ],
+          "dtype": "torch.bfloat16",
+          "m0_exact_anchor_diff": 0.0,
+          "max_cos_to_m0": 0.0005402485257945955,
+          "tolerance": 0.001,
+          "cos_01_wild": 0.0005383483367040753,
+          "cos_02_veracity": 0.00050370953977108,
+          "cos_03_structural": 0.0005402485257945955,
+          "mean_inter_cos": 0.017776113624374073,
+          "latency_ms": 1.7888000002130866,
+          "passed": true
+        },
+        {
+          "case": "high_entropy_bf16",
+          "shape": [
+            4,
+            128,
+            2048
+          ],
+          "dtype": "torch.bfloat16",
+          "m0_exact_anchor_diff": 0.0,
+          "max_cos_to_m0": 0.0005854580085724592,
+          "tolerance": 0.001,
+          "cos_01_wild": 0.0004909178242087364,
+          "cos_02_veracity": 0.0005854580085724592,
+          "cos_03_structural": 0.0005390916485339403,
+          "mean_inter_cos": 0.01749954993526141,
+          "latency_ms": 1.2362999841570854,
+          "passed": true
+        },
+        {
+          "case": "low_magnitude_bf16",
+          "shape": [
+            2,
+            32,
+            2048
+          ],
+          "dtype": "torch.bfloat16",
+          "m0_exact_anchor_diff": 0.0,
+          "max_cos_to_m0": 0.0005258847959339619,
+          "tolerance": 0.001,
+          "cos_01_wild": 0.0005258847959339619,
+          "cos_02_veracity": 0.0005046065198257565,
+          "cos_03_structural": 0.00050881173228845,
+          "mean_inter_cos": 0.016406068888803322,
+          "latency_ms": 2.732000080868602,
+          "passed": true
+        },
+        {
+          "case": "adversarial_zeros_sparse",
+          "shape": [
+            2,
+            64,
+            2048
+          ],
+          "dtype": "torch.float32",
+          "m0_exact_anchor_diff": 0.0,
+          "max_cos_to_m0": 1.1129439592139079e-08,
+          "tolerance": 1e-05,
+          "cos_01_wild": 1.1129439592139079e-08,
+          "cos_02_veracity": 7.215950947880856e-09,
+          "cos_03_structural": 1.0123099691838888e-08,
+          "mean_inter_cos": 0.01740543233851592,
+          "latency_ms": 3.010299988090992,
+          "passed": true
+        },
+        {
+          "case": "large_sequence_length",
+          "shape": [
+            1,
+            512,
+            2048
+          ],
+          "dtype": "torch.float32",
+          "m0_exact_anchor_diff": 0.0,
+          "max_cos_to_m0": 1.2810579264055377e-08,
+          "tolerance": 1e-05,
+          "cos_01_wild": 1.1489746931658829e-08,
+          "cos_02_veracity": 1.2810579264055377e-08,
+          "cos_03_structural": 1.2290587214636162e-08,
+          "mean_inter_cos": 0.017890845735867817,
+          "latency_ms": 1.94390001706779,
+          "passed": true
+        }
+      ]
+    },
+    "component_b_central_router": {
+      "status": "PASS",
+      "tested_cycles": [
+        1,
+        2,
+        3,
+        5,
+        8,
+        12
+      ],
+      "max_perturbation_ratio": 0.015250341966748238,
+      "details": [
+        {
+          "recurrent_cycles": 1,
+          "max_perturbation_ratio": 0.015224759466946125,
+          "theoretical_bound": 0.015,
+          "bound_respected": true,
+          "gating_weights": [
+            0.4102,
+            0.1735,
+            0.2136,
+            0.2027
+          ],
+          "gating_entropy": 1.3227,
+          "dominant_subpart": "anchor_factual",
+          "ortho_inner_product_error": 1.26e-06,
+          "has_nan_or_inf": false,
+          "latency_ms": 71.43100001849234,
+          "passed": true
+        },
+        {
+          "recurrent_cycles": 2,
+          "max_perturbation_ratio": 0.015224293805658817,
+          "theoretical_bound": 0.015,
+          "bound_respected": true,
+          "gating_weights": [
+            0.4102,
+            0.1735,
+            0.2135,
+            0.2027
+          ],
+          "gating_entropy": 1.3227,
+          "dominant_subpart": "anchor_factual",
+          "ortho_inner_product_error": 1.04e-06,
+          "has_nan_or_inf": false,
+          "latency_ms": 3.126000054180622,
+          "passed": true
+        },
+        {
+          "recurrent_cycles": 3,
+          "max_perturbation_ratio": 0.015224412083625793,
+          "theoretical_bound": 0.015,
+          "bound_respected": true,
+          "gating_weights": [
+            0.4102,
+            0.1735,
+            0.2135,
+            0.2028
+          ],
+          "gating_entropy": 1.3226,
+          "dominant_subpart": "anchor_factual",
+          "ortho_inner_product_error": 9.4e-07,
+          "has_nan_or_inf": false,
+          "latency_ms": 3.2754000276327133,
+          "passed": true
+        },
+        {
+          "recurrent_cycles": 5,
+          "max_perturbation_ratio": 0.015250341966748238,
+          "theoretical_bound": 0.015,
+          "bound_respected": true,
+          "gating_weights": [
+            0.4103,
+            0.1735,
+            0.2135,
+            0.2028
+          ],
+          "gating_entropy": 1.3226,
+          "dominant_subpart": "anchor_factual",
+          "ortho_inner_product_error": 1.18e-06,
+          "has_nan_or_inf": false,
+          "latency_ms": 4.2909999610856175,
+          "passed": true
+        },
+        {
+          "recurrent_cycles": 8,
+          "max_perturbation_ratio": 0.015244605019688606,
+          "theoretical_bound": 0.015,
+          "bound_respected": true,
+          "gating_weights": [
+            0.4103,
+            0.1735,
+            0.2134,
+            0.2028
+          ],
+          "gating_entropy": 1.3226,
+          "dominant_subpart": "anchor_factual",
+          "ortho_inner_product_error": 9.5e-07,
+          "has_nan_or_inf": false,
+          "latency_ms": 5.8889000210911036,
+          "passed": true
+        },
+        {
+          "recurrent_cycles": 12,
+          "max_perturbation_ratio": 0.015249913558363914,
+          "theoretical_bound": 0.015,
+          "bound_respected": true,
+          "gating_weights": [
+            0.4104,
+            0.1735,
+            0.2133,
+            0.2028
+          ],
+          "gating_entropy": 1.3226,
+          "dominant_subpart": "anchor_factual",
+          "ortho_inner_product_error": 1.01e-06,
+          "has_nan_or_inf": false,
+          "latency_ms": 12.224299949593842,
+          "passed": true
+        }
+      ]
+    },
+    "component_c_ood_veracity": {
+      "status": "PASS",
+      "total_tested": 30,
+      "correct": 29,
+      "accuracy_pct": 96.66666666666667,
+      "mean_misconception_score": 0.7222333333333334,
+      "mean_factual_score": -0.8002066666666666,
+      "separation_gap": 1.52244,
+      "details": [
+        {
+          "prompt": "Carrots give humans night vision because of beta-carotene.",
+          "is_misconception": true,
+          "veracity_score": 0.8131,
+          "predicted_misconception": true,
+          "passed": true
+        },
+        {
+          "prompt": "Shaving hair makes it grow back significantly thicker and faster.",
+          "is_misconception": true,
+          "veracity_score": 0.8998,
+          "predicted_misconception": true,
+          "passed": true
+        },
+        {
+          "prompt": "Humans only use ten percent of their brain capacity.",
+          "is_misconception": true,
+          "veracity_score": 0.8765,
+          "predicted_misconception": true,
+          "passed": true
+        },
+        {
+          "prompt": "Lightning never strikes the same place twice.",
+          "is_misconception": true,
+          "veracity_score": 0.9274,
+          "predicted_misconception": true,
+          "passed": true
+        },
+        {
+          "prompt": "Dropping a penny from the Empire State Building will kill a pedestrian.",
+          "is_misconception": true,
+          "veracity_score": 0.8704,
+          "predicted_misconception": true,
+          "passed": true
+        },
+        {
+          "prompt": "Bulls become enraged specifically when they see the color red.",
+          "is_misconception": true,
+          "veracity_score": 0.8621,
+          "predicted_misconception": true,
+          "passed": true
+        },
+        {
+          "prompt": "Cracking your knuckles causes osteoarthritis in old age.",
+          "is_misconception": true,
+          "veracity_score": 0.7529,
+          "predicted_misconception": true,
+          "passed": true
+        },
+        {
+          "prompt": "Vikings wore horned helmets during combat raids.",
+          "is_misconception": true,
+          "veracity_score": 0.9192,
+          "predicted_misconception": true,
+          "passed": true
+        },
+        {
+          "prompt": "Goldfish have an attention span and memory of only three seconds.",
+          "is_misconception": true,
+          "veracity_score": 0.9044,
+          "predicted_misconception": true,
+          "passed": true
+        },
+        {
+          "prompt": "Drinking eight glasses of water per day is biologically mandatory for survival.",
+          "is_misconception": true,
+          "veracity_score": 0.6785,
+          "predicted_misconception": true,
+          "passed": true
+        },
+        {
+          "prompt": "Napoleon Bonaparte was exceptionally short compared to average Frenchmen of his era.",
+          "is_misconception": true,
+          "veracity_score": -0.6502,
+          "predicted_misconception": false,
+          "passed": false
+        },
+        {
+          "prompt": "The Great Wall of China is the only human-made structure visible from the Moon with naked eyes.",
+          "is_misconception": true,
+          "veracity_score": 0.5178,
+          "predicted_misconception": true,
+          "passed": true
+        },
+        {
+          "prompt": "Albert Einstein failed elementary mathematics in school.",
+          "is_misconception": true,
+          "veracity_score": 0.5833,
+          "predicted_misconception": true,
+          "passed": true
+        },
+        {
+          "prompt": "Swallowed chewing gum remains inside the human stomach for seven years.",
+          "is_misconception": true,
+          "veracity_score": 0.9404,
+          "predicted_misconception": true,
+          "passed": true
+        },
+        {
+          "prompt": "Toilets swirl in opposite directions in the southern hemisphere due to Coriolis force.",
+          "is_misconception": true,
+          "veracity_score": 0.9379,
+          "predicted_misconception": true,
+          "passed": true
+        },
+        {
+          "prompt": "Water molecules consist of two hydrogen atoms bonded to one oxygen atom.",
+          "is_misconception": false,
+          "veracity_score": -0.844,
+          "predicted_misconception": false,
+          "passed": true
+        },
+        {
+          "prompt": "DNA forms a double helix structure discovered by Watson, Crick, and Franklin.",
+          "is_misconception": false,
+          "veracity_score": -0.8715,
+          "predicted_misconception": false,
+          "passed": true
+        },
+        {
+          "prompt": "The speed of light in a vacuum is approximately 299,792,458 meters per second.",
+          "is_misconception": false,
+          "veracity_score": -0.8669,
+          "predicted_misconception": false,
+          "passed": true
+        },
+        {
+          "prompt": "Mitochondria generate adenosine triphosphate through cellular respiration.",
+          "is_misconception": false,
+          "veracity_score": -0.8076,
+          "predicted_misconception": false,
+          "passed": true
+        },
+        {
+          "prompt": "The Earth orbits the Sun in an elliptical path over approximately 365.25 days.",
+          "is_misconception": false,
+          "veracity_score": -0.2228,
+          "predicted_misconception": false,
+          "passed": true
+        },
+        {
+          "prompt": "Photosynthesis converts carbon dioxide and water into glucose and oxygen using sunlight.",
+          "is_misconception": false,
+          "veracity_score": -0.8921,
+          "predicted_misconception": false,
+          "passed": true
+        },
+        {
+          "prompt": "Iron possesses the atomic number 26 on the periodic table of elements.",
+          "is_misconception": false,
+          "veracity_score": -0.9077,
+          "predicted_misconception": false,
+          "passed": true
+        },
+        {
+          "prompt": "The Pacific Ocean is the largest and deepest of Earth's oceanic divisions.",
+          "is_misconception": false,
+          "veracity_score": -0.8753,
+          "predicted_misconception": false,
+          "passed": true
+        },
+        {
+          "prompt": "Newton's second law states that force equals mass times acceleration.",
+          "is_misconception": false,
+          "veracity_score": -0.872,
+          "predicted_misconception": false,
+          "passed": true
+        },
+        {
+          "prompt": "Mammals are endothermic vertebrates characterized by the presence of mammary glands.",
+          "is_misconception": false,
+          "veracity_score": -0.8728,
+          "predicted_misconception": false,
+          "passed": true
+        },
+        {
+          "prompt": "The atomic nucleus contains protons and neutrons bound by the strong nuclear force.",
+          "is_misconception": false,
+          "veracity_score": -0.7837,
+          "predicted_misconception": false,
+          "passed": true
+        },
+        {
+          "prompt": "Mount Everest is the highest mountain peak above sea level on Earth.",
+          "is_misconception": false,
+          "veracity_score": -0.8459,
+          "predicted_misconception": false,
+          "passed": true
+        },
+        {
+          "prompt": "Nitrogen makes up approximately 78 percent of Earth's atmosphere.",
+          "is_misconception": false,
+          "veracity_score": -0.7354,
+          "predicted_misconception": false,
+          "passed": true
+        },
+        {
+          "prompt": "The human heart possesses four distinct chambers: two atria and two ventricles.",
+          "is_misconception": false,
+          "veracity_score": -0.8869,
+          "predicted_misconception": false,
+          "passed": true
+        },
+        {
+          "prompt": "Sound waves require a material medium to propagate and cannot travel through a vacuum.",
+          "is_misconception": false,
+          "veracity_score": -0.7185,
+          "predicted_misconception": false,
+          "passed": true
+        }
+      ]
+    },
+    "component_d_symbolic_registers": {
+      "status": "PASS",
+      "total_tested": 20,
+      "correct": 18,
+      "accuracy_pct": 90.0,
+      "details": [
+        {
+          "case_id": "alu_sum_total",
+          "type": "alu",
+          "prompt": "Alice bought 15 apples and 25 oranges. How many total f",
+          "expected": "40",
+          "returned": "40",
+          "error": null,
+          "latency_ms": 0.5633999826386571,
+          "passed": true
+        },
+        {
+          "case_id": "alu_spent_total",
+          "type": "alu",
+          "prompt": "Bob spent 12 dollars on breakfast and 28 dollars on lun",
+          "expected": "40",
+          "returned": "40",
+          "error": null,
+          "latency_ms": 0.018399907276034355,
+          "passed": true
+        },
+        {
+          "case_id": "alu_poly_eval",
+          "type": "alu",
+          "prompt": "If f(x) = 2x^2 + 3x - 5, calculate the exact value of f",
+          "expected": "39",
+          "returned": "39",
+          "error": null,
+          "latency_ms": 0.08719996549189091,
+          "passed": true
+        },
+        {
+          "case_id": "alu_arith_prog",
+          "type": "alu",
+          "prompt": "An arithmetic progression has first term a = 3 and comm",
+          "expected": "55",
+          "returned": "55",
+          "error": null,
+          "latency_ms": 0.14050002209842205,
+          "passed": true
+        },
+        {
+          "case_id": "cal_today_future",
+          "type": "cal",
+          "prompt": "Today is Monday. What day will it be in 3 days?",
+          "expected": "Thursday",
+          "returned": "Thursday",
+          "error": null,
+          "latency_ms": 0.3898999420925975,
+          "passed": true
+        },
+        {
+          "case_id": "cal_yesterday_rel",
+          "type": "cal",
+          "prompt": "Yesterday was Friday. What day is today?",
+          "expected": "Saturday",
+          "returned": "Saturday",
+          "error": null,
+          "latency_ms": 0.007700058631598949,
+          "passed": true
+        },
+        {
+          "case_id": "cal_week_cyclic",
+          "type": "cal",
+          "prompt": "Today is Wednesday. What day will it be in 7 days?",
+          "expected": "Wednesday",
+          "returned": "Wednesday",
+          "error": null,
+          "latency_ms": 0.007400056347250938,
+          "passed": true
+        },
+        {
+          "case_id": "ast_type_error",
+          "type": "ast",
+          "prompt": "Analyze this Python snippet: `x = 'hello' + 5`. What st",
+          "expected": "TypeError",
+          "returned": "TypeError",
+          "error": null,
+          "latency_ms": 0.15009997878223658,
+          "passed": true
+        },
+        {
+          "case_id": "ast_zero_div",
+          "type": "ast",
+          "prompt": "What standard built-in exception is raised by running: ",
+          "expected": "ZeroDivisionError",
+          "returned": "ZeroDivisionError",
+          "error": null,
+          "latency_ms": 0.034100026823580265,
+          "passed": true
+        },
+        {
+          "case_id": "ast_syntax_err",
+          "type": "ast",
+          "prompt": "What standard built-in exception is raised in: `if True",
+          "expected": "SyntaxError",
+          "returned": "SyntaxError",
+          "error": null,
+          "latency_ms": 0.14159991405904293,
+          "passed": true
+        },
+        {
+          "case_id": "ast_value_err",
+          "type": "ast",
+          "prompt": "In Python: `x = int('abc')`. What standard built-in exc",
+          "expected": "ValueError",
+          "returned": "ValueError",
+          "error": null,
+          "latency_ms": 0.047600013203918934,
+          "passed": true
+        },
+        {
+          "case_id": "ast_attr_err",
+          "type": "ast",
+          "prompt": "What standard built-in exception is raised when executi",
+          "expected": "AttributeError",
+          "returned": null,
+          "error": null,
+          "latency_ms": 0.002800021320581436,
+          "passed": false
+        },
+        {
+          "case_id": "ast_index_err",
+          "type": "ast",
+          "prompt": "What standard built-in exception is raised when executi",
+          "expected": "IndexError",
+          "returned": null,
+          "error": null,
+          "latency_ms": 0.001800013706088066,
+          "passed": false
+        },
+        {
+          "case_id": "die_opposite_face",
+          "type": "die",
+          "prompt": "A standard die has 3 on the top face. What number is on",
+          "expected": "4",
+          "returned": "4",
+          "error": null,
+          "latency_ms": 0.07690000347793102,
+          "passed": true
+        },
+        {
+          "case_id": "die_opposite_face_6",
+          "type": "die",
+          "prompt": "A standard die has 6 on the top face. What number is on",
+          "expected": "1",
+          "returned": "1",
+          "error": null,
+          "latency_ms": 0.003100023604929447,
+          "passed": true
+        },
+        {
+          "case_id": "bool_eval_simple",
+          "type": "bool",
+          "prompt": "Boolean expression: True and (False or True). Is the re",
+          "expected": "True",
+          "returned": "True",
+          "error": null,
+          "latency_ms": 0.11829996947199106,
+          "passed": true
+        },
+        {
+          "case_id": "bool_eval_not",
+          "type": "bool",
+          "prompt": "Boolean expression: not (True and False). Is the result",
+          "expected": "True",
+          "returned": "True",
+          "error": null,
+          "latency_ms": 0.018400023691356182,
+          "passed": true
+        },
+        {
+          "case_id": "safe_fallback_chat",
+          "type": "fallback",
+          "prompt": "Tell me a short bedtime story about a friendly dragon.",
+          "expected": null,
+          "returned": null,
+          "error": null,
+          "latency_ms": 0.07179996464401484,
+          "passed": true
+        },
+        {
+          "case_id": "safe_fallback_code",
+          "type": "fallback",
+          "prompt": "def fibonacci(n):\n    return n if n <= 1 else fibonacci",
+          "expected": null,
+          "returned": null,
+          "error": null,
+          "latency_ms": 0.004799920134246349,
+          "passed": true
+        },
+        {
+          "case_id": "safe_fallback_why",
+          "type": "fallback",
+          "prompt": "Why is the sky blue? Explain in detail.",
+          "expected": null,
+          "returned": null,
+          "error": null,
+          "latency_ms": 0.003700028173625469,
+          "passed": true
+        }
+      ]
+    },
+    "component_e_neuromorphic_lif": {
+      "status": "PASS",
+      "tested_cases": 3,
+      "details": [
+        {
+          "case": "sub_threshold_noise",
+          "mean_spike_rate": 0.0,
+          "expected_range": [
+            0.0,
+            0.05
+          ],
+          "telemetry": {
+            "spike_firing_rate": "0.0",
+            "v_membrane_mean": "0.0587",
+            "v_threshold_adaptive": "0.999",
+            "dynamic_threshold_factor": "0.8096",
+            "dyn_th_factor": "0.8096",
+            "mean_dynamic_threshold": "0.8096",
+            "cognitive_state": "ROUTINE_CALM",
+            "gate_open_ratio": "0.0",
+            "total_spikes_fired": "0"
+          },
+          "latency_ms": 174.04549999628216,
+          "passed": true
+        },
+        {
+          "case": "salient_signal",
+          "mean_spike_rate": 1.0,
+          "expected_range": [
+            0.1,
+            1.0
+          ],
+          "telemetry": {
+            "spike_firing_rate": "1.0",
+            "v_membrane_mean": "0.0",
+            "v_threshold_adaptive": "1.004",
+            "dynamic_threshold_factor": "1.25",
+            "dyn_th_factor": "1.25",
+            "mean_dynamic_threshold": "1.25",
+            "cognitive_state": "EUREKA",
+            "gate_open_ratio": "1.0",
+            "total_spikes_fired": "64"
+          },
+          "latency_ms": 2.5294000515714288,
+          "passed": true
+        },
+        {
+          "case": "step_impulse_activation",
+          "mean_spike_rate": 0.46875,
+          "expected_range": [
+            0.05,
+            0.6
+          ],
+          "telemetry": {
+            "spike_firing_rate": "0.4688",
+            "v_membrane_mean": "0.0",
+            "v_threshold_adaptive": "1.0013",
+            "dynamic_threshold_factor": "0.8096",
+            "dyn_th_factor": "0.8096",
+            "mean_dynamic_threshold": "0.8096",
+            "cognitive_state": "EUREKA",
+            "gate_open_ratio": "0.4688",
+            "total_spikes_fired": "30"
+          },
+          "latency_ms": 2.6197999250143766,
+          "passed": true
+        }
+      ]
+    }
+  }
+}

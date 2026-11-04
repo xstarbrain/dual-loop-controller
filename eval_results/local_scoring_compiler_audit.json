@@ -1,0 +1,33 @@
+{
+  "total_tasks": 3,
+  "resolved_tasks": 1,
+  "accuracy": 0.3333333333333333,
+  "total_time_s": 2.41,
+  "results": [
+    {
+      "instance_id": "fastapi_15661",
+      "repo": "fastapi/fastapi",
+      "resolved": true,
+      "baseline_failed": true,
+      "duration_s": 1.17,
+      "snippet": "................                                                         [100%]\n16 passed in 0.11s",
+      "status": "RESOLVED (PASS)"
+    },
+    {
+      "instance_id": "fastapi_15588",
+      "repo": "fastapi/fastapi",
+      "resolved": false,
+      "baseline_failed": true,
+      "error": "Patch application failed: error: patch failed: fastapi/sse.py:33\nerror: fastapi/sse.py: patch does not apply",
+      "duration_s": 0.62
+    },
+    {
+      "instance_id": "fastapi_15589",
+      "repo": "fastapi/fastapi",
+      "resolved": false,
+      "baseline_failed": true,
+      "error": "Patch application failed: error: patch failed: fastapi/dependencies/utils.py:826\nerror: fastapi/dependencies/utils.py: patch does not apply",
+      "duration_s": 0.62
+    }
+  ]
+}

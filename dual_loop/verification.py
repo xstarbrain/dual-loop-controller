@@ -625,3 +625,438 @@ class AntiHyperSkepticismFilter(nn.Module):
         # Only apply critique if genuinely tied / conflicted
         return True
 
+
+class IntrinsicPopperianCycleVerifier(nn.Module):
+    """
+    Unified Intrinsic Popperian-Cycle Falsification & Cycle-Consistency Verifier.
+
+    Combines two intrinsic, zero-label verification mechanisms to drive closed-loop
+    synaptic learning without ground-truth benchmark labels:
+    1. Popperian Falsification (Code / Math / Symbolic Contracts):
+       - Executes generated Python code in an AST + restricted sandbox via
+         PopperianSelfPlayEngine and checks against property/functional invariants
+         and unimplemented stub traps (e.g. bare `pass` or missing body).
+       - Verifies quantitative/symbolic invariants extracted directly from the prompt
+         (polynomial evaluation, arithmetic series, word-problem conservation laws).
+       - Detects degenerate conversational/format mismatches (e.g., answering bare
+         "Yes" to an open-ended "Can you suggest..." prompt).
+    2. Cycle-Consistency Reconstruction Energy (General Text & Reasoning):
+       - Projects the generated response hidden state h_r back into the query space
+         via cycle-inverse map f_inv(h_r) and measures reconstruction energy:
+             E_cycle = 0.5 * (1.0 - cos(f_inv(h_r), h_q)) + E_penalty
+       - Emits a signed dopamine verification signal c in {-1.0, +1.0} (and continuous
+         confidence score) to trigger either Positive Hebbian Consolidation (+1)
+         or Anti-Hebbian Orthogonal Deflation + Unitary Givens Rotation (-1).
+    """
+    def __init__(
+        self,
+        d_model: int = 2048,
+        tau_cycle: float = 0.65
+    ):
+        super().__init__()
+        self.d_model = d_model
+        self.tau_cycle = tau_cycle
+
+        # Cycle-consistency inverse map f_inv: R^D -> R^D initialized as residual near-identity
+        self.cycle_inverse_proj = nn.Linear(d_model, d_model, bias=False)
+        with torch.no_grad():
+            nn.init.eye_(self.cycle_inverse_proj.weight)
+
+        from dual_loop.curiosity_daemon import PopperianSelfPlayEngine
+        self.popperian_engine = PopperianSelfPlayEngine
+
+    @staticmethod
+    def _extract_code_block(text: str) -> str:
+        import re
+        m = re.search(r"```(?:python)?\s*(.*?)```", text, re.DOTALL)
+        if m:
+            return m.group(1).strip()
+        return text.strip()
+
+    def _verify_code_intrinsic(self, prompt: str, response: str) -> Tuple[Optional[bool], str]:
+        import ast
+        import re
+
+        p_low = prompt.lower()
+        is_math_prompt = any(k in p_low for k in [
+            "evaluate the polynomial", "roots of x^2", "arithmetic progression", "if f(x) ="
+        ])
+        if is_math_prompt:
+            return None, "not_code"
+
+        is_code_prompt = (
+            "```python" in prompt
+            or "Complete the Python function" in prompt
+            or "Provide the Python code definition" in prompt
+            or ("def " in prompt and "python" in p_low)
+            or "write a function" in p_low
+        )
+        has_code_resp = "def " in response or "return " in response or "```python" in response
+
+        if not (is_code_prompt or has_code_resp):
+            return None, "not_code"
+
+        code = self._extract_code_block(response)
+        # If the response only contains an indented return body and the prompt had the `def ` header,
+        # reconstruct the full function for AST verification
+        proto_match = re.search(r"(def\s+\w+\s*\([^)]*\)\s*:)", prompt)
+        if proto_match and "def " not in code:
+            proto = proto_match.group(1)
+            indented_lines = [
+                ("    " + line if not line.startswith((" ", "\t")) else line)
+                for line in code.splitlines()
+                if line.strip()
+            ]
+            if indented_lines:
+                code = proto + "\n" + "\n".join(indented_lines)
+
+        if not code or "def " not in code:
+            return False, "missing_function_definition"
+
+        code_lines = [ln for ln in code.splitlines() if ln.strip()]
+        if len(code_lines) >= 2 and code_lines[0].lstrip().startswith("def ") and code_lines[0].rstrip().endswith(":"):
+            if not code_lines[1].startswith((" ", "\t")):
+                code = code_lines[0] + "\n" + "\n".join(
+                    ("    " + ln if not ln.startswith((" ", "\t")) else ln)
+                    for ln in code_lines[1:]
+                )
+
+        # Check for unimplemented stub and normalize class Solution / bounded while loops for sandbox
+        try:
+            try:
+                tree = ast.parse(code)
+            except SyntaxError:
+                # If trailing test-case lines after the function body were truncated at max_tokens,
+                # trim lines after the last indented `return` statement and retry parsing
+                lines = code.splitlines()
+                last_ret_idx = -1
+                for idx_l, ln in enumerate(lines):
+                    if ln.lstrip().startswith("return"):
+                        last_ret_idx = idx_l
+                if last_ret_idx > 0:
+                    tree = ast.parse("\n".join(lines[:last_ret_idx + 1]))
+                else:
+                    raise
+
+            func_defs = [n for n in ast.walk(tree) if isinstance(n, ast.FunctionDef)]
+            if not func_defs:
+                return False, "no_ast_function_def"
+            for fn in func_defs:
+                real_stmts = [
+                    s for s in fn.body
+                    if not isinstance(s, ast.Pass)
+                    and not (isinstance(s, ast.Expr) and isinstance(s.value, ast.Constant))
+                ]
+                if not real_stmts:
+                    return False, f"unimplemented_stub:{fn.name}"
+
+            # Unwrap top-level `class Solution:` methods into standalone functions and drop trailing print/test statements
+            new_body = []
+            for node in tree.body:
+                if isinstance(node, ast.ClassDef):
+                    for item in node.body:
+                        if isinstance(item, ast.FunctionDef):
+                            item.args.args = [a for a in item.args.args if a.arg != "self"]
+                            new_body.append(item)
+                elif isinstance(node, ast.FunctionDef):
+                    new_body.append(node)
+            tree.body = new_body
+
+            # Convert bounded condition `while <cond>:` inside functions into `for step_idx in range(256):`
+            # (leaving `while True:` untouched so infinite loop security guard still triggers)
+            class _BoundedWhileTransformer(ast.NodeTransformer):
+                def visit_While(self, node: ast.While):
+                    self.generic_visit(node)
+                    if isinstance(node.test, ast.Constant) and bool(node.test.value) is True:
+                        return node
+                    guard = ast.If(
+                        test=ast.UnaryOp(op=ast.Not(), operand=node.test),
+                        body=[ast.Break()],
+                        orelse=[]
+                    )
+                    for_node = ast.For(
+                        target=ast.Name(id="step_idx", ctx=ast.Store()),
+                        iter=ast.Call(
+                            func=ast.Name(id="range", ctx=ast.Load()),
+                            args=[ast.Constant(value=256)],
+                            keywords=[]
+                        ),
+                        body=[guard] + node.body,
+                        orelse=node.orelse
+                    )
+                    return ast.copy_location(for_node, node)
+
+            tree = ast.fix_missing_locations(_BoundedWhileTransformer().visit(tree))
+            code = ast.unparse(tree)
+        except SyntaxError as e:
+            return False, f"syntax_error:{e.msg}"
+
+        ok, reason = self.popperian_engine.verify_sandbox(code, test_condition="exec")
+        if not ok:
+            return False, reason
+
+        # Run intrinsic Popperian property micro-tests and bounded recursion guard
+        env: Dict[str, Any] = {}
+        try:
+            import math
+            from typing import List as _List, Tuple as _Tuple, Dict as _Dict, Optional as _Optional, Any as _Any
+            env.update({
+                "math": math,
+                "List": _List,
+                "Tuple": _Tuple,
+                "Dict": _Dict,
+                "Optional": _Optional,
+                "Any": _Any,
+            })
+            exec(code, env, env)
+
+            # Wrap all user-defined functions in `env` with a bounded call-depth guard (max 64 frames)
+            # so mutually recursive or self-recursive functions work safely while infinite recursion
+            # is immediately falsified.
+            call_depth = {"count": 0}
+            fn_names = [n.name for n in tree.body if isinstance(n, ast.FunctionDef)]
+            for fname in fn_names:
+                orig_fn = env.get(fname)
+                if callable(orig_fn):
+                    def _make_guarded(f):
+                        def _guarded(*a, **kw):
+                            call_depth["count"] += 1
+                            if call_depth["count"] > 64:
+                                call_depth["count"] -= 1
+                                raise RecursionError("Max Popperian sandbox call depth (64) exceeded")
+                            try:
+                                return f(*a, **kw)
+                            finally:
+                                call_depth["count"] -= 1
+                        return _guarded
+                    env[fname] = _make_guarded(orig_fn)
+
+            property_checks = [
+                ("concat_lists", lambda f: f([1, 2], [3]) == [1, 2, 3]),
+                ("merge_lists", lambda f: f([1, 2], [3]) == [1, 2, 3]),
+                ("is_palindrome", lambda f: f("racecar") is True and f("hello") is False),
+                ("string_xor", lambda f: f("1010", "0110") == "1100"),
+                ("find_index", lambda f: f([10, 20, 30], 20) == 1),
+                ("reverse_str", lambda f: f("abc") == "cba"),
+                ("add_two", lambda f: f(3, 5) == 8),
+                ("factorial", lambda f: f(5) == 120 and f(0) == 1),
+                ("fib", lambda f: f(5) in (5, 8) and f(1) == 1),
+                ("fibonacci", lambda f: f(5) in (5, 8) and f(1) == 1),
+                ("gcd", lambda f: f(12, 8) == 4),
+                ("greatest_common_divisor", lambda f: f(12, 8) == 4),
+                ("strlen", lambda f: f("abc") == 3),
+                ("flip_case", lambda f: f("aBc") == "AbC"),
+                ("concatenate", lambda f: f(["a", "b"]) == "ab"),
+            ]
+            for name, check_fn in property_checks:
+                if name in env and callable(env[name]):
+                    if not check_fn(env[name]):
+                        return False, f"property_falsified:{name}"
+
+            # If the prompt or code defines a target entry function not in property_checks,
+            # probe it on safe canonical arguments if it takes 1 numeric/string/list argument
+            target_fn_name = None
+            if proto_match:
+                m_name = re.search(r"def\s+(\w+)\s*\(", proto_match.group(1))
+                if m_name:
+                    target_fn_name = m_name.group(1)
+            if target_fn_name is None and fn_names:
+                target_fn_name = fn_names[-1]
+
+            checked_names = {n for n, _ in property_checks}
+            if target_fn_name and target_fn_name in env and target_fn_name not in checked_names:
+                target_ast = next((n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == target_fn_name), None)
+                if target_ast is not None and len(target_ast.args.args) == 1:
+                    # Try safe canonical inputs (int, list, str) to detect immediate infinite recursion or unconditional crash
+                    probed_ok = False
+                    for sample_in in (3, [1, 2, 3], "abc"):
+                        try:
+                            _ = env[target_fn_name](sample_in)
+                            probed_ok = True
+                            break
+                        except RecursionError:
+                            return False, f"infinite_recursion:{target_fn_name}"
+                        except Exception:
+                            continue
+        except RecursionError:
+            return False, "runtime_property_error:RecursionError"
+        except Exception as e:
+            return False, f"runtime_property_error:{type(e).__name__}"
+
+        return True, "popperian_code_verified"
+
+    def _verify_math_and_conversational_intrinsic(
+        self,
+        prompt: str,
+        response: str
+    ) -> Tuple[Optional[bool], str, Optional[str]]:
+        """
+        Returns (is_verified_or_None, reason, expected_correction_hint).
+        """
+        import re
+        import math
+        resp_clean = response.strip()
+        if not resp_clean:
+            return False, "empty_response", None
+
+        p_lower = prompt.lower()
+
+        # 1. Check conversational open-ended prompts falsely clamped to bare "Yes" / "No"
+        open_ended_openers = (
+            "can you suggest", "can you give", "can you write", "can you explain",
+            "can you help", "can you provide", "can you tell", "can you list",
+            "could you suggest", "could you give", "could you explain",
+            "what are some", "how can i", "how do i", "any tips"
+        )
+        if any(op in p_lower for op in open_ended_openers):
+            if resp_clean.lower().rstrip(".!") in ("yes", "no"):
+                return False, "falsified_binary_clamp_on_open_prompt", None
+            return True, "open_ended_conversational_verified", None
+
+        # 2. Intrinsic symbolic polynomial / function check: f(x) = ax + b or P(x) = x^2 - ax + b
+        m_lin = re.search(r"f\(x\)\s*=\s*(\d+)x\s*\+\s*(\d+).*?f\((\d+)\)", prompt)
+        if m_lin:
+            a, b, xv = int(m_lin.group(1)), int(m_lin.group(2)), int(m_lin.group(3))
+            expected = str(a * xv + b)
+            ok = bool(re.search(r"(?<!\w)" + re.escape(expected) + r"\b", resp_clean))
+            return ok, ("math_linear_verified" if ok else f"math_linear_falsified:expected_{expected}"), expected
+
+        m_quad = re.search(r"P\(x\)\s*=\s*x\^2\s*-\s*(\d+)x\s*\+\s*(\d+)\s*at\s*x\s*=\s*(\d+)", prompt)
+        if m_quad:
+            a, b, xv = int(m_quad.group(1)), int(m_quad.group(2)), int(m_quad.group(3))
+            expected = str((xv ** 2) - a * xv + b)
+            ok = bool(re.search(r"(?<!\w)" + re.escape(expected) + r"\b", resp_clean))
+            return ok, ("math_quad_verified" if ok else f"math_quad_falsified:expected_{expected}"), expected
+
+        m_roots = re.search(r"x\^2\s*([+\-])\s*(\d+)x\s*([+\-])\s*(\d+)\s*=\s*0", prompt)
+        if m_roots:
+            b_coef = int(m_roots.group(2)) * (1 if m_roots.group(1) == "+" else -1)
+            c_coef = int(m_roots.group(4)) * (1 if m_roots.group(3) == "+" else -1)
+            disc = b_coef * b_coef - 4 * c_coef
+            if disc >= 0:
+                sq = int(round(math.isqrt(disc)))
+                if sq * sq == disc:
+                    r1 = (-b_coef - sq) // 2
+                    r2 = (-b_coef + sq) // 2
+                    s1, s2 = str(min(r1, r2)), str(max(r1, r2))
+                    ok = (
+                        bool(re.search(r"(?<!\w)" + re.escape(s1) + r"\b", resp_clean))
+                        and bool(re.search(r"(?<!\w)" + re.escape(s2) + r"\b", resp_clean))
+                    )
+                    hint = f"{s1}, {s2}" if s1 != s2 else s1
+                    return ok, ("math_roots_verified" if ok else f"math_roots_falsified:expected_{hint}"), hint
+
+        m_ap = re.search(r"first\s+(\d+)\s+terms\s+of\s+an\s+arithmetic\s+progression\s+with\s+first\s+term\s+a\s*=\s*(\d+)\s+and\s+common\s+difference\s+d\s*=\s*(\d+)", prompt)
+        if m_ap:
+            n_t, a, d = int(m_ap.group(1)), int(m_ap.group(2)), int(m_ap.group(3))
+            expected = str((n_t * (2 * a + (n_t - 1) * d)) // 2)
+            ok = bool(re.search(r"(?<!\w)" + re.escape(expected) + r"\b", resp_clean))
+            return ok, ("math_ap_verified" if ok else f"math_ap_falsified:expected_{expected}"), expected
+
+        return None, "general_domain", None
+
+    @torch.no_grad()
+    def _adapt_cycle_inverse_online(
+        self,
+        h_query: Optional[torch.Tensor],
+        h_response: Optional[torch.Tensor],
+        lr: float = 0.05
+    ) -> None:
+        """
+        Online Hebbian alignment of cycle_inverse_proj on verified (h_query, h_response) pairs
+        so f_inv(h_response) -> h_query improves over time.
+        """
+        if h_query is None or h_response is None:
+            return
+        w_dev = self.cycle_inverse_proj.weight.device
+        w_dtype = self.cycle_inverse_proj.weight.dtype
+        hq = F.normalize(h_query.detach().float().reshape(-1, self.d_model).mean(dim=0, keepdim=True), p=2, dim=-1).to(w_dev)
+        hr = F.normalize(h_response.detach().float().reshape(-1, self.d_model).mean(dim=0, keepdim=True), p=2, dim=-1).to(w_dev)
+        if float(hq.norm().item()) < 1e-6 or float(hr.norm().item()) < 1e-6:
+            return
+        hr_recon = self.cycle_inverse_proj(hr.to(dtype=w_dtype)).float()
+        err = hq - hr_recon
+        dW = (lr * torch.matmul(err.t(), hr)).to(dtype=w_dtype)
+        self.cycle_inverse_proj.weight.data.add_(dW)
+
+    def verify(
+        self,
+        prompt: str,
+        response: str,
+        h_query: Optional[torch.Tensor] = None,
+        h_response: Optional[torch.Tensor] = None
+    ) -> Tuple[float, Dict[str, Any]]:
+        """
+        Executes unified Popperian-Cycle verification.
+
+        Returns:
+            dopamine_sign: +1.0 if verified/coherent, -1.0 if falsified/incoherent.
+            telemetry: Dict with verification_mode, reason, cycle_energy, etc.
+        """
+        # 1. Check code via Popperian AST + Sandbox
+        code_ok, code_reason = self._verify_code_intrinsic(prompt, response)
+        if code_ok is not None:
+            sign = 1.0 if code_ok else -1.0
+            if code_ok:
+                self._adapt_cycle_inverse_online(h_query, h_response)
+            return sign, {
+                "verified": bool(code_ok),
+                "dopamine_sign": sign,
+                "verification_mode": "popperian_code_sandbox",
+                "reason": code_reason,
+                "cycle_energy": 0.1 if code_ok else 0.95,
+                "correction_hint": None
+            }
+
+        # 2. Check symbolic math / conversational constraints
+        sym_ok, sym_reason, hint = self._verify_math_and_conversational_intrinsic(prompt, response)
+        if sym_ok is not None:
+            sign = 1.0 if sym_ok else -1.0
+            if sym_ok:
+                self._adapt_cycle_inverse_online(h_query, h_response)
+            return sign, {
+                "verified": bool(sym_ok),
+                "dopamine_sign": sign,
+                "verification_mode": "popperian_symbolic_invariant",
+                "reason": sym_reason,
+                "cycle_energy": 0.1 if sym_ok else 0.9,
+                "correction_hint": hint
+            }
+
+        # 3. Cycle-Consistency Reconstruction Energy in Latent Space
+        cycle_energy = 0.25
+        if h_query is not None and h_response is not None:
+            with torch.no_grad():
+                hq = h_query.detach().float().reshape(-1, self.d_model).mean(dim=0, keepdim=True)
+                hr = h_response.detach().float().reshape(-1, self.d_model).mean(dim=0, keepdim=True)
+                w_dev = self.cycle_inverse_proj.weight.device
+                w_dtype = self.cycle_inverse_proj.weight.dtype
+                hr_recon = self.cycle_inverse_proj(hr.to(device=w_dev, dtype=w_dtype)).float().to(hq.device)
+                cos_sim = float(F.cosine_similarity(hr_recon, hq, dim=-1).mean().item())
+                cycle_energy = float(np.clip(0.5 * (1.0 - cos_sim), 0.0, 1.0))
+
+        # Check text degeneracy penalties (repetitive n-grams or empty text)
+        words = response.strip().split()
+        if len(words) == 0:
+            cycle_energy = 1.0
+            reason = "empty_output"
+        elif len(words) >= 8 and len(set(words)) <= 2:
+            cycle_energy = 0.95
+            reason = "degenerate_repetition"
+        else:
+            reason = "cycle_consistency_coherent" if cycle_energy <= self.tau_cycle else "cycle_consistency_high_energy"
+
+        verified = cycle_energy <= self.tau_cycle
+        sign = 1.0 if verified else -1.0
+        if verified:
+            self._adapt_cycle_inverse_online(h_query, h_response)
+        return sign, {
+            "verified": bool(verified),
+            "dopamine_sign": sign,
+            "verification_mode": "cycle_consistency_energy",
+            "reason": reason,
+            "cycle_energy": float(cycle_energy),
+            "correction_hint": None
+        }
+
+

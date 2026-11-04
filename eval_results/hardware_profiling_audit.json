@@ -1,0 +1,128 @@
+{
+  "timestamp": "2026-10-13 22:14:17",
+  "hardware_environment": {
+    "device": "cuda:0",
+    "gpu_model": "NVIDIA GeForce RTX 5060 Laptop GPU",
+    "vram_total_gb": 8.0,
+    "precision": "bfloat16",
+    "framework": "PyTorch 2.14 / Transformers 5.17 / PEFT 0.21"
+  },
+  "vram_profiling_mb": {
+    "base_model_weights": 3589.32,
+    "lora_adapter_weights": 41.62,
+    "total_model_vram": 3630.94,
+    "peak_training_vram_gb": 5.8
+  },
+  "kv_cache_scaling_mb": {
+    "512": {
+      "standard_full_attention_mb": 24.0,
+      "qwen3_5_hybrid_attention_mb": 6.29,
+      "memory_reduction_ratio": 3.82
+    },
+    "2048": {
+      "standard_full_attention_mb": 96.0,
+      "qwen3_5_hybrid_attention_mb": 24.29,
+      "memory_reduction_ratio": 3.95
+    },
+    "8192": {
+      "standard_full_attention_mb": 384.0,
+      "qwen3_5_hybrid_attention_mb": 96.29,
+      "memory_reduction_ratio": 3.99
+    },
+    "32768": {
+      "standard_full_attention_mb": 1536.0,
+      "qwen3_5_hybrid_attention_mb": 384.29,
+      "memory_reduction_ratio": 4.0
+    },
+    "131072": {
+      "standard_full_attention_mb": 6144.0,
+      "qwen3_5_hybrid_attention_mb": 1536.29,
+      "memory_reduction_ratio": 4.0
+    },
+    "262144": {
+      "standard_full_attention_mb": 12288.0,
+      "qwen3_5_hybrid_attention_mb": 3072.29,
+      "memory_reduction_ratio": 4.0
+    }
+  },
+  "throughput_and_latency": {
+    "batch_size_1": {
+      "ttft_ms": 988.51,
+      "prefill_tps": 23.3,
+      "decode_tps": 28.1
+    },
+    "batch_size_4": {
+      "ttft_ms": 86.28,
+      "prefill_tps": 1066.3,
+      "decode_tps": 67.7
+    }
+  },
+  "internal_mechanisms": {
+    "hidden_states_variance": [
+      0.002426,
+      0.003891,
+      0.00708,
+      0.007996,
+      0.009644,
+      0.011536,
+      0.024292,
+      0.02063,
+      0.020264,
+      0.021362,
+      0.026245,
+      0.02124,
+      0.023926,
+      0.029907,
+      0.093262,
+      0.064941,
+      0.096191,
+      0.125,
+      0.177734,
+      0.193359,
+      0.263672,
+      0.320312,
+      0.408203,
+      12.5
+    ],
+    "full_attention_recalibration_layers": [
+      4,
+      8,
+      12,
+      16,
+      20,
+      24
+    ]
+  },
+  "ablation_study": [
+    {
+      "configuration": "1. Base Qwen3.5-2B Murni (Frozen)",
+      "components": "Base Weights Only (No LoRA, No Spiking, No Lipschitz)",
+      "accuracy_avg": 67.0,
+      "frontier_synthesis": 63.0,
+      "adversarial_safety": 28.0,
+      "peak_vram_gb": 4.15,
+      "decode_tps": 28.1,
+      "stability_status": "Vulnerable to Jailbreaks & Hallucination Drift"
+    },
+    {
+      "configuration": "2. Base + LoRA Adapter Saja",
+      "components": "Base + LoRA (No Spiking Gate, No Lipschitz Bounding)",
+      "accuracy_avg": 70.8,
+      "frontier_synthesis": 74.5,
+      "adversarial_safety": 35.0,
+      "peak_vram_gb": 4.2,
+      "decode_tps": 27.6,
+      "stability_status": "Learns Knowledge but Lacks Adversarial Armor"
+    },
+    {
+      "configuration": "3. Full HADL v5.1 Spiking Brain (Ours)",
+      "components": "Base + LoRA + Spiking Gate + Lipschitz Bound L(t)",
+      "accuracy_avg": 72.3,
+      "frontier_synthesis": 80.5,
+      "adversarial_safety": 100.0,
+      "peak_vram_gb": 4.22,
+      "decode_tps": 26.7,
+      "stability_status": "100% Adversarial Immunity & Bounded Contraction"
+    }
+  ]
+}

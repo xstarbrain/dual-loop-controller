@@ -1,0 +1,873 @@
+{
+  "timestamp": "2026-10-14 16:10:34",
+  "exam_file": "frontier_study/exam_pool_round2.json",
+  "use_adapter": true,
+  "total_score": 62.5,
+  "max_score": 100.0,
+  "score_percentage": 62.5,
+  "domain_scores": {
+    "Distributed Consensus": {
+      "scored": 15.5,
+      "total": 20.0
+    },
+    "Zero-Knowledge Cryptography": {
+      "scored": 9.0,
+      "total": 20.0
+    },
+    "Quantum Stabilizers & Topological Codes": {
+      "scored": 13.5,
+      "total": 20.0
+    },
+    "Symplectic Dynamics & Neural ODEs": {
+      "scored": 9.5,
+      "total": 20.0
+    },
+    "Category Theory & Formal Semantics": {
+      "scored": 15.0,
+      "total": 20.0
+    }
+  },
+  "question_records": [
+    {
+      "idx": 1,
+      "id": "EX2_01",
+      "domain": "Distributed Consensus",
+      "question": "Analyze how Raft handles non-voting members (Learners) when scaling clusters, and how it prevents network partition stalls during joint consensus membership changes.",
+      "score": 2.0,
+      "max_score": 2.0,
+      "passed_rubrics": [
+        "learner node",
+        "joint consensus",
+        "cluster membership",
+        "two-phase configuration"
+      ],
+      "missing_rubrics": [],
+      "response": "1. Learner Nodes: In large clusters, adding a new voting member directly can stall availability if the new node has an empty log and cannot catch up before taking part in election quorums. Raft introduces non-voting 'Learner' nodes that replicate the log and catch up with state without participating in majority voting quorums until fully synchronized.\n\n2. Joint Consensus (C_{old,new}): Reconfiguration changes membership safely in two phases: the leader creates entry C_{old,new}. In this joint configuration, decisions require independent majorities from BOTH C_{old} and C_{new}. No single partition can make unilateral decisions.\n\n3. Finalizing C_{new}: Once C_{old,new} is committed, leader creates entry C_{new}, safely transitioning the cluster without downtime."
+    },
+    {
+      "idx": 2,
+      "id": "EX2_02",
+      "domain": "Distributed Consensus",
+      "question": "Explain the Paxos Leases mechanism. How do master leases allow consistent linearizable reads without running Phase 2 accepts for read-only queries?",
+      "score": 1.5,
+      "max_score": 2.0,
+      "passed_rubrics": [
+        "paxos lease",
+        "linearizable read",
+        "master lease"
+      ],
+      "missing_rubrics": [
+        "clock synchronization"
+      ],
+      "response": "Paxos Leases mechanism eliminates Phase 2 network round-offs for read-only queries through the following invariants:\n\n1. Leader Lease Bound: A leader is guaranteed to hold a valid proposal acceptance certificate from a master with lease time T before it is expired.\n2. Node Quota: Acceptors grant the leader one proposal per lease time T.\n3. Log Completeness: Any accepted proposal is logged with unique zxid and value.\n\nFor linearizable read(r): the leader queries its master lease monitor to retrieve the most recent accepted zxid with value v. By the FLP Impossibility and Paxos Invariant, no conflicting proposal will be accepted after zxid is committed. The leader applies update(v) and returns v. This guarantees O(log_N) reads with zero replica communication after the initial master lease establishment."
+    },
+    {
+      "idx": 3,
+      "id": "EX2_03",
+      "domain": "Distributed Consensus",
+      "question": "In the Raft protocol, explain why a candidate node that increments its term must explicitly persist currentTerm and votedFor to non-volatile disk before sending RequestVote.",
+      "score": 1.5,
+      "max_score": 2.0,
+      "passed_rubrics": [
+        "votedfor",
+        "currentterm",
+        "split vote prevention"
+      ],
+      "missing_rubrics": [
+        "non-volatile disk"
+      ],
+      "response": "Raft guarantees strict quorum majority and log consistency through two phases:\n\n1. Candidate Election: When a node becomes idle (no votes received), it increments its term and votes for itself. If a majority quorum votes for it, it becomes Candidate.\n\n2. Term Persistence & Vote Acceptance: A candidate must ensure that its current term and the set of voted-for nodes are committed before sending RequestVote. This prevents stale candidates from receiving votes in higher terms and ensures formal safety guarantees:\n- CurrentTerm: Guarantees that logs are sequenced monotonically and that higher terms completely overwrite lower term logs.\n- votedFor: Guarantees that a node only accepts proposals from nodes that held votes in an earlier, higher-priority term, providing strict causal consistency and zero-coordination-overtake safety."
+    },
+    {
+      "idx": 4,
+      "id": "EX2_04",
+      "domain": "Distributed Consensus",
+      "question": "Formulate the LWW-Element-Set (Last-Write-Wins Element Set) CRDT. What are its failure modes when distributed physical clocks experience NTP drift?",
+      "score": 1.5,
+      "max_score": 2.0,
+      "passed_rubrics": [
+        "lww-element-set",
+        "wall clock timestamp",
+        "ntp drift"
+      ],
+      "missing_rubrics": [
+        "causality loss"
+      ],
+      "response": "1. LWW-Element-Set Definition: An LWW-Element-Set CRDT is a finite union of ordered elementary sets S = \u222a v \u2208 elements: Set(v). Each element has a unique ID and a timestamp T(v).\n\n2. Merge Rule: Merge two sets s1 and s2 is s1 \u222a s2 with sorted order by timestamp T, breaking ties by element ID.\n\n3. NTP Drift Failure Mode: When a node restarts or reboots, its physical clock may have drifted significantly (e.g., +1 hour). If naive replication allows a new instance to write an element with a higher timestamp than a stale instance from a drifted clock, the new instance wins. Consequently, stale configuration data is overwritten, causing state divergence and unresolvable distributed locks. LWW-Element-Set guarantees zero-coordination omissions and zero-state divergence as long as clock drift is bounded within a single instance's lifetime."
+    },
+    {
+      "idx": 5,
+      "id": "EX2_05",
+      "domain": "Distributed Consensus",
+      "question": "Explain the concept of Chain Replication in distributed storage. How does it separate read path at the tail and write path at the head to achieve high throughput?",
+      "score": 1.5,
+      "max_score": 2.0,
+      "passed_rubrics": [
+        "chain replication",
+        "head node",
+        "tail node"
+      ],
+      "missing_rubrics": [
+        "strong consistency"
+      ],
+      "response": "1. Architecture: N nodes arranged in a linear chain: Head -> Node_1 -> ... -> Tail.\n\n2. Write Path (Head to Tail): Write requests travel strictly from Head to Tail. Each node appends a new checkpoint and extends its log. Log entries are committed via full quorum replication before the next write is accepted. This guarantees zero-coordination O(1) writes and zero replica communication during commit.\n\n3. Read Path (Tail to Head): Read requests travel strictly from Tail to Head. Because logs are strictly append-only, the node with the most recent log entry (Head) holds the strictly consistent state up to the latest checkpoint. Reading from the tail avoids replica round-robin shuffling and provides zero-coordination reads."
+    },
+    {
+      "idx": 6,
+      "id": "EX2_06",
+      "domain": "Distributed Consensus",
+      "question": "Describe the Zab (ZooKeeper Atomic Broadcast) protocol's recovery phase versus broadcast phase. How does it differ from Paxos in maintaining FIFO order?",
+      "score": 1.5,
+      "max_score": 2.0,
+      "passed_rubrics": [
+        "zab protocol",
+        "recovery phase",
+        "zxid identifier"
+      ],
+      "missing_rubrics": [
+        "fifo atomic broadcast"
+      ],
+      "response": "1. Zab Protocol Phases: Operates in two continuous phases: (a) Recovery Phase (Leader Activation) where nodes elect a prospective leader, synchronize logs to ensure all committed proposals from prior epochs are applied, and establish epoch number e; (b) Broadcast Phase where the leader acts as primary sequencer.\n\n2. 64-bit zxid Identifier: Every proposal is tagged with zxid = <epoch, counter>. Proposals are sequenced monotonically.\n\n3. FIFO Order Preservation: Unlike Paxos which allows out-of-order instance commitment, Zab guarantees strict causal FIFO order: messages from a specific client are proposed and committed in the exact sequence they were submitted."
+    },
+    {
+      "idx": 7,
+      "id": "EX2_07",
+      "domain": "Distributed Consensus",
+      "question": "Explain the concept of Quorum Leases in distributed caches. How do they balance read latency with cache invalidation guarantees across partitions?",
+      "score": 1.0,
+      "max_score": 2.0,
+      "passed_rubrics": [
+        "cache invalidation",
+        "stale read bound"
+      ],
+      "missing_rubrics": [
+        "quorum lease",
+        "lease expiration"
+      ],
+      "response": "1. Quorum Intersection Invariant: A distributed cache requires two conditions to hold simultaneously: (a) Read replicas must serve consistent reads from a majority quorum Q1, and (b) Invalidation updates must reach a majority quorum Q2. By the pigeonhole principle, Q1 \u2229 Q2 is non-empty (|Q1 \u2229 Q2| \u2265 (|Q1| + |Q2| - n) / 2 > 0).\n\n2. Cross-Partition Routing: An update from partition P1 is routed to replica in intersection P1 \u2229 P2. The read replica uses timestamp tracing or causal consistency guarantees to ensure that any read request from P2 will serve the freshly invalidated version written by P1, eliminating stale reads across partition boundaries."
+    },
+    {
+      "idx": 8,
+      "id": "EX2_08",
+      "domain": "Distributed Consensus",
+      "question": "Analyze how Byzantine Fault Tolerant protocols like Tendermint consensus utilize 2/3+1 voting rounds (Pre-vote and Pre-commit) to achieve instant finality.",
+      "score": 1.0,
+      "max_score": 2.0,
+      "passed_rubrics": [
+        "prevote precommit",
+        "instant finality"
+      ],
+      "missing_rubrics": [
+        "tendermint",
+        "2/3 majority"
+      ],
+      "response": "Key Invariant Analysis:\n1. Goal: Achieve instant finality (no more than one uncommitted block is ever included in state machine logs) while allowing nodes to reject malicious peers.\n\n2. Round Structure: Every commit operation consists of two phases:\n- Phase 1 (2/3 + 1 Voting): Potential successors vote to pre-vote candidate node and pre-commit to proposed log. Acceptance threshold is N/3 + 1 (2/3 fraction + 1 guarantee).\n- Phase 2 (1 Quorum Intersection): A separate quorum Q1 votes and commits, and a separate quorum Q2 votes and commits. Q1 and Q2 must intersect by at least one node v.\n\n3. Finality Proof: If log L is committed via (v, log L), node v is guaranteed to exist and will participate in future rounds. In any competing uncommitted log L', node v must have voted and committed to either log L or log L'. Thus, at most one uncommitted log can exist. State machine nodes can commit the next block immediately without cold restarts.\nPractical Application: In production architectures, verifying these"
+    },
+    {
+      "idx": 9,
+      "id": "EX2_09",
+      "domain": "Distributed Consensus",
+      "question": "In distributed systems, what is Chandy-Lamport distributed snapshotting algorithm? How do marker messages record global state without stopping execution?",
+      "score": 2.0,
+      "max_score": 2.0,
+      "passed_rubrics": [
+        "chandy-lamport",
+        "marker message",
+        "channel state",
+        "global snapshot"
+      ],
+      "missing_rubrics": [],
+      "response": "1. Goal: Capture a consistent global state (consistent cut) of a distributed system including node states and in-flight channel messages without freezing execution.\n\n2. Algorithm Mechanics: Process P initiates snapshot by recording local state and broadcasting a Control Marker along all outgoing channels.\n\n3. Marker Rule on Arrival: When process Q receives marker along channel c: if Q has not yet snapshotted, Q records local state, marks channel c as empty, and broadcasts markers on all outgoing channels. If Q already snapshotted, channel c's state is recorded as all messages received between Q's snapshot and the arrival of the marker on c.\n\n4. Consistency Invariant: By the FLP Impossibility and Brewer's Invariant, no process can make a conflicting local modification while a marker is in flight on any channel, guaranteeing that the recorded state is a valid consistent cut of the global execution trace."
+    },
+    {
+      "idx": 10,
+      "id": "EX2_10",
+      "domain": "Distributed Consensus",
+      "question": "Analyze the Raft log truncation scenario: explain what occurs when an elected leader detects a follower log mismatch at index N and decrements nextIndex.",
+      "score": 2.0,
+      "max_score": 2.0,
+      "passed_rubrics": [
+        "nextindex",
+        "matchindex",
+        "log truncation",
+        "uncommitted entries"
+      ],
+      "missing_rubrics": [],
+      "response": "1. Log Matching Condition: A leader is elected only when it holds a log entry with index N and term T that is present and uncommitted on all followers' logs.\n\n2. Log Truncation Event: Suppose a new log entry with index N' > N and term T is appended by a higher-priority replica. The leader detects this mismatch at index N. According to Raft's Log Truncation Rule, the leader records its state machine commitIndex = N, truncates its local log from index N+1 to end, and increments nextIndex = N + 1.\n\n3. Follower Synchronization: The leader broadcasts this update. Any follower whose log contains entries up to and including index N applies those entries, resets its log gap to start at index N + 1, and increments its nextIndex. Formal invariants guarantee that logs are truncated in strict sequential order and that leader election is strictly quorum-based."
+    },
+    {
+      "idx": 11,
+      "id": "EX2_11",
+      "domain": "Zero-Knowledge Cryptography",
+      "question": "Explain how the Groth16 zk-SNARK achieves 3-group-element proof size. Why is it non-malleable only under specific simulation-sound variants?",
+      "score": 1.0,
+      "max_score": 2.0,
+      "passed_rubrics": [
+        "groth16",
+        "3 group elements"
+      ],
+      "missing_rubrics": [
+        "trusted setup",
+        "simulation soundness"
+      ],
+      "response": "1. Groth16 Proof Structure: A Groth16 proof consists of exactly three group elements: \u03c0 = (A \u2208 G_1, B \u2208 G_2, C \u2208 G_1).\n\n2. Verification Pairing Equation: The verifier checks e(A, B) = e(\u03b1, \u03b2) \u00b7 e(\u2211 x_i L_i(\u03c4), \u03b3) \u00b7 e(C, \u03b4).\n\n3. Malleability: In standard Groth16, an adversary can re-randomize or rescale (A, B) by multiplying A by scalar r and B by r^{-1}, producing a valid proof for the same statement without knowing the witness. To prevent malleability in rollups or transactions, simulation-sound variants (e.g., Baghery et al.) bind statement hashes directly to the proof."
+    },
+    {
+      "idx": 12,
+      "id": "EX2_12",
+      "domain": "Zero-Knowledge Cryptography",
+      "question": "Detail the role of roots of unity in vanishing polynomial Z_H(X) = X^n - 1 over a multiplicative subgroup in polynomial SNARKs.",
+      "score": 1.0,
+      "max_score": 2.0,
+      "passed_rubrics": [
+        "roots of unity",
+        "vanishing polynomial"
+      ],
+      "missing_rubrics": [
+        "multiplicative subgroup",
+        "fft efficiency"
+      ],
+      "response": "Key Invariant Analysis:\n1. Vanishing Polynomial Constraint: In SNARKs (e.g., Baghery et al.), proving that a witness vector s satisfies an affine hyperplane equation a \u00b7 s_1 + b \u00b7 s_2 + c = 0 requires verifying a polynomial identity of degree d = log_2(n^2) over F_2.\n\n2. Roots of Unity: Let \u03b6 be a primitive d-th root of unity in an extension field. Evaluating the polynomial P(s) = a s_1 + b s_2 + c at s = \u03b6^s yields:\n   P(\u03b6^s) = a \u03b6^{s_1} + b \u03b6^{s_2} + c = 0.\n\n3. Vanishing Norm: Summing over all group elements \u03bc \u2208 C_d:\n   \u2211_{\u03bc \u2208 C_d} P(\u03bc^s) = \u2211_{\u03bc} (a \u03bc^{s_1} + b \u03bc^{s_2} + c) = a \u2211 \u03bc^{s_1} + b \u2211 \u03bc^{s_2} + \u2211 c."
+    },
+    {
+      "idx": 13,
+      "id": "EX2_13",
+      "domain": "Zero-Knowledge Cryptography",
+      "question": "Explain how multi-scalar multiplication (MSM) dominates prover computation time in elliptic-curve SNARKs, and how Pippenger's algorithm optimizes it.",
+      "score": 1.0,
+      "max_score": 2.0,
+      "passed_rubrics": [
+        "multi-scalar multiplication",
+        "pippenger algorithm"
+      ],
+      "missing_rubrics": [
+        "bucket method",
+        "prover bottleneck"
+      ],
+      "response": "1. Multi-Scalar Multiplication Bottleneck: In SNARKs (e.g., Baghery et al.), proof verification involves multiplying three field elements: e = A \u00b7 B \u00b7 C. Traditional scalar multiplication takes O(log^2 n) steps (e.g., 128 cycles on x86).\n\n2. Pippenger's Algorithm (1992): Replaces arbitrary scalar B with a low-weight linear combination of field basis vectors: B = \u2211 \u03b1_i L_i, where L_i are fixed low-degree polynomials (e.g., 4 or 5 terms).\n\n3. Acceleration via Fast Field Multiplication (FFM): Each term \u03b1_i L_i is multiplied using Fast Double-and-Add. The matrix of coefficients M_{i,j} satisfies M^2 = 2M - I (Cayley-Dickson). Verifying \u2211 \u03b1_i L_i = B allows verifying the linear combination in a single elliptic curve point check (3 group elements) without traversing the entire binary expansion of scalar B."
+    },
+    {
+      "idx": 14,
+      "id": "EX2_14",
+      "domain": "Zero-Knowledge Cryptography",
+      "question": "Explain the Reed-Solomon proximity testing problem in STARKs and how the FRI (Fast Reed-Solomon Interactive Oracle Proof) protocol solves it.",
+      "score": 1.5,
+      "max_score": 2.0,
+      "passed_rubrics": [
+        "fri protocol",
+        "proximity testing",
+        "folding degree"
+      ],
+      "missing_rubrics": [
+        "reed-solomon"
+      ],
+      "response": "1. Proximity Testing: Given oracle access to a function f: D \u2192 F, verify whether f is close to a low-degree polynomial P(X) of degree < d without querying all points.\n\n2. FRI Protocol Mechanics: Prover and verifier engage in rounds of degree folding: in round k, the polynomial f_k(X) of degree d is split into even and odd terms f_k(X) = g(X^2) + X h(X^2). The verifier sends random challenge \u03b1_k, and the prover defines f_{k+1}(Y) = g(Y) + \u03b1_k h(Y), which has degree d/2.\n\n3. Logarithmic Verification: After log_2(d) rounds, the degree reduces to a constant, which the verifier queries directly. Merkle paths verify consistency between rounds, providing transparent O(log^2 d) verification without trusted setups."
+    },
+    {
+      "idx": 15,
+      "id": "EX2_15",
+      "domain": "Zero-Knowledge Cryptography",
+      "question": "Describe the difference between arithmetic circuits over prime fields versus boolean circuits. Why do hashes like Poseidon or Rescue outperform SHA-256 in ZKPs?",
+      "score": 0.5,
+      "max_score": 2.0,
+      "passed_rubrics": [
+        "prime field"
+      ],
+      "missing_rubrics": [
+        "poseidon hash",
+        "algebraic hash",
+        "sha-256 constraint cost"
+      ],
+      "response": "Key Invariant Analysis:\n1. Arithmetic Circuits over Prime Fields: Operate in finite field F_p (e.g., F_2, F_3, F_5). Operations include addition, multiplication, and scalar multiplication by field elements. Circuit size and speed depend on field size (e.g., 128 bits in F_2, 32 bits in F_3).\n\n2. Boolean Circuits: Operate strictly on true/false values (GF(2)). All arithmetic is done via XOR and bitwise AND/OR.\n\n3. Poseidon/Rescue Outperformance: By encoding message blocks and round keys into even/odd word positions (e.g., 128/129 words), they eliminate half the circuit width and eliminate even-position carry propagation, achieving 2x-4x speedup and 3x-4x smaller footprint compared to standard SHA-256."
+    },
+    {
+      "idx": 16,
+      "id": "EX2_16",
+      "domain": "Zero-Knowledge Cryptography",
+      "question": "Explain how look-up arguments (such as Plookup and Halo2 Lookups) bypass expensive R1CS multiplication gates for bitwise operations and ranges.",
+      "score": 1.5,
+      "max_score": 2.0,
+      "passed_rubrics": [
+        "plookup",
+        "lookup table",
+        "grand product"
+      ],
+      "missing_rubrics": [
+        "bitwise efficiency"
+      ],
+      "response": "1. R1CS Bitwise Bottleneck: In standard arithmetic circuits, computing bitwise XOR or 8-bit range checks requires decomposing each word into individual bits (e.g., 32 constraints for a 32-bit integer).\n\n2. Plookup Solution: Precompute a lookup table T of valid inputs/outputs (e.g., all 8-bit XOR pairs). Prover asserts that vector of witness values f is a sub-multiset of table T.\n\n3. Grand Product Invariant: By sorting f and T together into a sorted multiset s, prover proves multiset inclusion using a single grand product polynomial accumulator \u220f (1 + \u03b2 f_i)(1 + \u03b3) = \u220f (1 + \u03b2 s_i)(1 + \u03b3 s_{i+1}). This compresses hundreds of bitwise gates into a single lookup check."
+    },
+    {
+      "idx": 17,
+      "id": "EX2_17",
+      "domain": "Zero-Knowledge Cryptography",
+      "question": "Detail how the Sumcheck protocol verifies that the sum of a multivariate polynomial over a Boolean hypercube equals a claimed scalar in O(d log N) verifier time.",
+      "score": 0.0,
+      "max_score": 2.0,
+      "passed_rubrics": [],
+      "missing_rubrics": [
+        "sumcheck protocol",
+        "boolean hypercube",
+        "univariate reduction",
+        "round challenges"
+      ],
+      "response": "1. Problem: Prover claims \u2211_{x \u2208 {0, 1}^n} P(x_1, ..., x_n) = C for multivariate polynomial P of individual degree d.\n\n2. Round-by-Round Protocol: In round 1, prover fixes x_1 and sums over remaining variables, sending univariate polynomial s_1(X_1) = \u2211_{x_2...x_n} P(X_1, x_2, ..., x_n). Verifier checks s_1(0) + s_1(1) = C. Verifier then picks random challenge r_1 \u2208 F.\n\n3. Iteration: In round i, prover sends s_i(X_i) = \u2211 P(r_1, ..., r_{i-1}, X_i, x_{i+1}, ...). Verifier checks s_i(0) + s_i(1) = s_{i-1}(r_{i-1}) and picks random r_i.\n\n4. Final Check: After n rounds, verifier checks s_n(r_n) = P(r_1, ..., r_n) with a single query"
+    },
+    {
+      "idx": 18,
+      "id": "EX2_18",
+      "domain": "Zero-Knowledge Cryptography",
+      "question": "Explain how Zero-Knowledge Rollups (ZK-Rollups) verify thousands of layer-2 transactions off-chain and commit succinct state roots to layer-1.",
+      "score": 1.0,
+      "max_score": 2.0,
+      "passed_rubrics": [
+        "zk-rollup",
+        "state root"
+      ],
+      "missing_rubrics": [
+        "validity proof",
+        "data availability"
+      ],
+      "response": "Key Invariant Analysis:\n1. Off-Chain Transaction Batch: N transactions (T1, T2, ..., TN) are committed off-chain using compact Merkle authentication paths.\n\n2. Succinct State Root Commitment: Rollup computes a succinct state root R = Commitment(MerkleRoot of batch).\n\n3. Layer-1 Verification: Layer-1 oracle verifies R is valid and creates a new state root S' = VerifyOracle(R). State transition function f(state, R) = S'.\n\n4. Finality: Once S' is committed to layer-1, no further transactions can be included until S' is re-derived and re-committed. ZK-Rollups reduce transaction scale from layer-1 to a single commitment anchor."
+    },
+    {
+      "idx": 19,
+      "id": "EX2_19",
+      "domain": "Zero-Knowledge Cryptography",
+      "question": "Explain the concept of DLOG hardness on elliptic curves and how it underpins the binding property of Pedersen commitments: C = g^m h^r.",
+      "score": 0.5,
+      "max_score": 2.0,
+      "passed_rubrics": [
+        "discrete log"
+      ],
+      "missing_rubrics": [
+        "pedersen commitment",
+        "blinding factor",
+        "perfect hiding"
+      ],
+      "response": "1. Binding Graph: A commitment scheme is binding if for any two commitments C1 = g^{m1} h^{r1} and C2 = g^{m2} h^{r2}, it holds that |m1 - m2| < n / L where L is the order of the scalar subgroup.\n\n2. DLOG Hardness: Assuming the Discrete Logarithm problem is hard on curve group (C, G, h), an adversary cannot find an explicit pre-image m for a given commitment C = g^m.\n\n3. Bound on Difference: In any collision attack, the adversary can only find two pre-images m1 and m2 that differ by a small constant epsilon (e.g., epsilon = 1). Therefore, |m1 - m2| = |m1 - m2| <= n / L, which prevents two parties from committing to conflicting values without detecting the breach."
+    },
+    {
+      "idx": 20,
+      "id": "EX2_20",
+      "domain": "Zero-Knowledge Cryptography",
+      "question": "Analyze the difference between interactive arguments and proofs. Why does statistical soundness differ from computational soundness in SNARKs?",
+      "score": 1.0,
+      "max_score": 2.0,
+      "passed_rubrics": [
+        "computational soundness",
+        "prover bound"
+      ],
+      "missing_rubrics": [
+        "statistical zero knowledge",
+        "negligible error"
+      ],
+      "response": "Key Invariant Analysis:\n1. Interactive Argument of Knowledge (IAA): An IAA consists of a prover-verified claim \u03c0, an interactive proof protocol \u03c0 with verifier V and prover P, and a soundness guarantee that no prover can make a false claim pass with non-negligible probability.\n\n2. Computational Soundness: In SNARKs, soundness is proven via the Gap Diffie-Hellman (GDH) assumption: under the assumption that computing DH products on random inputs is intractable, no prover can craft a false \u03c0 that passes V's query check with probability greater than 1/p(L), where p(L) is the probability of verifier's randomness being chosen.\n\n3. Statistical Soundness: In interactive proofs without computational constraints (e.g., Sigma protocols), soundness requires that no prover can bias the verifier's random string s to produce a false claim with probability \u03b5 > 0. Statistical soundness imposes a strict negative correlation bound: for all provers P and verifiers V, |Pr[P generates \u03c0 and s makes (\u03c0, s) valid] - Pr[P generates \u03c0 and s does not make (\u03c0, s) valid"
+    },
+    {
+      "idx": 21,
+      "id": "EX2_21",
+      "domain": "Quantum Stabilizers & Topological Codes",
+      "question": "Explain the 5-qubit quantum code [[5, 1, 3]]. Why is it the smallest possible code capable of protecting a logical qubit against arbitrary single-qubit errors?",
+      "score": 2.0,
+      "max_score": 2.0,
+      "passed_rubrics": [
+        "5-qubit code",
+        "quantum hamming bound",
+        "single-qubit error",
+        "stabilizer generators"
+      ],
+      "missing_rubrics": [],
+      "response": "The [[5, 1, 3]] code is the minimal quantum error-correcting code with the following invariants:\n\n1. Dimension Constraint: By the quantum Hamming bound, any [[n, k, d]] code satisfies 2^k >= n * d / 2. For k = 1, n = 5, d = 3: 2^1 = 2 >= 5 * 3 / 2 = 7.5, which is impossible. Thus, no quantum error-correcting code can protect a single logical qubit with arbitrary single-qubit errors (X, Y, Z) on 5 physical qubits.\n\n2. Stabilizer Generators: The [[5, 1, 3]] code is defined by the cyclic stabilizer subgroup generated by:\n   g1 = XZZXI\n   g2 = XIXZZ\n   g3 = ZXIXX\n   g4 = ZXZXI\n   g5 = IXZZX\nThese 5 generators form an optimal stabilizer code.\n\n3. Perfect Code: The [[5, 1, 3]] code is a perfect"
+    },
+    {
+      "idx": 22,
+      "id": "EX2_22",
+      "domain": "Quantum Stabilizers & Topological Codes",
+      "question": "Describe how X-cut and Z-cut topological boundary conditions in planar surface codes define logical operators X_L and Z_L on boundaries.",
+      "score": 1.0,
+      "max_score": 2.0,
+      "passed_rubrics": [
+        "planar surface code",
+        "logical operator"
+      ],
+      "missing_rubrics": [
+        "rough boundary",
+        "smooth boundary"
+      ],
+      "response": "Key Invariant Analysis:\n1. Planar Surface Code Geometry: Non-trivial topological boundary conditions arise when the physical boundary of the code is a straight line (X-cut) or a vertical line (Z-cut) in the lattice.\n\n2. X-Cut Boundary Conditions: When a non-trivial X-type error chain (Z_error) propagates along the X-cut boundary, it is exponentially suppressed by the topological Aharonov-Bohm phase factor (-1)^n. Consequently, X-type logical operators must be defined along the Z-cut boundary:\n   X_L = \\prod_{i \\in \\text{Z-cut}} X_i\n   Z_L = \\prod_{j \\in \\text{X-cut}} Z_j\n\n3. Rigorous Invariance: Any physical operation or measurement must respect these conditions to preserve the stabilizer code space and topological degeneracy."
+    },
+    {
+      "idx": 23,
+      "id": "EX2_23",
+      "domain": "Quantum Stabilizers & Topological Codes",
+      "question": "Explain how Lattice Surgery implements fault-tolerant logical CNOT gates between two planar surface code patches using merge and split operations.",
+      "score": 2.0,
+      "max_score": 2.0,
+      "passed_rubrics": [
+        "lattice surgery",
+        "patch merge",
+        "patch split",
+        "logical cnot"
+      ],
+      "missing_rubrics": [],
+      "response": "1. Planar Surface Code Constraints: In 2D architectures, moving physical qubits across each other causes crosstalk and error spread. Traditional transversal gates cannot perform CNOT between distant patches.\n\n2. Lattice Surgery Principle: Implements multi-qubit logical operations by dynamically merging and splitting the boundaries of adjacent code patches along their rough (X) or smooth (Z) boundaries.\n\n3. Merge Phase: Additional ancilla qubits along the interface between Patch 1 (Control) and Patch 2 (Target) measure joint Pauli operators (Z_L1 \u2297 Z_L2) without measuring individual qubits.\n\n4. Split Phase: The boundary stabilizers are decoupled back into two distinct planar patches. Any syndrome measurement results from the merge operation determine Pauli X and Z byproduct corrections on the target patch, realizing a fault-tolerant CNOT with zero physical qubit movement."
+    },
+    {
+      "idx": 24,
+      "id": "EX2_24",
+      "domain": "Quantum Stabilizers & Topological Codes",
+      "question": "Detail the role of the Clifford hierarchy P_k in quantum error correction. Why does the T gate sit at level 3, outside the Clifford group at level 2?",
+      "score": 1.0,
+      "max_score": 2.0,
+      "passed_rubrics": [
+        "clifford hierarchy",
+        "t gate level 3"
+      ],
+      "missing_rubrics": [
+        "pauli group level 1",
+        "non-transversal"
+      ],
+      "response": "1. Clifford Hierarchy: The Clifford group C_k consists of Clifford gates at level k. Level 1: H (Hadamard). Level 2: CNOT, S, H-CNOT, iY-CNOT (all Clifford). Level 3: T-gate (T = diag(1, i)).\n\n2. Non-Clifford at Level 3: The T-gate does not belong to C_2. It is the non-Clifford bottleneck in fault-tolerant architectures.\n\n3. Hierarchical Distillation (Bravyi-Kitaev): To implement universal computation, non-Clifford gates are extracted from highly stabilizer codes via Clifford-to-Clifford gate teleportation (Bravyi-Kitaev code). The T-gate is the primary non-Clifford gate extracted from the [[n, k, d]] stabilizer code."
+    },
+    {
+      "idx": 25,
+      "id": "EX2_25",
+      "domain": "Quantum Stabilizers & Topological Codes",
+      "question": "Explain how the Union-Find decoder works as an alternative to MWPM in surface codes, and why its O(N) complexity enables real-time syndrome decoding.",
+      "score": 1.5,
+      "max_score": 2.0,
+      "passed_rubrics": [
+        "union-find decoder",
+        "cluster growth",
+        "real-time decoding"
+      ],
+      "missing_rubrics": [
+        "linear time complexity"
+      ],
+      "response": "1. Real-Time Bottleneck: In superconducting processors, syndrome extraction cycles run every ~200ns. MWPM uses Edmonds' Blossom Algorithm (O(V^3) or O(V^2.5)), which is too slow for real-time decoding, causing an exponential decoding backlog.\n\n2. Union-Find Decoder (Delfosse & Nickerson): Operates via cluster growth and peeling. Non-trivial syndrome defect vertices grow spherical clusters of radius r by expanding cluster boundaries along lattice edges.\n\n3. Cluster Merging: When two clusters touch, they merge using the standard Disjoint-Set Union-Find data structure. A cluster stops growing once it becomes valid (contains an even number of defects or touches a boundary).\n\n4. Peeling: A spanning tree is constructed for each valid cluster, and a simple linear-time peeling algorithm extracts the Pauli correction chain. The entire decoding algorithm runs in nearly linear O(N \u03b1(N)) time, matching physical clock cycles."
+    },
+    {
+      "idx": 26,
+      "id": "EX2_26",
+      "domain": "Quantum Stabilizers & Topological Codes",
+      "question": "Describe how leakage errors (where qubits leave the |0>, |1> computational subspace) threaten fault-tolerant codes, and how Leakage Reduction Units (LRUs) reset them.",
+      "score": 1.5,
+      "max_score": 2.0,
+      "passed_rubrics": [
+        "leakage error",
+        "leakage reduction unit",
+        "ancilla reset"
+      ],
+      "missing_rubrics": [
+        "computational subspace"
+      ],
+      "response": "Key Invariant Analysis:\n1. Leakage Threat: Non-Clifford gates or error correction cycles can transition a physical qubit into an unaccounted state |\u03bb\u27e9 (|0\u27e9 + |1\u27e9)|\u03bb\u27e9 or |\u03bb\u27e9|0\u27e9. In stabilizer codes, |\u03bb\u27e9 states are orthogonal to the code space V_code. Any measurement or gate interaction with |\u03bb\u27e9 introduces non-trivial syndrome eigenstates (|0\u27e9 - |1\u27e9)|\u03bb\u27e9/\u221a2), causing exponential error propagation and decoding explosion.\n\n2. Leakage Reduction Unit (LRU): An LRU is a dedicated ancilla-based circuit that intercepts leaked qubits from the main code. The LRU implements a non-trivial Clifford gate (e.g., T-gate or H-gate) and measures the ancilla. By the non-triviality condition, measuring the ancilla with outcome +1 projects the leaked qubit back strictly into the |0\u27e9 or |1\u27e9 subspace, while the ancilla is reset to a known state for reuse.\n\n3. Invariant Preservation: LRUs strictly bound leakage rates to O(\u03b5) per cycle and"
+    },
+    {
+      "idx": 27,
+      "id": "EX2_27",
+      "domain": "Quantum Stabilizers & Topological Codes",
+      "question": "Explain the Bacon-Shor subsystem code. How do gauge operators simplify syndrome extraction compared to standard stabilizer codes?",
+      "score": 1.0,
+      "max_score": 2.0,
+      "passed_rubrics": [
+        "subsystem code",
+        "gauge operators"
+      ],
+      "missing_rubrics": [
+        "bacon-shor code",
+        "two-body measurements"
+      ],
+      "response": "1. Subsystem Architecture: N physical qubits encode k logical qubits and m ancilla check qubits arranged in a regular lattice (subsystem code).\n\n2. Gauge Operators: Non-trivial Pauli X and Z operators act along the lattice edges (gauge operators). Any syndrome measurement eigenvalue corresponds to a gauge class [A, B] = A \u2297 B.\n\n3. Simplified Syndrome Extraction: By flipping an edge qubit, the syndrome measurement basis transforms from diagonal Pauli Z to off-diagonal Pauli X, converting parity check equations from stabilizer constraints into simple parity-parity constraints (X L_1 X L_2 ... X L_k X = 0), allowing syndrome extraction via Clifford gates (H Z H) without measuring unencoded physical qubits."
+    },
+    {
+      "idx": 28,
+      "id": "EX2_28",
+      "domain": "Quantum Stabilizers & Topological Codes",
+      "question": "What is the physical meaning of fault-tolerance threshold ~1% in surface codes under depolarizing noise models?",
+      "score": 1.5,
+      "max_score": 2.0,
+      "passed_rubrics": [
+        "depolarizing noise",
+        "physical threshold",
+        "syndrome measurement noise"
+      ],
+      "missing_rubrics": [
+        "fault-tolerant scaling"
+      ],
+      "response": "1. Depolarizing Noise Model: Decoupled single-qubit errors with probability p per step (independent of measurement outcomes): U = (1-p)I + p X/2 + p Y/2 + p Z/2.\n\n2. Syndrome Extraction & Syndrome Graph: Pauli error chains connect defect vertices. Syndrome graph vertices represent syndrome measurement outcomes (XZ, ZX, YZ, XY) and edges represent chain of errors.\n\n3. Tree-like vs. Crossed-Over Syndrome Graphs: In stabilizer codes, tree-like syndrome graphs allow error correction by peeling errors off the leaves. Crossed-over graphs (where error chains intersect) create non-trivial topological defects (vortex pairs) that propagate indefinitely and cause exponential state decay.\n\n4. Threshold Theorem: Surface codes require a physical error rate p < p_th \u2248 1% (specifically, the magic threshold p_th = 1/(3d) for d = 3, 4, or 5) to ensure that corrective Pauli measurements converge to a clean tree-like structure and that fault-tolerance bounds hold."
+    },
+    {
+      "idx": 29,
+      "id": "EX2_29",
+      "domain": "Quantum Stabilizers & Topological Codes",
+      "question": "Explain how quantum teleportation of gates (Gottesman-Chuang trick) enables execution of non-Clifford gates using offline prepared magic states.",
+      "score": 1.0,
+      "max_score": 2.0,
+      "passed_rubrics": [
+        "gate teleportation",
+        "gottesman-chuang"
+      ],
+      "missing_rubrics": [
+        "magic state",
+        "byproduct operator"
+      ],
+      "response": "1. The Non-Clifford Bottleneck: Universal computation requires a non-Clifford gate (e.g., T-gate = diag(1, e^{i\u03c0/4})). Preparing non-Clifford states on physical hardware is costly.\n\n2. Gottesman-Chuang Trick: Instead of synthesizing a non-Clifford gate via Clifford circuits (which require many physical gates), prepare a non-Clifford state |T\u27e9 = (|0\u27e9 + e^{i\u03c0/4}|1\u27e9)/\u221a2 in offline memory (e.g., via error-correcting code syndrome extraction).\n\n3. Teleportation via Clifford Permutation: Apply a Clifford permutation channel C_L that maps |0\u27e9 \u2192 |01\u27e9, |1\u27e9 \u2192 |10\u27e9. By the distillation theorem, applying C_L followed by the phase flip gate Z = diag(1, -1) perfectly implements the T-gate with a single Clifford measurement and classical communication."
+    },
+    {
+      "idx": 30,
+      "id": "EX2_30",
+      "domain": "Quantum Stabilizers & Topological Codes",
+      "question": "Analyze the difference between geometric locality in 2D surface codes versus high-rate LDPC (Low-Density Parity-Check) quantum codes.",
+      "score": 1.0,
+      "max_score": 2.0,
+      "passed_rubrics": [
+        "quantum ldpc",
+        "geometric locality"
+      ],
+      "missing_rubrics": [
+        "hyperbolic code",
+        "syndrome sparsity"
+      ],
+      "response": "Key Invariant Analysis:\n1. Geometric Locality in 2D Surface Codes: Non-Clifford gates are implemented via transversal operations (e.g., T-gates on the XZZXY code). Because physical hardware imposes strict coherence time limits, non-Clifford gates are restricted to a single lattice site. All stabilizer checks and syndrome extraction are confined to adjacent vertices and faces of the 2D grid.\n\n2. High-Rate LDPC Quantum Codes (e.g., Gao-Jia-Knill, Bravyi-Kitaev): Encode n physical qubits into m logical qubits with rate R = n/m >> 1/2. Check matrices are sparse permutation matrices rather than dense Clifford circuits.\n\n3. Cross-Talk and Scaling Limits: In superconducting processors, crosstalk between adjacent wires limits gate fidelity to ~99.9%. Surface codes fail exponentially when distance d decreases below ~10-20 nm. LDPC codes scale linearly O(L) without exponential error accumulation, allowing fault-tolerance architectures that span hundreds of kilometers.\nPractical Application: In production architectures, verifying these conditions prevents state"
+    },
+    {
+      "idx": 31,
+      "id": "EX2_31",
+      "domain": "Symplectic Dynamics & Neural ODEs",
+      "question": "Explain how Hamiltonian Neural Networks parameterize kinetic and potential energy T(p) and V(q) to learn physics from raw trajectory data.",
+      "score": 1.5,
+      "max_score": 2.0,
+      "passed_rubrics": [
+        "hamiltonian mechanics",
+        "kinetic energy",
+        "potential energy"
+      ],
+      "missing_rubrics": [
+        "phase trajectory"
+      ],
+      "response": "Key Invariant Analysis:\n1. Hamiltonian Formulation: Classical mechanics is defined by Hamiltonian H(p, q) = T(p) + V(q). Standard neural networks cannot learn non-polynomial kinetic energy T(p) or non-separable potential V(q) directly from position-only trajectories.\n\n2. Invariant Matching: To learn physics from raw trajectories (positions q(t) and momenta p(t)), the model must learn continuous, smooth functions that exactly reproduce the true Hamiltonian:\n   - Kinetic Energy: Learned via RNN/LSTM or Transformer as a continuous function f(q, p) matching the true quadratic form T(p) = p^T M^{-1} p.\n   - Potential Energy: Learned via RNN/LSTM or Transformer as a continuous function g(q) matching the true scalar potential V(q).\n\n3. Equations of Motion: Hamilton's canonical equations of motion are d q/dt = \u2202H/\u2202p and d p/dt = - \u2202H/\u2202q. By training the neural network to minimize the discrete Euler-Marieva integration error ||q(t) - q_{true}(t)||^"
+    },
+    {
+      "idx": 32,
+      "id": "EX2_32",
+      "domain": "Symplectic Dynamics & Neural ODEs",
+      "question": "Explain how Lagrangian Neural Networks (LNNs) parameterize dynamics using L(q, q_dot) and the Euler-Lagrange equations without requiring canonical momenta.",
+      "score": 1.0,
+      "max_score": 2.0,
+      "passed_rubrics": [
+        "euler-lagrange equation",
+        "generalized coordinates"
+      ],
+      "missing_rubrics": [
+        "lagrangian neural network",
+        "mass matrix inversion"
+      ],
+      "response": "1. Lagrangian Formulation: Lagrangian L(q, q\u0307) = T(q, q\u0307) - V(q) parameterizes kinetic and potential energy in arbitrary generalized coordinates (q, q\u0307) without needing canonical coordinates (q, p).\n\n2. Euler-Lagrange Equations: d/dt (\u2202L/\u2202q\u0307) - \u2202L/\u2202q = 0. Expanding by chain rule:\n   (\u2202^2 L / \u2202q\u0307^2) \u00b7 q\u0308 + (\u2202^2 L / \u2202q\u0307 \u2202q) \u00b7 q\u0307 - \u2202L/\u2202q = 0.\n\n3. Solving for Acceleration q\u0308:\n   q\u0308 = (\u2202^2 L / \u2202q\u0307^2)^{-1} \u00b7 [\u2202L/\u2202q - (\u2202^2 L / \u2202q\u0307 \u2202q) \u00b7 q\u0307].\nThe Hessian matrix (\u2202^2 L / \u2202q\u0307^2) acts"
+    },
+    {
+      "idx": 33,
+      "id": "EX2_33",
+      "domain": "Symplectic Dynamics & Neural ODEs",
+      "question": "Describe how adaptive step-size ODE solvers (such as Dormand-Prince / RK45) adjust step size Delta t based on local truncation error estimates during forward Neural ODE passes.",
+      "score": 1.0,
+      "max_score": 2.0,
+      "passed_rubrics": [
+        "adaptive step size",
+        "local truncation error"
+      ],
+      "missing_rubrics": [
+        "dormand-prince",
+        "step rejection"
+      ],
+      "response": "Key Invariant Analysis:\n1. Local Truncation Error Estimation: RK45 computes two intermediate solutions: a high-order reference step of size h = Delta t / 2 and a low-order step of size h/2. The difference between these two trajectories estimates the local truncation error E_local proportional to Delta t^p.\n\n2. Adaptive Step-Size Control: The solver dynamically adjusts Delta t in the next step to ensure E_local <= tau (a user-defined tolerance):\n   - If |approximation_error| > tau, Delta t is reduced proportionally (Delta t_new = Delta t / (1 + beta * |error|)).\n   - If |approximation_error| <= tau, Delta t may be increased to accelerate convergence.\n\n3. Global Convergence Guarantee: By continuously correcting step size, the solver achieves exponential convergence O(h^p) without exploding or stalling, preserving continuous ODE trajectories in continuous training loops."
+    },
+    {
+      "idx": 34,
+      "id": "EX2_34",
+      "domain": "Symplectic Dynamics & Neural ODEs",
+      "question": "Explain how Augmented Neural ODEs resolve the limitation of standard Neural ODEs in learning trajectories with self-intersecting flows.",
+      "score": 1.5,
+      "max_score": 2.0,
+      "passed_rubrics": [
+        "augmented neural ode",
+        "extra dimensions",
+        "homeomorphism"
+      ],
+      "missing_rubrics": [
+        "flow intersection"
+      ],
+      "response": "1. Topological Limitation of Standard Neural ODEs: Solutions to autonomous ODEs dz/dt = f(z) are homeomorphisms (continuous, invertible maps). Therefore, trajectories in R^d cannot cross each other (uniqueness of solutions by Picard-Lindel\u00f6f). Consequently, a standard Neural ODE cannot model concentric circles, self-intersecting features, or complex topologies without breaking continuity.\n\n2. Augmented Neural ODEs: Augment the state space with extra dummy dimensions: z_aug(t) = [z(t), 0]^T \u2208 R^{d + p}.\n\n3. Disentanglement in Higher Dimensions: In the expanded R^{d + p} space, trajectories that appear to intersect when projected onto R^d can pass over or under each other in the extra dimensions without intersecting, preserving the homeomorphism theorem while drastically simplifying the learned vector field f."
+    },
+    {
+      "idx": 35,
+      "id": "EX2_35",
+      "domain": "Symplectic Dynamics & Neural ODEs",
+      "question": "Explain the concept of Symplectic Matrix group Sp(2n, R) and why any Hamiltonian transformation must satisfy M^T J M = J.",
+      "score": 0.5,
+      "max_score": 2.0,
+      "passed_rubrics": [
+        "symplectic group"
+      ],
+      "missing_rubrics": [
+        "canonical transformation",
+        "phase space volume",
+        "invariance of j"
+      ],
+      "response": "Key Invariant Analysis:\n1. Symplectic Group Definition: Sp(2n, R) is the group of (2n) \u00d7 (2n) real matrices M satisfying the symplectic condition:\n   M^T J M = J, where J = [[0, I_n], [-I_n, 0]] is the standard symplectic form.\n\n2. Geometric Meaning: This condition ensures that M maps symplectic submanifolds (canonical coordinates (q, p)) to other symplectic submanifolds. In physical systems, canonical coordinates represent generalized coordinates (q) and conjugate momenta (p).\n\n3. Hamiltonian Evolution: Time evolution is governed by Hamilton's canonical equations:\n   dq/dt = \u2202H/\u2202p,   dp/dt = -\u2202H/\u2202q\nThis can be written in vector-matrix form:\n   [dq/dt, dp/dt]^T = J^{-1} [\u2202H/\u2202p, -\u2202H/\u2202q]^T = -J [\u2202H/\u2202p, -"
+    },
+    {
+      "idx": 36,
+      "id": "EX2_36",
+      "domain": "Symplectic Dynamics & Neural ODEs",
+      "question": "Describe the role of Picard-Lindelof Theorem in ensuring unique solutions to Neural ODE initial value problems: dz/dt = f(z, t).",
+      "score": 0.5,
+      "max_score": 2.0,
+      "passed_rubrics": [
+        "existence and uniqueness"
+      ],
+      "missing_rubrics": [
+        "picard-lindel\\u00f6f theorem",
+        "lipschitz continuity",
+        "initial value problem"
+      ],
+      "response": "Key Invariant Analysis:\n1. Problem Formulation: Neural ODEs model continuous continuous evolution: dz/dt = f(z, t; \u03b8). Trajectories are solutions to autonomous ODEs.\n\n2. Picard-Lindel\u00f6f Conditions: A function f(z, t) is continuously differentiable with respect to z (C^1) and Lipschitz continuous in z (|f(z_1, t) - f(z_2, t)| \u2264 L |z_1 - z_2|) on a domain D \u00d7 T.\n\n3. Existence and Uniqueness: Under these conditions, there exists a unique maximal solution z(t) defined on a maximal interval I_z. Crucially, for neural networks, restricting \u03b8 to a convex body B_\u03b8 and f_\u03b8 to a convex set C_f ensures that the vector field is globally Lipschitz continuous (Lipschitz constant L is bounded by the network architecture and activation bounds). Therefore, a unique global solution z(t) exists for all t \u2208 R.\nPractical Application: In production architectures, verifying these conditions prevents state divergence and ensures formal safety guarantees."
+    },
+    {
+      "idx": 37,
+      "id": "EX2_37",
+      "domain": "Symplectic Dynamics & Neural ODEs",
+      "question": "Explain how neural vector fields with non-zero curl fail to represent conservative forces in physical systems.",
+      "score": 0.5,
+      "max_score": 2.0,
+      "passed_rubrics": [
+        "conservative force"
+      ],
+      "missing_rubrics": [
+        "curl free vector field",
+        "gradient system",
+        "potential energy"
+      ],
+      "response": "1. Conservative Vector Fields: A force field F is conservative if work done around any closed loop is zero: \u222e F \u00b7 dr = 0. By Stokes' Theorem, this implies curl F = 0 everywhere.\n\n2. Neural Vector Fields: Continuous neural networks parameterize vector fields v(theta) across space.\n\n3. Non-Zero Curl in Neural Fields: If the network architecture or training loss includes a non-zero curl term (e.g., from non-corrective Jacobian regularization or non-corrective loss functions), curl F \u2260 0.\n\n4. Topological Invariance: The integral of curl F over any closed loop is non-zero (\u222e curl F \u00b7 dr = \u222b (\u2207 \u00d7 F) \u00b7 dA \u2260 0). By the generalized Stokes' theorem, the potential function v(theta) must develop a multi-valued branch cut (a discontinuity along a closed curve).\n\n5. Physical Impossibility: Physical conservative forces (e.g., gravity, electrostatics) possess single-valued potential functions. Therefore, any neural vector field with non-zero curl represents an artificial, non-physical force."
+    },
+    {
+      "idx": 38,
+      "id": "EX2_38",
+      "domain": "Symplectic Dynamics & Neural ODEs",
+      "question": "Explain how discrete residual connections z_{k+1} = z_k + f(z_k) approximate continuous Euler discretization of an underlying continuous neural flow.",
+      "score": 1.5,
+      "max_score": 2.0,
+      "passed_rubrics": [
+        "residual connection",
+        "euler discretization",
+        "continuous flow"
+      ],
+      "missing_rubrics": [
+        "step size dt"
+      ],
+      "response": "Key Invariant Analysis:\n1. Continuous Dynamics: Unconstrained continuous neural architectures (e.g., RealNVP, Normalizing Flows) obey continuous ODEs: dz/dt = f(z). Solutions are obtained via Euler discretization: z_{k+1} = z_k + h f(z_k).\n\n2. Discrete Bottleneck: Standard neural networks cannot represent arbitrary continuous vector fields f(z) directly in discrete layers.\n\n3. Discrete Residual Connection: Discrete residual connections parameterize the vector field as a neural network: f(z) = z + z_k \\odot g(z_k). The update rule becomes: z_{k+1} = z_k + h (z_k + z_k \\odot g(z_k)) = z_{k+1} = z_k (1 + h (I + h g(z_k))). This factorization separates the continuous geometric flow (1 + h g) from the discrete neural network parameterization (z_k). Invariant Check: This formulation strictly preserves the continuous Euler invariant z_{k+1} = z_k + h f(z_k) while encoding arbitrary continuous vector fields in compact"
+    },
+    {
+      "idx": 39,
+      "id": "EX2_39",
+      "domain": "Symplectic Dynamics & Neural ODEs",
+      "question": "Analyze why stiff differential equations cause extreme step size contraction in explicit Runge-Kutta solvers and require implicit A-stable methods.",
+      "score": 0.5,
+      "max_score": 2.0,
+      "passed_rubrics": [
+        "a-stability"
+      ],
+      "missing_rubrics": [
+        "stiff equation",
+        "implicit solver",
+        "step size collapse"
+      ],
+      "response": "1. Stability Condition: For an explicit Runge-Kutta method with step size h and eigenvalue spectrum \u03bb_i of the Jacobian J, the amplification factor satisfies |1 - h \u03bb_i| \u2264 1.\n\n2. Explicit Method Limitation: Explicit methods require h \u03bb_i \u2264 2 (to prevent exponential divergence |1 - h \u03bb_i| \u2265 -1). For stiff systems where eigenvalues span orders of magnitude (e.g., -100 to +1), explicit methods are forced to take step sizes h \u2264 0.01, which is computationally prohibitive.\n\n3. Implicit A-Stability: Implicit methods evaluate the Jacobian at an interior stage and solve for the new state. Their stability region includes the entire left half-plane, allowing arbitrarily small step sizes and exponential convergence without iterative refinement."
+    },
+    {
+      "idx": 40,
+      "id": "EX2_40",
+      "domain": "Symplectic Dynamics & Neural ODEs",
+      "question": "Explain how spectral normalization restricts the Lipschitz constant of each linear layer W to ||W||_2 <= 1 to enforce globally contractive neural networks.",
+      "score": 1.0,
+      "max_score": 2.0,
+      "passed_rubrics": [
+        "spectral normalization",
+        "contractive network"
+      ],
+      "missing_rubrics": [
+        "singular value",
+        "power iteration"
+      ],
+      "response": "Spectral normalization restricts the spectral norm ||W||_2 <= 1 for each layer W:\n\n1. Spectral Norm Definition: ||W||_2 = max_{||v||_2 = 1} ||W v||_2. This measures the maximum affine contraction/expansion factor of a single linear layer.\n\n2. Global Contraction Invariant: In globally contractive networks, every layer satisfies ||W||_2 <= 1. By the Minkowski inequality, the cumulative contraction over all layers guarantees global contractivity: ||sum W_i z_i|| <= sum ||W_i||_2 ||z_i|| <= ||z_i||.\n\n3. Invariant Preservation: Spectral normalization prevents exponential parameter explosion and ensures that training convergence guarantees hold without stochastic activation clipping."
+    },
+    {
+      "idx": 41,
+      "id": "EX2_41",
+      "domain": "Category Theory & Formal Semantics",
+      "question": "Explain how Functoriality preserves identities and composition: F(id_A) = id_{F(A)} and F(g o f) = F(g) o F(f). What happens if a mapping fails compositionality?",
+      "score": 2.0,
+      "max_score": 2.0,
+      "passed_rubrics": [
+        "functoriality",
+        "identity preservation",
+        "composition preservation",
+        "arrow mapping"
+      ],
+      "missing_rubrics": [],
+      "response": "1. Functor Definition: A functor F: C \u2192 D between categories C and D maps objects to objects and morphisms to morphisms while strictly preserving identity and composition.\n\n2. Preservation of Identity: For any object A in C, F(id_A) is the identity morphism in D, denoted id_{F(A)}. This ensures that abstract identity arrows are transported isomorphically to their targets in the codomain.\n\n3. Preservation of Composition: For composable morphisms f: A \u2192 B and g: B \u2192 C, functoriality guarantees F(g o f) = F(g) \u2218 F(f). This algebraic rigidity guarantees that semantic meaning is preserved across abstraction layers without re-interpretation.\n\n4. Failure of Compositionality: When a mapping fails this condition (e.g., in non-functorial transformations or broken semantic architectures), semantic meaning diverges irreversibly, causing state divergence, logic explosion, or system deadlock."
+    },
+    {
+      "idx": 42,
+      "id": "EX2_42",
+      "domain": "Category Theory & Formal Semantics",
+      "question": "Explain the universal property of the Categorical Product A x B. How do projection morphisms pi_1 and pi_2 uniquely factor any pair of morphisms f: C -> A, g: C -> B?",
+      "score": 2.0,
+      "max_score": 2.0,
+      "passed_rubrics": [
+        "categorical product",
+        "projection morphisms",
+        "universal property",
+        "unique mediating morphism"
+      ],
+      "missing_rubrics": [],
+      "response": "1. Definition of Categorical Product: A product of objects A and B is an object A \u00d7 B together with canonical projection morphisms \u03c0_1: A \u00d7 B \u2192 A and \u03c0_2: A \u00d7 B \u2192 B.\n\n2. Universal Property: For any object C and any pair of morphisms f: C \u2192 A and g: C \u2192 B, there exists a UNIQUE mediating morphism \u27e8f, g\u27e9: C \u2192 A \u00d7 B such that the diagram commutes:\n   \u03c0_1 \u2218 \u27e8f, g\u27e9 = f   and   \u03c0_2 \u2218 \u27e8f, g\u27e9 = g.\n\n3. Programming Meaning: This formalizes pair types (tuples) in functional programming: given functions producing A and B from C, \u27e8f, g\u27e9 is the pair-producing function \\c -> (f(c), g(c))."
+    },
+    {
+      "idx": 43,
+      "id": "EX2_43",
+      "domain": "Category Theory & Formal Semantics",
+      "question": "Explain the universal property of the Categorical Coproduct A + B and its canonical inclusion morphisms i_1 and i_2.",
+      "score": 1.0,
+      "max_score": 2.0,
+      "passed_rubrics": [
+        "categorical coproduct",
+        "inclusion morphisms"
+      ],
+      "missing_rubrics": [
+        "dual product",
+        "sum type"
+      ],
+      "response": "1. Definition of Categorical Coproduct: Given locally small categories C, D and morphisms f: A -> C, g: B -> C, a coproduct (also known as disjoint union or direct sum) is an object A + B together with canonical inclusion morphisms i_1: A -> A + B and i_2: B -> A + B such that for any object Z and morphism h: A -> Z, there exists a unique mediating morphism \\hat{h}: A + B -> Z making the square commute:\n   h o i_1 = \\hat{h} o i_1   and   h o i_2 = \\hat{h} o i_2.\n\n2. Universal Property Invariance: This property characterizes the coproduct uniquely up to isomorphism. Any construction satisfying these conditions is canonically isomorphic to A + B, making it the most general and natural way to combine objects A and B in category theory."
+    },
+    {
+      "idx": 44,
+      "id": "EX2_44",
+      "domain": "Category Theory & Formal Semantics",
+      "question": "Explain how the Reader Monad (-> R) and State Monad (s -> (a, s)) are formulated categorically as endofunctors with Kleisli triples.",
+      "score": 1.5,
+      "max_score": 2.0,
+      "passed_rubrics": [
+        "state monad",
+        "reader monad",
+        "kleisli triple"
+      ],
+      "missing_rubrics": [
+        "environment threading"
+      ],
+      "response": "1. Functoriality: A functor F: C -> C maps objects to objects and morphisms to morphisms.\n\n2. Endofunctor: An endofunctor F: C -> C maps objects to objects and morphisms to morphisms within the same category C.\n\n3. Kleisli Triple (T, H, k): For any endofunctor F, there exists a canonical Kleisli triple (T, H, k) where:\n- State Monad: T = State, H = product functor, k = state constant functor.\n- Reader Monad: T = Reader, H = exponential functor, k = reader constant functor.\n\n4. Evaluation Map: The monad morphism eval: T -> F satisfies eval(f) = f(unit).\n\n5. Categorical Semantics: Programs and states are modeled as formal objects and morphisms in category theory, with equational reasoning proving termination and safety guarantees."
+    },
+    {
+      "idx": 45,
+      "id": "EX2_45",
+      "domain": "Category Theory & Formal Semantics",
+      "question": "Describe the difference between an Equivalence of Categories versus an Isomorphism of Categories. What role do natural isomorphisms of functors play?",
+      "score": 1.5,
+      "max_score": 2.0,
+      "passed_rubrics": [
+        "equivalence of categories",
+        "isomorphism of categories",
+        "natural isomorphism"
+      ],
+      "missing_rubrics": [
+        "full faithful essentially surjective"
+      ],
+      "response": "Key Invariant Analysis:\n1. Isomorphism of Categories: A full and faithful functor F: C \u2192 D is an isomorphism of categories if and only if its inverse functor F^{-1}: D \u2192 C exists and is also a functor (i.e., it is fully and faithful). In this case, categories C and D are isomorphic as mathematical structures.\n\n2. Equivalence of Categories: Two categories C and D are equivalent if there exists a functor F: C \u2192 D that is fully faithful, and a functor G: D \u2192 C such that G \u2218 F is naturally isomorphic to the identity functor on C, and F \u2218 G is naturally isomorphic to the identity functor on D.\n\n3. Role of Natural Isomorphisms of Functors: The natural isomorphisms \u03b1: F \u21d2 G and \u03b2: G \u21d2 F provide the \"2-isomorphism\" that glues the categories together. They are morphisms in the category of categories (Cat). Because natural transformations are isomorphisms, the functor category (Cat) is a Cartesian closed category, and the subcategory of full and faithful functors (Fun(C,"
+    },
+    {
+      "idx": 46,
+      "id": "EX2_46",
+      "domain": "Category Theory & Formal Semantics",
+      "question": "Explain the concept of a Sheaf on a topological space and how the gluing axiom ensures local consistency leads to unique global sections.",
+      "score": 1.5,
+      "max_score": 2.0,
+      "passed_rubrics": [
+        "sheaf",
+        "gluing axiom",
+        "local sections"
+      ],
+      "missing_rubrics": [
+        "presheaf"
+      ],
+      "response": "1. Sheaf of Sets: A sheaf F on topological space X is a functor F: Open(X) \u2192 Set satisfying:\n- Locality: For open U \u2286 X and sections s, t \u2208 F(U) with s|_U \u2229 t|_U = t|_U \u2229 s|_U (they agree on intersection), there exists a unique global section s\u0303 \u2208 F(U) such that s\u0303|_U = s|_U = t|_U.\n- Gluing Axiom: For any open cover {U_i} of U and sections s_i \u2208 F(U_i) that are locally compatible (s_i|_{U_i \u2229 U_j} = s_j|_{U_i \u2229 U_j} for all i, j), there exists a unique global section s\u0303 \u2208 F(U) such that s\u0303|_{U_i} = s_i for all i.\n\n2. Meaning of Sheaves: Sheaves model mathematical objects that are locally well-defined (e.g., rational functions, smooth manifolds, presheaves of groups) and whose global structure is completely"
+    },
+    {
+      "idx": 47,
+      "id": "EX2_47",
+      "domain": "Category Theory & Formal Semantics",
+      "question": "Explain how an Epimorphism is defined categorically without referring to element surjectivity: g o f = h o f implies g = h.",
+      "score": 1.0,
+      "max_score": 2.0,
+      "passed_rubrics": [
+        "epimorphism",
+        "surjection"
+      ],
+      "missing_rubrics": [
+        "right cancellation",
+        "dual of monomorphism"
+      ],
+      "response": "1. Category of Endowed Sets: A category C has objects (sets) and morphisms (functions).\n\n2. Epimorphism Definition: A morphism f: A \u2192 B is an epimorphism (epi) if for any two morphisms g, h: C \u2192 A, the diagram commutes (h o f = g o f) implies g = h.\n\n3. Semantic Meaning: An epimorphism is a surjective map in the semantic sense (every element in B is mapped to by some element in A), but the categorical definition is strictly more general: it holds in categories where surjective maps are not even morphisms (e.g., the category of groups, where the image of a homomorphism may not be a subgroup).\n\n4. Universal Property: An epimorphism e: A \u2192 B is a universal epimorphism if for any object C and morphism k: D \u2192 B, there exists a unique mediating morphism u: D \u2192 A such that h o f = k = u o f. Epimorphisms generate the category's subobject lattice and represent maximal surjections in categorical semantics."
+    },
+    {
+      "idx": 48,
+      "id": "EX2_48",
+      "domain": "Category Theory & Formal Semantics",
+      "question": "Explain how a Monomorphism is defined categorically: f o g = f o h implies g = h, and why it models injective structure preservation.",
+      "score": 1.0,
+      "max_score": 2.0,
+      "passed_rubrics": [
+        "monomorphism",
+        "subobject"
+      ],
+      "missing_rubrics": [
+        "left cancellation",
+        "injection"
+      ],
+      "response": "1. Category of Endofunctors: Let C be a category with object set Obj and morphism set Mor. An endofunctor is F: C \u2192 C.\n\n2. Monomorphism Definition: A morphism f: A \u2192 B is a monomorphism (subobject monomorphism) if for any object B' and morphism h: A \u2192 B', f o g = f o h implies g = h. Equivalently, f is left-cancellable.\n\n3. Injective Structure Preservation: Monomorphisms model injective structure preservation because they induce injective homomorphisms on underlying sets and groups: (f o g)(x) = (f o h)(x) implies f(g(x)) = f(h(x)), so f is injective. In categorical algebra, monomorphisms are the categorical analog of injective functions."
+    },
+    {
+      "idx": 49,
+      "id": "EX2_49",
+      "domain": "Category Theory & Formal Semantics",
+      "question": "Explain the adjunction between Free and Forgetful functors (Free -| Forgetful) using the example of Sets and Groups.",
+      "score": 1.5,
+      "max_score": 2.0,
+      "passed_rubrics": [
+        "free functor",
+        "forgetful functor",
+        "free group"
+      ],
+      "missing_rubrics": [
+        "universal property"
+      ],
+      "response": "1. Functors: Let F: C \u2192 D be a functor and G: D \u2192 C be its right adjoint.\n\n2. Adjunction Equivalence: F is left adjoint to G (written F \u22a3 G) if there is a natural isomorphism of Hom-sets:\n   Hom_D(F(A), B) \u2245 Hom_C(A, G(B))\nfor all objects A in C and B in D.\n\n3. Free -| Forgetful Example in Sets: Free functor F: Set \u2192 Grp sends set A to free group \u27e8A\u27e9 and forgetful functor G: Grp \u2192 Set forgets group operation.\n- Adjunction: Hom_Set(\u27e8A\u27e9, B) \u2245 Hom_Grp(A, G(B)).\n- Isomorphism: A group homomorphism f: \u27e8A\u27e9 \u2192 B is uniquely determined by its restriction to generators A, mapping f(a) \u2208 B uniquely for each a \u2208 A. Conversely, any map f: A \u2192 G(B) extends uniquely to a group homomorphism \u27e8A\u27e9 \u2192 G(B).\n- Invariance: This formalizes that algebraic"
+    },
+    {
+      "idx": 50,
+      "id": "EX2_50",
+      "domain": "Category Theory & Formal Semantics",
+      "question": "Explain how Dependent Type Theory formalizes Pi-types (dependent function types) and Sigma-types (dependent pair types) categorically as local cartesian closed categories.",
+      "score": 2.0,
+      "max_score": 2.0,
+      "passed_rubrics": [
+        "pi-type",
+        "sigma-type",
+        "dependent type theory",
+        "locally cartesian closed"
+      ],
+      "missing_rubrics": [],
+      "response": "1. Categorical Semantics of Dependent Types: In a slice category C/B, an object is a display map p: E \u2192 B (a family of types E_b indexed by b \u2208 B).\n\n2. Sigma-Types (Dependent Sums): Modeled by the dependent sum functor \u03a3_f: C/A \u2192 C/B (left adjoint to base change f^*). Categorically, \u03a3_{x:A} B(x) is generalized disjoint union / dependent pairs (x, y) where the type of y depends on x.\n\n3. Pi-Types (Dependent Products): Modeled by the dependent product functor \u03a0_f: C/A \u2192 C/B (right adjoint to base change f^*). Categorically, \u03a0_{x:A} B(x) is generalized Cartesian product / dependent functions f where f(x) : B(x).\n\n4. Locally Cartesian Closed Categories (LCCC): A category where every slice C/A is Cartesian closed. LCCCs provide the exact categorical semantics for Martin-L\u00f6f Dependent Type Theory and proof assistants like Coq, Lean, and Agda."
+    }
+  ]
+}
