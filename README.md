@@ -437,7 +437,7 @@ Following the identification of the BPE space token `220` collision (where penal
 
 From source:
 ```bash
-git clone https://github.com/Ch3nOff/dual-loop-controller.git
+git clone https://github.com/xstarbrain/dual-loop-controller.git
 cd dual-loop-controller
 pip install -e .
 ```
@@ -571,7 +571,7 @@ HADL v4.5 (Car-Lift Hydraulic) ----> HADL v4.6 (HF Standalone Fused) ----> HADL 
   author={Chen, Matthew and DeepMind Antigravity Team},
   journal={X-Star Cognitive Monograph Series},
   year={2026},
-  url={https://github.com/Ch3nOff/dual-loop-controller}
+  url={https://github.com/xstarbrain/dual-loop-controller}
 }
 ```
 

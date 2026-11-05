@@ -10,7 +10,7 @@ readme = "README_PYPI.md"
 requires-python = ">=3.9"
 license = "MIT"
 authors = [
-    { name = "Ch3nOff" }
+    { name = "Matthew Chen", email = "xstarbrain@gmail.com" }
 ]
 keywords = [
     "deep-learning",
@@ -84,9 +84,9 @@ hadl = "dual_loop.cli:main"
 hadl_dual_loop = "dual_loop.vllm_plugin:register"
 
 [project.urls]
-Homepage = "https://github.com/Ch3nOff/dual-loop-controller"
-Repository = "https://github.com/Ch3nOff/dual-loop-controller.git"
-"Bug Tracker" = "https://github.com/Ch3nOff/dual-loop-controller/issues"
+Homepage = "https://github.com/xstarbrain/dual-loop-controller"
+Repository = "https://github.com/xstarbrain/dual-loop-controller.git"
+"Bug Tracker" = "https://github.com/xstarbrain/dual-loop-controller/issues"
 
 [tool.setuptools.packages.find]
 where = ["."]

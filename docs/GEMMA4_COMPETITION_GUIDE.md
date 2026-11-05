@@ -1,6 +1,6 @@
 # Gemma 4 Developer Agent Competition: HADL Architecture & Competitor Guide
 
-> **Author**: Matthew Chen (Ch3nOff)  
+> **Author**: Matthew Chen (xstarbrain)  
 > **System**: Hardware-Aligned Autopoietic Latent Deliberation (HADL v2.5.0)  
 > **Target**: Google - The Gemma 4 Developer Agent Competition (Kaggle)
 

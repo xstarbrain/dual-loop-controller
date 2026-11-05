@@ -436,7 +436,7 @@ Setelah mendeteksi tabrakan token spasi BPE `220` (di mana penekanan awalan teks
 
 Dari repositori lokal:
 ```bash
-git clone https://github.com/Ch3nOff/dual-loop-controller.git
+git clone https://github.com/xstarbrain/dual-loop-controller.git
 cd dual-loop-controller
 pip install -e .
 ```
@@ -570,7 +570,7 @@ HADL v4.5 (Hidrolik Car-Lift) ----> HADL v4.6 (Fusi Standalone HF) ----> HADL v5
   author={Chen, Matthew and DeepMind Antigravity Team},
   journal={X-Star Cognitive Monograph Series},
   year={2026},
-  url={https://github.com/Ch3nOff/dual-loop-controller}
+  url={https://github.com/xstarbrain/dual-loop-controller}
 }
 ```
 

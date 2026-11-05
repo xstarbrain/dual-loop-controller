@@ -1,5 +1,5 @@
 <p align="center">
-  English | <a href="https://github.com/Ch3nOff/dual-loop-controller/blob/main/docs/README_id.md">Bahasa Indonesia</a> | <a href="https://github.com/Ch3nOff/dual-loop-controller/blob/main/docs/README_zh.md">简体中文</a> | <a href="https://github.com/Ch3nOff/dual-loop-controller/blob/main/docs/README_ja.md">日本語</a> | <a href="https://github.com/Ch3nOff/dual-loop-controller/blob/main/docs/README_ko.md">한국어</a> | <a href="https://github.com/Ch3nOff/dual-loop-controller/blob/main/docs/README_es.md">Español</a> | <a href="https://github.com/Ch3nOff/dual-loop-controller/blob/main/docs/README_fr.md">Français</a> | <a href="https://github.com/Ch3nOff/dual-loop-controller/blob/main/docs/README_de.md">Deutsch</a> | <a href="https://github.com/Ch3nOff/dual-loop-controller/blob/main/docs/README_ru.md">Русский</a> | <a href="https://github.com/Ch3nOff/dual-loop-controller/blob/main/docs/README_ar.md">العربية</a>
+  English | <a href="https://github.com/xstarbrain/dual-loop-controller/blob/main/docs/README_id.md">Bahasa Indonesia</a> | <a href="https://github.com/xstarbrain/dual-loop-controller/blob/main/docs/README_zh.md">简体中文</a> | <a href="https://github.com/xstarbrain/dual-loop-controller/blob/main/docs/README_ja.md">日本語</a> | <a href="https://github.com/xstarbrain/dual-loop-controller/blob/main/docs/README_ko.md">한국어</a> | <a href="https://github.com/xstarbrain/dual-loop-controller/blob/main/docs/README_es.md">Español</a> | <a href="https://github.com/xstarbrain/dual-loop-controller/blob/main/docs/README_fr.md">Français</a> | <a href="https://github.com/xstarbrain/dual-loop-controller/blob/main/docs/README_de.md">Deutsch</a> | <a href="https://github.com/xstarbrain/dual-loop-controller/blob/main/docs/README_ru.md">Русский</a> | <a href="https://github.com/xstarbrain/dual-loop-controller/blob/main/docs/README_ar.md">العربية</a>
 </p>
 
 <h1 align="center">X-Star 2B Autonomous Brain & Dual-Loop Controller (v4.6.1)</h1>
@@ -9,9 +9,9 @@
   <a href="https://pypi.org/project/dual-loop-controller/"><img src="https://img.shields.io/pypi/v/dual-loop-controller.svg?color=blue" alt="PyPI version"></a>
   <a href="https://pypi.org/project/dual-loop-controller/"><img src="https://img.shields.io/pypi/pyversions/dual-loop-controller.svg" alt="Python Versions"></a>
   <a href="https://pytorch.org/"><img src="https://img.shields.io/badge/PyTorch-2.6%2B%20CUDA%2012.8-ee4c2c.svg" alt="PyTorch"></a>
-  <a href="https://github.com/Ch3nOff/dual-loop-controller"><img src="https://img.shields.io/badge/GitHub-Repository-black.svg" alt="GitHub"></a>
-  <a href="https://github.com/Ch3nOff/dual-loop-controller/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT-green.svg" alt="License"></a>
-  <a href="https://github.com/Ch3nOff/dual-loop-controller/tree/main/tests"><img src="https://img.shields.io/badge/1,000Q%20Audit-92.6%25%20Verified-brightgreen.svg" alt="1000Q Benchmark"></a>
+  <a href="https://github.com/xstarbrain/dual-loop-controller"><img src="https://img.shields.io/badge/GitHub-Repository-black.svg" alt="GitHub"></a>
+  <a href="https://github.com/xstarbrain/dual-loop-controller/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT-green.svg" alt="License"></a>
+  <a href="https://github.com/xstarbrain/dual-loop-controller/tree/main/tests"><img src="https://img.shields.io/badge/1,000Q%20Audit-92.6%25%20Verified-brightgreen.svg" alt="1000Q Benchmark"></a>
 </p>
 
 ---
@@ -94,5 +94,5 @@ xstar serve --port 8000
 
 ## License & Attribution
 
-MIT License. Developed by Ch3nOff & The X-Star Research Team.
-See [GitHub Repository](https://github.com/Ch3nOff/dual-loop-controller) for full documentation, whitepaper, and audit data.
+MIT License. Developed by Matthew Chen (@xstarbrain) & The X-Star Research Team.
+See [GitHub Repository](https://github.com/xstarbrain/dual-loop-controller) for full documentation, whitepaper, and audit data.

@@ -210,7 +210,7 @@ The Dual-Loop Controller provides hardware-aligned, non-autoregressive **System 
 <p align="center">
   <a href="https://huggingface.co/spaces/CH3NDev/dual-loop-controller-demo"><img src="https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-ZeroGPU%20Live%20Demo-blue.svg" alt="Live Demo"></a>
   <a href="https://pypi.org/project/dual-loop-controller/"><img src="https://img.shields.io/pypi/v/dual-loop-controller.svg?color=blue" alt="PyPI version"></a>
-  <a href="https://github.com/Ch3nOff/dual-loop-controller"><img src="https://img.shields.io/badge/GitHub-Ch3nOff%2Fdual--loop--controller-black.svg" alt="GitHub"></a>
+  <a href="https://github.com/xstarbrain/dual-loop-controller"><img src="https://img.shields.io/badge/GitHub-Ch3nOff%2Fdual--loop--controller-black.svg" alt="GitHub"></a>
   <a href="https://huggingface.co/Qwen/Qwen3.5-2B"><img src="https://img.shields.io/badge/Base%20Backbone-Qwen%2FQwen3.5--2B-orange.svg" alt="Base Model Qwen3.5-2B"></a>
 </p>
 
@@ -475,10 +475,10 @@ Evaluated 100% authentically on `Qwen/Qwen3.5-2B` on CUDA GPU across all 20 reas
 
 ## 🔗 Links & Resources
 
-* **GitHub Repository**: [https://github.com/Ch3nOff/dual-loop-controller](https://github.com/Ch3nOff/dual-loop-controller)
+* **GitHub Repository**: [https://github.com/xstarbrain/dual-loop-controller](https://github.com/xstarbrain/dual-loop-controller)
 * **PyPI Package**: [https://pypi.org/project/dual-loop-controller/](https://pypi.org/project/dual-loop-controller/)
-* **Scientific Verification Archive**: [BENCHMARKS.md](https://github.com/Ch3nOff/dual-loop-controller/blob/main/BENCHMARKS.md)
+* **Scientific Verification Archive**: [BENCHMARKS.md](https://github.com/xstarbrain/dual-loop-controller/blob/main/BENCHMARKS.md)
 
 ## License
 
-MIT License. See [LICENSE](https://github.com/Ch3nOff/dual-loop-controller/blob/main/LICENSE) for details.
+MIT License. See [LICENSE](https://github.com/xstarbrain/dual-loop-controller/blob/main/LICENSE) for details.

@@ -258,7 +258,7 @@ print(tokenizer.decode(outputs[0][inputs.input_ids.shape[1]:], skip_special_toke
   author={Chen, Matthew and DeepMind Antigravity Team},
   journal={X-Star Cognitive Monograph Series},
   year={2026},
-  url={https://github.com/Ch3nOff/dual-loop-controller}
+  url={https://github.com/xstarbrain/dual-loop-controller}
 }
 ```
 

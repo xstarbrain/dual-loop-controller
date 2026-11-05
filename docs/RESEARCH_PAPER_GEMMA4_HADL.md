@@ -1,6 +1,6 @@
 # HADL-SWE: Hardware-Aligned Dual-Process Latent Deliberation with Popperian Invariant Verification for Autonomous Software Engineering on Open-Weight Gemma 4
 
-**Matthew Chen** (`Ch3nOff`)  
+**Matthew Chen** (`xstarbrain`)  
 *Dual-Loop Cognitive Architecture Group*  
 *Submission for Google — The Gemma 4 Developer Agent Competition (Paper Track)*  
 
