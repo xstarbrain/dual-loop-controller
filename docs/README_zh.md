@@ -151,7 +151,7 @@ $$
 
 $$
 \begin{aligned}
-\mathbf{A}^{(c)} &= \operatorname{softmax}\left(\frac{\mathbf{Q}\,\mathbf{K}^\top}{\sqrt{d_r}} + \mathbf{B}_{\text{torus}}\right) \\
+\mathbf{A}^{(c)} &= \text{softmax}\left(\frac{\mathbf{Q}\,\mathbf{K}^\top}{\sqrt{d_r}} + \mathbf{B}_{\text{torus}}\right) \\
 \Delta \mathbf{h}_{\perp} &= \sum_{r=1}^3 w_r \mathbf{M}_r^{(C)} \\
 \mathbf{h}_{\text{routed}} &= \mathbf{M}_0 + \min\left(1.0,\, \frac{0.0150\,\|\mathbf{M}_0\|_2}{\|\Delta \mathbf{h}_\perp\|_2}\right)\Delta \mathbf{h}_\perp
 \end{aligned}

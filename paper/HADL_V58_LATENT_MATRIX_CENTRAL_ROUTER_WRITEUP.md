@@ -50,9 +50,9 @@ Implemented in [`CentralCognitiveRouter`](file:///c:/Users/Matthew%20Chen/Docume
 
 $$
 \begin{aligned}
-\boldsymbol{\alpha}^{(c)} &= \operatorname{softmax}\left(\mathbf{W}_{\text{gate}}\,\operatorname{LN}(\mathbf{c}^{(c)}) + \boldsymbol{\beta}_{\text{telemetry}}\right) \in \Delta^3 \\
+\boldsymbol{\alpha}^{(c)} &= \text{softmax}\left(\mathbf{W}_{\text{gate}}\,\text{LN}(\mathbf{c}^{(c)}) + \boldsymbol{\beta}_{\text{telemetry}}\right) \in \Delta^3 \\
 \mathbf{r}^{(c)} &= \sum_{k=0}^{3} \alpha_k^{(c)} \mathbf{M}_k \\
-\mathbf{c}^{(c+1)} &= \operatorname{GRUCell}\left(\mathbf{r}^{(c)}, \mathbf{c}^{(c)}\right)
+\mathbf{c}^{(c+1)} &= \text{GRUCell}\left(\mathbf{r}^{(c)}, \mathbf{c}^{(c)}\right)
 \end{aligned}
 $$
 

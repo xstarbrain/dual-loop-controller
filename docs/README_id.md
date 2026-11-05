@@ -58,7 +58,7 @@ Pada model bahasa besar (LLM) konvensional saat ini—baik transformer autoregre
 Pada arsitektur autoregresif standar:
 
 $$
-\text{Pikiran}_t \equiv \text{Token}_t \sim \operatorname{softmax}\left(\mathbf{W}_{\text{vocab}}\,\mathbf{h}_t\right)
+\text{Pikiran}_t \equiv \text{Token}_t \sim \text{softmax}\left(\mathbf{W}_{\text{vocab}}\,\mathbf{h}_t\right)
 $$
 
 Ini sama saja dengan memaksa otak manusia hanya bisa berpikir jika pita suaranya bergetar mengeluarkan kata-kata. Padahal pada kecerdasan biologis, proses berpikir internal adalah dinamika atraktor berdimensi tinggi yang kontinu, non-linear, dan beroperasi di ruang laten abstrak (spasial, visual, verisitas, verifikasi kontradiksi). Bahasa manusia hanyalah **alat komunikasi periferal (codec)** berkecepatan rendah yang bertugas memproyeksikan manifold keadaan internal menjadi simbol-simbol diskret agar bisa dipahami pihak luar.
@@ -183,13 +183,13 @@ Setiap sub-bagian mengemban fungsi kognitif terpisah:
 2. **$\mathbf{M}_1$ (Sub-Ruang Eksplorasi Lateral Liar)**: Memungkinkan penjelajahan asosiasi berentropi tinggi secara leluasa tanpa merusak kata-kata pada token output:
 
 $$
-\mathbf{M}_1 = \mathcal{P}_{\perp \mathbf{M}_0}\left(\mathbf{W}_{\text{up}}^{(1)}\,\sigma\left(\mathbf{W}_{\text{down}}^{(1)}\,\operatorname{LN}(\mathbf{h})\right)\right)
+\mathbf{M}_1 = \mathcal{P}_{\perp \mathbf{M}_0}\left(\mathbf{W}_{\text{up}}^{(1)}\,\sigma\left(\mathbf{W}_{\text{down}}^{(1)}\,\text{LN}(\mathbf{h})\right)\right)
 $$
 
 3. **$\mathbf{M}_2$ (Sub-Ruang Verisitas Epistemik)**: Memproyeksikan aktivasi ke dalam manifold verisitas terlatih untuk mendeteksi kontradiksi atau mitos keliru:
 
 $$
-\mathbf{M}_2 = \mathcal{P}_{\perp \mathbf{M}_0}\left(\mathbf{W}_{\text{up}}^{(2)}\,\tanh\left(\mathbf{W}_{\text{mid}}^{(2)}\,\operatorname{SiLU}\left(\mathbf{W}_{\text{down}}^{(2)}\,\operatorname{LN}(\mathbf{h})\right)\right)\right)
+\mathbf{M}_2 = \mathcal{P}_{\perp \mathbf{M}_0}\left(\mathbf{W}_{\text{up}}^{(2)}\,\tanh\left(\mathbf{W}_{\text{mid}}^{(2)}\,\text{SiLU}\left(\mathbf{W}_{\text{down}}^{(2)}\,\text{LN}(\mathbf{h})\right)\right)\right)
 $$
 
 $$
@@ -224,7 +224,7 @@ Pada setiap putaran mikro-siklus $c \in \{1, \dots, C\}$ (bawaan $C = 2$, terbuk
 
 $$
 \begin{aligned}
-\mathbf{A}^{(c)} &= \operatorname{softmax}\left(\frac{\mathbf{Q}(M^{(c-1)})\,\mathbf{K}(M^{(c-1)})^\top}{\sqrt{d_r}} + \mathbf{B}_{\text{torus}}\right) \\
+\mathbf{A}^{(c)} &= \text{softmax}\left(\frac{\mathbf{Q}(M^{(c-1)})\,\mathbf{K}(M^{(c-1)})^\top}{\sqrt{d_r}} + \mathbf{B}_{\text{torus}}\right) \\
 \Delta \mathbf{M}_r^{(c)} &= \mathbf{W}_{\text{out}}\left(\mathbf{A}_{r,:}^{(c)}\,\mathbf{V}(M^{(c-1)})\right) \\
 \mathbf{M}_r^{(c)} &= \mathcal{P}_{\perp \mathbf{M}_0}\left(\mathbf{M}_r^{(c-1)} + \alpha\,\Delta \mathbf{M}_r^{(c)}\right) \quad \forall r \in \{1, 2, 3\}
 \end{aligned}
@@ -233,7 +233,7 @@ $$
 Bobot penyeimbang dinamis $\mathbf{w} \in \Delta^3$ diatur langsung oleh sinyal konflik verisitas $s_{\text{veracity}}$:
 
 $$
-\mathbf{w} = \operatorname{softmax}\left(\mathbf{W}_{\text{gate}}\left[\mathbf{q}_{\text{pool}} \,\|\, \bar{u}_{\text{drive}} \,\|\, s_{\text{veracity}}\right] + \boldsymbol{\beta}_v\right)
+\mathbf{w} = \text{softmax}\left(\mathbf{W}_{\text{gate}}\left[\mathbf{q}_{\text{pool}} \,\|\, \bar{u}_{\text{drive}} \,\|\, s_{\text{veracity}}\right] + \boldsymbol{\beta}_v\right)
 $$
 
 Injeksi residu kembali ke residual stream Layer 7 dijaga dengan batas rasio norma homeostatis $\eta_{\max} = 0.0150$:
@@ -250,7 +250,7 @@ Berada di transisi Layer 7 $\to$ 8 pada [`LeakyIntegrateAndFireGate`](file:///c:
 
 $$
 \begin{aligned}
-I(t) &= \|\mathbf{W}_{\text{sensor}}\,\operatorname{LN}(\mathbf{h}_t)\|_1 \\
+I(t) &= \|\mathbf{W}_{\text{sensor}}\,\text{LN}(\mathbf{h}_t)\|_1 \\
 V_m(t) &= \beta\,V_m(t-1) + I(t) \\
 S(t) &= \Theta\left(V_m(t) - V_{\text{th}}(t)\right) \\
 V_m(t) &\leftarrow V_m(t)\left(1 - S(t)\right) \quad \text{(Reset Refraktori)}

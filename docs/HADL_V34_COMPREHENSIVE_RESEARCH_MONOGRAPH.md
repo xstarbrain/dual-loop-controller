@@ -15,7 +15,7 @@
 Autoregressive Large Language Models (LLMs) and Vision-Language Models (VLMs) operate predominantly as reactive next-token predictors. Modern attempts to scale test-time reasoning—most notably verbal Chain-of-Thought (CoT) and external multi-agent debate—suffer from three foundational pathologies: (1) **Token Bloat and Quadratic KV-Cache Thrashing**, wherein models emit thousands of superficial scratchpad tokens, inducing $O(N^2)$ memory growth and severe serving latency; (2) **Catastrophic Forgetting and Plasticity Collapse**, wherein ingesting novel domain facts via sequential gradient descent irrevocably degrades pre-trained base representations; and (3) **Compounding Error Spirals ("Refining the Lie")**, wherein an erroneous initial premise produced during early token generation is treated as an authoritative ground truth during subsequent feedback iterations, locking the model into degenerate rationalization loops.
 
 In this monograph, we formalize, implement, and empirically validate the **Hierarchical Asymmetric Dual-Loop Cognitive Operating System (HADL v3.4)**. HADL shifts cognitive deliberation from discrete verbal output space into a continuous, geometry-preserving latent manifold ($\mathbb{R}^D$). We establish six mathematical breakthroughs:
-1. **The SquareCloud Dynamic Cognitive Engine**, uniting Selective Identity Subspace Routing ($\mathbf{M}_{\text{select}} = \operatorname{diag}(s_i / \sqrt{d_{\text{eff}}}) \cdot \mathbf{I}_D$), Bounded Simplex Density Clouds ($\mathcal{P}_{\text{cloud}} \in [0, 1]$ with zero overflow), and Dynamic Moving Point Modulations ($\mathbf{C}_{\text{point}} = V \odot (1 + \frac{1}{2}\tanh(K \mathbf{W}_{vk}))$) to transform passive probability clouds into active particle coordinates with +100% relative reasoning improvement (33.3% $\to$ 66.7%).
+1. **The SquareCloud Dynamic Cognitive Engine**, uniting Selective Identity Subspace Routing ($\mathbf{M}_{\text{select}} = \text{diag}(s_i / \sqrt{d_{\text{eff}}}) \cdot \mathbf{I}_D$), Bounded Simplex Density Clouds ($\mathcal{P}_{\text{cloud}} \in [0, 1]$ with zero overflow), and Dynamic Moving Point Modulations ($\mathbf{C}_{\text{point}} = V \odot (1 + \frac{1}{2}\tanh(K \mathbf{W}_{vk}))$) to transform passive probability clouds into active particle coordinates with +100% relative reasoning improvement (33.3% $\to$ 66.7%).
 2. **Unitary Trigonometric Givens Rotations** that guarantee strict metric isometry ($\|h'\|_2 \equiv \|h\|_2$), eliminating activation explosions with an empirical isometry error of exactly $0.000000$.
 3. **The Vexdoor Dynamic Wind Decay Gate** ($V(t) = \max(0, \frac{E}{\sqrt{N}} e^{-t/\tau} - \gamma t)$), which dynamically swings shut as generation advances, eliminating infinite repetition loops by over 41% and restoring clean natural token halting.
 4. **Non-Destructive Epistemic Nullspace Append ($\mathbf{\Pi}_{\text{null}}$)**, which projects novel facts strictly into the orthogonal nullspace of pre-trained parameter matrices ($\mathbf{\Pi}_{\text{null}}(W) \cdot X^\top$ where $W \cdot \mathbf{\Pi}_{\text{null}} \equiv 0$), mathematically guaranteeing zero catastrophic forgetting (empirically confirmed: 99.95% base retention vs. 18.4% for naive sequential fine-tuning).
@@ -290,7 +290,7 @@ SquareCloud replaces the isotropic scalar $\frac{1}{\sqrt{D}}$ with a learnable 
 $$s_i \triangleq s_{\text{floor}} + (1.0 - s_{\text{floor}}) \cdot \sigma(w_{s, i}) \in [s_{\text{floor}}, 1.0], \quad \forall i \in \{1, \dots, D\}$$
 where $s_{\text{floor}} = 0.01$ guarantees numerical non-degeneracy. The effective active subspace dimension $d_{\text{eff}}$ and the Selective Identity Operator $\mathbf{M}_{\text{select}} \in \mathbb{R}^{D \times D}$ are defined as:
 $$d_{\text{eff}} \triangleq \sum_{i=1}^D s_i$$
-$$\mathbf{M}_{\text{select}} \triangleq \operatorname{diag}\left(\frac{s_i}{\sqrt{d_{\text{eff}} + \epsilon}}\right) \cdot \mathbf{I}_D$$
+$$\mathbf{M}_{\text{select}} \triangleq \text{diag}\left(\frac{s_i}{\sqrt{d_{\text{eff}} + \epsilon}}\right) \cdot \mathbf{I}_D$$
 
 The scaled query representation $Q_{\text{scaled}}$ becomes:
 $$Q_{\text{scaled}} \triangleq Q \cdot \mathbf{M}_{\text{select}} = \left[ Q_{:, 1} \frac{s_1}{\sqrt{d_{\text{eff}} + \epsilon}}, \dots, Q_{:, D} \frac{s_D}{\sqrt{d_{\text{eff}} + \epsilon}} \right]$$
@@ -298,7 +298,7 @@ By dynamically suppressing redundant dimensions ($s_i \to s_{\text{floor}}$) and
 
 #### 2.7.2 SquareCloud Bounded Probability Simplex
 Instead of unconstrained logit sums, SquareCloud computes affinity matrices mapped strictly onto a compact probability simplex:
-$$\mathcal{P}_{\text{cloud}} \triangleq \operatorname{Softmax}\left(\frac{Q_{\text{scaled}} K^\top}{\tau} + \mathbf{M}_{\text{causal}}\right) \in [0, 1]^{S \times (S + N_{\text{slots}})}$$
+$$\mathcal{P}_{\text{cloud}} \triangleq \text{Softmax}\left(\frac{Q_{\text{scaled}} K^\top}{\tau} + \mathbf{M}_{\text{causal}}\right) \in [0, 1]^{S \times (S + N_{\text{slots}})}$$
 where $\tau = 0.85$ provides sharp semantic focus, $\mathbf{M}_{\text{causal}}$ preserves causal prefix isolation for prompt tokens, and $N_{\text{slots}} = 16$ provides bidirectional global workspace memory slots. By construction, $\sum_j \mathcal{P}_{\text{cloud}, ij} \equiv 1.0$, mathematically guaranteeing zero magnitude overflow and eliminating the unbounded logit inflation common to deep recurrent adapters.
 
 #### 2.7.3 Dynamic Moving Point Modulation $[\mathbf{V} \odot \mathbf{K}]$
@@ -633,9 +633,9 @@ Operating on a single consumer laptop GPU with only 4.84 GB VRAM at 28.6 tokens/
 | $p_{\text{judge}}$ | Decision Theory | Alignment probability computed by the Latent 1-Bit Executive Judge |
 | $\text{Gate}_{\text{hard}}$ | Non-Smooth Analysis | Straight-Through Estimator binary verdict ($\mathbb{I}(p_{\text{judge}} \ge 0.5)$) |
 | $\text{Syringe}(K, V)$ | Holographic Memory | Circular convolution binding via Fast Fourier Transform ($\mathcal{F}^{-1}(\mathcal{F}(K) \odot \mathcal{F}(V))$) |
-| $\mathbf{M}_{\text{select}}$ | Operator Algebra | Selective Identity Matrix Operator $\operatorname{diag}(s_i / \sqrt{d_{\text{eff}}}) \cdot \mathbf{I}_D$ |
+| $\mathbf{M}_{\text{select}}$ | Operator Algebra | Selective Identity Matrix Operator $\text{diag}(s_i / \sqrt{d_{\text{eff}}}) \cdot \mathbf{I}_D$ |
 | $s_i \in [0.01, 1]$ | Convex Optimization | Learnable smooth dimension selection gate $\sigma(w_{s, i})$ |
 | $d_{\text{eff}}$ | Dimensionality Theory | Effective active dimension sum $\sum_{i=1}^D s_i$ in SquareCloud |
-| $\mathcal{P}_{\text{cloud}}$ | Simplex Geometry | SquareCloud bounded probability distribution $\operatorname{Softmax}(Q_{\text{scaled}} K^\top / \tau)$ |
+| $\mathcal{P}_{\text{cloud}}$ | Simplex Geometry | SquareCloud bounded probability distribution $\text{Softmax}(Q_{\text{scaled}} K^\top / \tau)$ |
 | $\mathbf{C}_{\text{point}}$ | Particle Mechanics | Dynamic moving point coordinates $V \odot (1 + \frac{1}{2}\tanh(K \mathbf{W}_{vk}))$ |
 | $\mathbf{W}_{vk}$ | Bilinear Algebra | Key-value coordinate projection matrix initialized as identity $\mathbf{I}_D$ |

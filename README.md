@@ -58,7 +58,7 @@ In contemporary Large Language Models (LLMs)—ranging from standard autoregress
 In standard autoregressive architectures:
 
 $$
-\text{Thought}_t \equiv \text{Token}_t \sim \operatorname{softmax}\left(\mathbf{W}_{\text{vocab}}\,\mathbf{h}_t\right)
+\text{Thought}_t \equiv \text{Token}_t \sim \text{softmax}\left(\mathbf{W}_{\text{vocab}}\,\mathbf{h}_t\right)
 $$
 
 This equates thinking with vocalization. In humans, internal cognition does not proceed via sequential verbal speech; rather, cognition is a continuous, high-dimensional dynamical attractor process involving parallel lateral associations, spatial-kinematic modeling, and veracity verification. Language is merely a low-bandwidth **peripheral communication codec** used to project internal state manifolds into discrete surface symbols for inter-agent transmission.
@@ -183,13 +183,13 @@ The four cognitive subparts serve distinct roles:
 2. **$\mathbf{M}_1$ (Wild / Lateral Exploration Subspace)**: Provides unconstrained, high-entropy representation exploration without altering surface token generation:
 
 $$
-\mathbf{M}_1 = \mathcal{P}_{\perp \mathbf{M}_0}\left(\mathbf{W}_{\text{up}}^{(1)}\,\sigma\left(\mathbf{W}_{\text{down}}^{(1)}\,\operatorname{LN}(\mathbf{h})\right)\right)
+\mathbf{M}_1 = \mathcal{P}_{\perp \mathbf{M}_0}\left(\mathbf{W}_{\text{up}}^{(1)}\,\sigma\left(\mathbf{W}_{\text{down}}^{(1)}\,\text{LN}(\mathbf{h})\right)\right)
 $$
 
 3. **$\mathbf{M}_2$ (Epistemic Veracity Subspace)**: Projects representations into a learned metric space quantifying internal epistemic conflict:
 
 $$
-\mathbf{M}_2 = \mathcal{P}_{\perp \mathbf{M}_0}\left(\mathbf{W}_{\text{up}}^{(2)}\,\tanh\left(\mathbf{W}_{\text{mid}}^{(2)}\,\operatorname{SiLU}\left(\mathbf{W}_{\text{down}}^{(2)}\,\operatorname{LN}(\mathbf{h})\right)\right)\right)
+\mathbf{M}_2 = \mathcal{P}_{\perp \mathbf{M}_0}\left(\mathbf{W}_{\text{up}}^{(2)}\,\tanh\left(\mathbf{W}_{\text{mid}}^{(2)}\,\text{SiLU}\left(\mathbf{W}_{\text{down}}^{(2)}\,\text{LN}(\mathbf{h})\right)\right)\right)
 $$
 
 $$
@@ -224,7 +224,7 @@ For each recurrent cycle $c \in \{1, \dots, C\}$ (default $C = 2$, verified stab
 
 $$
 \begin{aligned}
-\mathbf{A}^{(c)} &= \operatorname{softmax}\left(\frac{\mathbf{Q}(M^{(c-1)})\,\mathbf{K}(M^{(c-1)})^\top}{\sqrt{d_r}} + \mathbf{B}_{\text{torus}}\right) \\
+\mathbf{A}^{(c)} &= \text{softmax}\left(\frac{\mathbf{Q}(M^{(c-1)})\,\mathbf{K}(M^{(c-1)})^\top}{\sqrt{d_r}} + \mathbf{B}_{\text{torus}}\right) \\
 \Delta \mathbf{M}_r^{(c)} &= \mathbf{W}_{\text{out}}\left(\mathbf{A}_{r,:}^{(c)}\,\mathbf{V}(M^{(c-1)})\right) \\
 \mathbf{M}_r^{(c)} &= \mathcal{P}_{\perp \mathbf{M}_0}\left(\mathbf{M}_r^{(c-1)} + \alpha\,\Delta \mathbf{M}_r^{(c)}\right) \quad \forall r \in \{1, 2, 3\}
 \end{aligned}
@@ -233,7 +233,7 @@ $$
 Dynamic subpart routing weights $\mathbf{w} \in \Delta^3$ are modulated by the live veracity conflict score $s_{\text{veracity}}$:
 
 $$
-\mathbf{w} = \operatorname{softmax}\left(\mathbf{W}_{\text{gate}}\left[\mathbf{q}_{\text{pool}} \,\|\, \bar{u}_{\text{drive}} \,\|\, s_{\text{veracity}}\right] + \boldsymbol{\beta}_v\right)
+\mathbf{w} = \text{softmax}\left(\mathbf{W}_{\text{gate}}\left[\mathbf{q}_{\text{pool}} \,\|\, \bar{u}_{\text{drive}} \,\|\, s_{\text{veracity}}\right] + \boldsymbol{\beta}_v\right)
 $$
 
 The routed residual state is projected with a strict relative norm bound $\eta_{\max} = 0.0150$:
@@ -250,7 +250,7 @@ Located at the Layer 7 $\to$ 8 transition in [`LeakyIntegrateAndFireGate`](file:
 
 $$
 \begin{aligned}
-I(t) &= \|\mathbf{W}_{\text{sensor}}\,\operatorname{LN}(\mathbf{h}_t)\|_1 \\
+I(t) &= \|\mathbf{W}_{\text{sensor}}\,\text{LN}(\mathbf{h}_t)\|_1 \\
 V_m(t) &= \beta\,V_m(t-1) + I(t) \\
 S(t) &= \Theta\left(V_m(t) - V_{\text{th}}(t)\right) \\
 V_m(t) &\leftarrow V_m(t)\left(1 - S(t)\right) \quad \text{(Refractory Reset)}
