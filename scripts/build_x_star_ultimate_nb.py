@@ -55,7 +55,7 @@ def create_ultimate_notebook():
 1. **The Prompt Is Not the Author (Shared-Prompt Gaussian Group Heads)**:
    - In standard LLM attribution, the prompt topic dominates stylistic variance.
    - Naive sample-mean subtraction ($X - \\mu$) on small groups ($n=2$ or $n=3$) deletes 50% of the author's own stylistic signal.
-   - We implement full 2-Way ANOVA decomposition: $Z = \\mu_{y} + P_{\\text{prompt}} + E$ with Ledoit-Wolf regularized covariances ($S_e, S_p$) and joint diagonalization ($A S_e A^T = I, A S_p A^T = \\operatorname{diag}(\\lambda)$).
+   - We implement full 2-Way ANOVA decomposition: $Z = \\mu_{y} + P_{\\text{prompt}} + E$ with Ledoit-Wolf regularized covariances ($S_e, S_p$) and joint diagonalization ($A S_e A^T = I, A S_p A^T = \\text{diag}(\\lambda)$).
    - **Exact Joint Tuple Decoding ($n \\le 3$)**: Evaluates exact joint likelihoods with the strict competition constraint that **no model can repeat in the same prompt group** (injective permutation decoding).
    - **Finite-Population Cavity EM ($n \\ge 4$)**: Applies finite-sample shrinkage $\\frac{\\lambda}{1 + (n-1)\\lambda}$ and mean-field class repulsion.
 2. **StyleGrams (4 Orthogonal TF-IDF Views, 540k dims)**:
