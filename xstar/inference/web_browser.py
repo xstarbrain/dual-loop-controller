@@ -57,10 +57,7 @@ class WebBrowser:
         """
         try:
             headers = {"User-Agent": cls.USER_AGENT}
-            try:
-                resp = requests.get(url, headers=headers, timeout=timeout)
-            except requests.exceptions.SSLError:
-                resp = requests.get(url, headers=headers, timeout=timeout, verify=False)
+            resp = requests.get(url, headers=headers, timeout=timeout, verify=True)
             resp.raise_for_status()
 
             raw_html = resp.text

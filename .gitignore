@@ -45,3 +45,6 @@ data/
 .idea/
 *.tmp
 *.bak
+offload*/
+offload_temp/
+offload_27b/

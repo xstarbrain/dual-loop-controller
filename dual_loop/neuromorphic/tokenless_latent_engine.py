@@ -29,6 +29,7 @@ Pillars:
 
 from __future__ import annotations
 
+import ast
 import math
 import re
 from dataclasses import dataclass
@@ -963,7 +964,7 @@ class IPv6NumericRegister(nn.Module):
         if not m_grid:
             return None
         try:
-            raw_grid = eval(m_grid.group(1).replace(" ", ""))
+            raw_grid = ast.literal_eval(m_grid.group(1).replace(" ", ""))
             # 90-degree clockwise rotation: (r, c) -> (c, N - 1 - r)
             r0 = [raw_grid[1][0], raw_grid[0][0]]
             r1 = [raw_grid[1][1], raw_grid[0][1]]

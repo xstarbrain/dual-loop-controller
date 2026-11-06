@@ -1257,7 +1257,7 @@ class NeuromorphicSpikingBrain(nn.Module):
         ckpt5_path = target_dir / "hadl_v57_spatial_grounding_dynamic_checkpoint.pt"
         if ckpt5_path.exists() and hasattr(self, "imagination_3d"):
             try:
-                data5 = torch.load(ckpt5_path, map_location="cpu", weights_only=False)
+                data5 = torch.load(ckpt5_path, map_location="cpu", weights_only=True)
                 with torch.no_grad():
                     if "state_dict" in data5:
                         self.imagination_3d.load_state_dict(data5["state_dict"], strict=False)
@@ -1269,7 +1269,7 @@ class NeuromorphicSpikingBrain(nn.Module):
         ckpt6_path = target_dir / "hadl_v58_latent_matrix_central_router.pt"
         if ckpt6_path.exists():
             try:
-                data6 = torch.load(ckpt6_path, map_location="cpu", weights_only=False)
+                data6 = torch.load(ckpt6_path, map_location="cpu", weights_only=True)
                 with torch.no_grad():
                     if "latent_matrix_state_dict" in data6 and hasattr(self, "latent_matrix_engine"):
                         self.latent_matrix_engine.load_state_dict(data6["latent_matrix_state_dict"], strict=False)
