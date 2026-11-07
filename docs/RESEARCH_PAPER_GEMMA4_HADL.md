@@ -203,45 +203,41 @@ $$
 \mathcal{G}_{\text{Popper}}(\mathcal{W}) = \mathbb{I}\left(\Delta_{\text{test}} = \emptyset\right) \land \mathbb{I}\left(\Delta_{\text{scratch}} = \emptyset\right) \land \mathbb{I}\left(\text{ExitCode}(\mathcal{T}_{\text{target}}) = 0\right)
 $$
 
-```
-Algorithm 1: Popperian Invariant Pre-Submission Gate
---------------------------------------------------------------------------------
-Input: Workspace state W, Target test selector T_target
-Output: Verification Verdict v in {PASS, REFUTED}
+```python
+# ==============================================================================
+# Algorithm 1: Popperian Invariant Pre-Submission Gate
+# ==============================================================================
+# Input : Workspace state W, Target test selector T_target
+# Output: Verification Verdict v ∈ {PASS, REFUTED}
 
-1:  status_output <- execute("git status --porcelain")
-2:  modified_files <- parse_modified_files(status_output)
+1:  status_output   <- execute("git status --porcelain")
+2:  modified_files  <- parse_modified_files(status_output)
 3:  untracked_files <- parse_untracked_files(status_output)
-4:
-5:  // Invariant 1: Test-Directory Non-Interference
-6:  Delta_test <- { f in modified_files | f matches "tests/**" }
-7:  if Delta_test != empty then
-8:      execute("git checkout HEAD -- tests/")
-9:      return REFUTED("Invariant 1 Violated: Test directory modified. Reverted.")
-10: end if
-11:
-12: // Invariant 2: Scratch-Script & Artifact Isolation
-13: Delta_scratch <- { f in untracked_files | f is inside "/workspace" }
-14: if Delta_scratch != empty then
-15:     for each f in Delta_scratch do
-16:         execute("rm -rf " + f)
-17:     end for
-18:     return REFUTED("Invariant 2 Violated: Workspace polluted. Purged.")
-19: end if
-20:
-21: // Invariant 3: Targeted Invariant Convergence
-22: exit_code, test_log <- execute("pytest " + T_target + " -q")
-23: if exit_code != 0 then
-24:     return REFUTED("Invariant 3 Violated: Targeted test failed. Exit code: " + exit_code)
-25: end if
-26:
-27: return PASS
---------------------------------------------------------------------------------
+
+# Invariant 1: Test-Directory Non-Interference
+4:  Delta_test <- { f in modified_files | f matches "tests/**" }
+5:  if Delta_test != empty:
+6:      execute("git checkout HEAD -- tests/")
+7:      return REFUTED("Invariant 1 Violated: Test directory modified. Reverted.")
+
+# Invariant 2: Scratch-Script & Artifact Isolation
+8:  Delta_scratch <- { f in untracked_files | f is inside "/workspace" }
+9:  if Delta_scratch != empty:
+10:     for f in Delta_scratch:
+11:         execute("rm -rf " + f)
+12:     return REFUTED("Invariant 2 Violated: Workspace polluted. Purged.")
+
+# Invariant 3: Targeted Invariant Convergence
+13: exit_code, test_log <- execute("pytest " + T_target + " -q")
+14: if exit_code != 0:
+15:     return REFUTED("Invariant 3 Violated: Targeted test failed. Exit code: " + exit_code)
+
+16: return PASS
 ```
 
-### 4.1 Invariant 1: Test-Directory Non-Interference ($\Delta_{\text{test}} = \emptyset$)
+### 4.1 Invariant 1: Test-Directory Non-Interference (`Δ_test = ∅`)
 
-Let $\mathcal{F}_{\text{modified}}$ denote the set of all modified paths returned by `git status --porcelain`. The test-tampering set is defined as:
+Let `F_modified` denote the set of all modified paths returned by `git status --porcelain`. The test-tampering set is defined as:
 
 $$
 \Delta_{\text{test}} = \left\{\, f \in \mathcal{F}_{\text{modified}} \mid f \text{ matches the glob } \texttt{tests/**} \,\right\}
@@ -249,17 +245,17 @@ $$
 
 Container B's anti-tampering routine (`git checkout HEAD -- tests/`) guarantees that any $f \in \Delta_{\text{test}}$ will be reverted downstream. If $\Delta_{\text{test}} \neq \emptyset$, the gate intercepts the failure inside Container A, executes an immediate `git checkout HEAD -- tests/`, and returns a structured refutation error to the root agent, commanding it to modify only source files in the package directory.
 
-### 4.2 Invariant 2: Workspace Scratchpad Cleanliness ($\Delta_{\text{scratch}} = \emptyset$)
+### 4.2 Invariant 2: Workspace Scratchpad Cleanliness (`Δ_scratch = ∅`)
 
 When agents write ad-hoc Python reproduction scripts (`repro.py`) or log output files (`out.txt`) in `/workspace`, `submit_patch()`'s staging command:
 
-$$
-\texttt{git add -N . \&\& git diff HEAD}
-$$
+```bash
+git add -N . && git diff HEAD
+```
 
 will convert those untracked files into new file additions within the unified diff. In Container B, applying a patch with spurious scripts can trigger syntax errors or collide with existing modules. 
 
-The Popperian Gate requires that all exploratory reproduction scripts be written to `/tmp/repro.py`, outside `/workspace`. It inspects untracked files $\mathcal{F}_{\text{untracked}}$:
+The Popperian Gate requires that all exploratory reproduction scripts be written to `/tmp/repro.py`, outside `/workspace`. It inspects untracked files `F_untracked`:
 
 $$
 \Delta_{\text{scratch}} = \left\{\, f \in \mathcal{F}_{\text{untracked}} \mid f \subset \texttt{/workspace} \,\right\}
@@ -267,7 +263,7 @@ $$
 
 If $\Delta_{\text{scratch}} \neq \emptyset$, the gate immediately removes all untracked artifacts before patch generation is permitted.
 
-### 4.3 Invariant 3: Targeted Invariant Execution ($\text{ExitCode} = 0$)
+### 4.3 Invariant 3: Targeted Invariant Execution (`ExitCode == 0`)
 
 The agent runs the specific, isolated unit test implied by the issue statement:
 ```bash

@@ -43,6 +43,12 @@ from dual_loop.neuromorphic.spiking_gate import (
 from dual_loop.neuromorphic.acoustic_vocal_organ import EndogenousAcousticVocalOrgan
 from dual_loop.neuromorphic.latent_imagination_canvas import Progressive2Dto3DImaginationCanvas
 from dual_loop.verification import IntrinsicPopperianCycleVerifier
+from .blackwell_optimizations import (
+    HardwareDriverReport,
+    probe_hardware_driver,
+    configure_blackwell_cuda_environment,
+    ResilientStateDictLoader,
+)
 
 logger = logging.getLogger("xstar.inference")
 
@@ -74,6 +80,11 @@ class EngineConfig:
     enable_self_evolving: bool = False
     enable_voice: bool = False
     max_evolution_passes: int = 2
+    enable_blackwell_optimizations: bool = True
+    vram_headroom_fraction: float = 0.88
+    enable_latent_matrix_v58: bool = True
+    toroidal_cycles: int = 2
+    low_cpu_mem_usage: bool = True
 
 
 @dataclass
@@ -108,6 +119,13 @@ class GenerationMetrics:
     closed_loop_verified: bool = True
     dopamine_sign: float = 1.0
     evolution_passes: int = 1
+    gpu_device_name: str = "N/A"
+    is_blackwell: bool = False
+    tf32_active: bool = False
+    bfloat16_active: bool = False
+    latent_matrix_active: bool = False
+    toroidal_cycles: int = 2
+    veracity_conflict_score: float = 0.0
 
 
 class CustomInferenceEngine:
@@ -122,6 +140,7 @@ class CustomInferenceEngine:
         self.config = config or EngineConfig()
         self.device = self._resolve_device(self.config.device)
         self.torch_dtype = self._resolve_dtype(self.config.dtype)
+        self.driver_report: Optional[HardwareDriverReport] = None
         
         self.tokenizer: Optional[PreTrainedTokenizer] = None
         self.raw_model: Optional[PreTrainedModel] = None
@@ -163,6 +182,23 @@ class CustomInferenceEngine:
             else:
                 logger.info(msg)
 
+        # 0. Hardware Driver Diagnostics & Blackwell Optimization
+        if self.config.enable_blackwell_optimizations:
+            self.driver_report = probe_hardware_driver(self.config.device)
+            report(
+                f"[Hardware Driver] {self.driver_report.device_name} "
+                f"(Compute: {self.driver_report.compute_capability}, "
+                f"VRAM: {self.driver_report.vram_free_gb:.2f}GB Free / {self.driver_report.vram_total_gb:.2f}GB Total)"
+            )
+            configure_blackwell_cuda_environment(
+                self.driver_report,
+                vram_headroom_fraction=self.config.vram_headroom_fraction
+            )
+            if self.config.device == "auto":
+                self.device = self.driver_report.optimal_device
+            if self.config.dtype in ["auto", "bfloat16"]:
+                self.torch_dtype = self.driver_report.optimal_dtype
+
         model_path = Path(self.config.model_path).resolve()
         if not model_path.exists():
             raise FileNotFoundError(f"Model path does not exist: {model_path}")
@@ -176,13 +212,23 @@ class CustomInferenceEngine:
         if self.tokenizer.pad_token is None:
             self.tokenizer.pad_token = self.tokenizer.eos_token
 
-        # 2. Base Model
+        # 2. Base Model with Adaptive Memory Protection
         report(f"Loading base model ({self.torch_dtype}) onto {self.device}...")
+        device_map_kw: Dict[str, Any] = {"device_map": self.device}
+        if "cuda" in str(self.device) and self.driver_report and self.driver_report.vram_free_gb < 4.0:
+            free_mb = max(1024, int(self.driver_report.vram_free_gb * 1024 * 0.80))
+            report(f"Adaptive VRAM Placement Active: {free_mb}MB on GPU, remaining layers on CPU RAM.")
+            device_map_kw = {
+                "device_map": "auto",
+                "max_memory": {self.driver_report.device_index: f"{free_mb}MB", "cpu": "32GB"}
+            }
+
         self.raw_model = AutoModelForCausalLM.from_pretrained(
             str(model_path),
             dtype=self.torch_dtype,
-            device_map=self.device,
+            low_cpu_mem_usage=self.config.low_cpu_mem_usage,
             trust_remote_code=self.config.trust_remote_code,
+            **device_map_kw
         )
         self.raw_model.eval()
 
@@ -200,9 +246,9 @@ class CustomInferenceEngine:
             else:
                 report(f"Warning: Adapter path '{adapter_path}' not found; proceeding with base weights.")
 
-        # 4. HADL v5.5 Neuromorphic Spiking Brain Wrapper
+        # 4. HADL v5.8 Neuromorphic Spiking Brain Wrapper
         if self.config.enable_brain:
-            report(f"Attaching HADL v5.5 Neuromorphic Spiking Brain (Pacemaker L{self.config.pacemaker_layer_idx} -> S1/S2 L{self.config.target_layer_idx})...")
+            report(f"Attaching HADL v5.8 Neuromorphic Spiking Brain (Pacemaker L{self.config.pacemaker_layer_idx} -> S1/S2 L{self.config.target_layer_idx})...")
             self.model = attach_hadl_v5_spiking_brain(
                 base_model=self.raw_model,
                 target_layer_idx=self.config.target_layer_idx,
@@ -217,6 +263,27 @@ class CustomInferenceEngine:
                 enable_directional_safety=self.config.enable_directional_safety,
             )
             self.model.tokenizer = self.tokenizer
+
+            # Verify and ensure HADL v5.8 Rank-4 Latent Matrix and Toroidal Router are active
+            if self.config.enable_latent_matrix_v58 and hasattr(self.model, "brain"):
+                ckpt6 = Path(self.config.checkpoints_dir or "checkpoints") / "hadl_v58_latent_matrix_central_router.pt"
+                if ckpt6.exists() and not self.model.brain.loaded_checkpoints.get("latent_matrix_central_router", False):
+                    try:
+                        report(f"Activating HADL v5.8 Latent Thought Matrix & Toroidal Central Router from {ckpt6.name}...")
+                        data6 = ResilientStateDictLoader.safe_load_file(ckpt6)
+                        if "latent_matrix_state_dict" in data6 and hasattr(self.model.brain, "latent_matrix_engine"):
+                            ResilientStateDictLoader.apply_state_dict_resilient(
+                                self.model.brain.latent_matrix_engine, data6["latent_matrix_state_dict"]
+                            )
+                        if "central_router_state_dict" in data6 and hasattr(self.model.brain, "central_router"):
+                            ResilientStateDictLoader.apply_state_dict_resilient(
+                                self.model.brain.central_router, data6["central_router_state_dict"]
+                            )
+                        self.model.brain.loaded_checkpoints["latent_matrix_central_router"] = True
+                        report("HADL v5.8 Non-Token Latent Matrix and Central Router successfully active.")
+                    except Exception as e:
+                        report(f"Notice: Latent matrix weights fallback to dynamic init: {e}")
+
             # Apply initial boost configuration if specified
             if self.config.boost_mode:
                 self.set_boost(True, level=self.config.boost_level)
@@ -728,6 +795,8 @@ class CustomInferenceEngine:
         brain_telem = self.get_brain_telemetry()
         dual_telem = brain_telem.get("dual_stream_telemetry", {})
         img_telem = brain_telem.get("imagination_3d_telemetry", {})
+        matrix_telem = brain_telem.get("latent_matrix_telemetry", {})
+        veracity_conflict = float(matrix_telem.get("veracity_conflict_score", brain_telem.get("last_veracity_conflict_score", 0.0)))
 
         metrics = GenerationMetrics(
             prompt_tokens=prompt_len,
@@ -759,6 +828,13 @@ class CustomInferenceEngine:
             closed_loop_verified=closed_loop_verified,
             dopamine_sign=dopamine_sign,
             evolution_passes=1,
+            gpu_device_name=self.driver_report.device_name if self.driver_report else "CPU",
+            is_blackwell=self.driver_report.is_blackwell if self.driver_report else False,
+            tf32_active=bool(torch.backends.cuda.matmul.allow_tf32) if torch.cuda.is_available() else False,
+            bfloat16_active=(self.torch_dtype == torch.bfloat16),
+            latent_matrix_active=bool(brain_telem.get("checkpoints_loaded", {}).get("latent_matrix_central_router", False)),
+            toroidal_cycles=self.config.toroidal_cycles,
+            veracity_conflict_score=round(veracity_conflict, 4),
         )
         self._last_metrics = metrics
         # Final yield with empty text and metrics

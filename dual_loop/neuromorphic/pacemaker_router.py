@@ -878,10 +878,13 @@ class CentralCognitiveRouter(nn.Module):
         # Compute dynamic sub-part routing weights w in Delta^{R-1}
         q_pool = self.q_proj(M_pool)  # [B, R, d_r]
         q_flat = q_pool.reshape(B, R * self.router_dim)
-        u_mean = (
-            u_drive.mean(dim=1).to(device=M.device, dtype=target_dtype)
-            if u_drive is not None else torch.zeros(B, 1, device=M.device, dtype=target_dtype)
-        )
+        if u_drive is not None:
+            if u_drive.dim() >= 2:
+                u_mean = u_drive.mean(dim=1).to(device=M.device, dtype=target_dtype)
+            else:
+                u_mean = u_drive.reshape(B, 1).to(device=M.device, dtype=target_dtype)
+        else:
+            u_mean = torch.zeros(B, 1, device=M.device, dtype=target_dtype)
         if u_mean.dim() == 1:
             u_mean = u_mean.unsqueeze(-1)
         if isinstance(veracity_conflict_score, torch.Tensor):

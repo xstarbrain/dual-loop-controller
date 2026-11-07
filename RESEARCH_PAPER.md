@@ -24,7 +24,11 @@ Empirical evaluations across 4 distinct regimes demonstrate that HADL establishe
 
 ### 1.1 The Passive Clock Coupling Problem in Autoregressive Models
 Modern Large Language Models (LLMs) based on the causal Transformer architecture (Vaswani et al., 2017) are formulated as autoregressive sequence predictors:
-$$P(Y \mid X) = \prod_{t=1}^T P(y_t \mid y_{<t}, X)$$
+
+$$
+P(Y \mid X) = \prod_{t=1}^T P(y_t \mid y_{<t}, X)
+$$
+
 Under this formulation, inference is strictly passive and clock-coupled: the model remains entirely inert until a token prompt $X$ is injected by an external agent. Once invoked, computation progresses forward in an irreversible, fixed-depth computational graph ($O(1)$ depth per token). This structure forces an unnatural conflation between **token emission clock** and **internal contemplation time**.
 
 Humans, by contrast, rely on dual-process cognitive mechanisms (Kahneman, 2011; Evans & Stanovich, 2013):
@@ -40,9 +44,17 @@ Attempts to endow LLMs with System 2 capabilities have largely relied on externa
 To bypass discrete token inflation, latent deliberation architectures (Goyal et al., 2021; Chen et al., 2026) intercept hidden representations $h \in \mathbb{R}^{B \times S \times D}$ at intermediate layers ($L_{mid}$) and apply recurrent latent ponder loops. However, early multi-loop architectures suffered from a critical failure mode: **gate cascade collapse**.
 
 In an attempt to regulate safety, earlier iterations chained multiple independent multiplicative sigmoid gates:
-$$\Delta h_{cascade} = \alpha \cdot g_{surprise} \cdot g_{\beta} \cdot g_{metacog} \cdot g_{epistemic} \cdot g_{drift} \cdot \Delta h_{raw}$$
+
+$$
+\Delta h_{cascade} = \alpha \cdot g_{surprise} \cdot g_{\beta} \cdot g_{metacog} \cdot g_{epistemic} \cdot g_{drift} \cdot \Delta h_{raw}
+$$
+
 Because each gate $g_i \in (0, 1)$ typically evaluates between $0.40$ and $0.70$, chaining 5 multiplicative terms results in an exponential attenuation of the deliberative delta:
-$$\prod_{i=1}^5 g_i \approx (0.6)^5 \approx 0.0778 \ll 0.15$$
+
+$$
+\prod_{i=1}^5 g_i \approx (0.6)^5 \approx 0.0778 \ll 0.15
+$$
+
 This vanishing signal norm ($\|\Delta h\| / \|h\| \to 0$) suffocates backpropagation gradients, forces the adapter into an uninformative identity mapping, and fails to steer later Transformer layers toward correct reasoning attractors.
 
 ### 1.3 Key Contributions of HADL v2.4.0
@@ -80,8 +92,13 @@ To solve both the clock coupling bottleneck and gate cascade collapse without to
 ### 2.1 Friston Active Inference & Expected Free Energy
 HADL models cognitive resource allocation through the lens of Friston's Free Energy Principle (Friston, 2010; Friston et al., 2017). An agent maintains internal beliefs $Q(s)$ over hidden environmental and latent cognitive states $s$, receiving observations $o$ (tokens). Policy selection $\pi \in \{\pi_0, \pi_1, \pi_2\}$ minimizes the Expected Free Energy $G(\pi)$:
 
-$$G(\pi) = \sum_\tau G(\pi, \tau)$$
-$$G(\pi, \tau) = \underbrace{\mathbb{E}_{Q(o_\tau, s_\tau \mid \pi)}\left[\ln Q(s_\tau \mid \pi) - \ln Q(s_\tau \mid o_\tau, \pi)\right]}_{\text{Epistemic Value (Information Gain / Curiosity)}} - \underbrace{\mathbb{E}_{Q(o_\tau \mid \pi)}\left[\ln P(o_\tau)\right]}_{\text{Pragmatic Value (Goal Realization)}}$$
+$$
+G(\pi) = \sum_\tau G(\pi, \tau)
+$$
+
+$$
+G(\pi, \tau) = \underbrace{\mathbb{E}_{Q(o_\tau, s_\tau \mid \pi)}\left[\ln Q(s_\tau \mid \pi) - \ln Q(s_\tau \mid o_\tau, \pi)\right]}_{\text{Epistemic Value (Information Gain / Curiosity)}} - \underbrace{\mathbb{E}_{Q(o_\tau \mid \pi)}\left[\ln P(o_\tau)\right]}_{\text{Pragmatic Value (Goal Realization)}}
+$$
 
 We parameterize three discrete operational policies:
 * **$\pi_0$ (Fluent Streaming Bypass)**: Selected when epistemic vacuity is low ($u < 0.65$). Bypasses deep pondering; execution time is **0.0078 ms**.
@@ -90,36 +107,80 @@ We parameterize three discrete operational policies:
 
 ### 2.2 Homeostatic Drive Dynamics & Allostatic Modulation
 Let the physiological drive state of the reasoning core be represented by a 4-dimensional vector $S_t \in \mathbb{R}^4$:
-$$S_t = \begin{bmatrix} E_t & U_t & D_t & C_t \end{bmatrix}^T$$
+
+$$
+S_t = \begin{bmatrix} E_t & U_t & D_t & C_t \end{bmatrix}^T
+$$
+
 where $E_t$ is metabolic compute energy, $U_t$ is uncertainty (Dirichlet vacuity), $D_t$ is representation drift from the context anchor, and $C_t$ is coherence. Homeostatic drive reduction (Hull, 1943; Sterling, 2012) defines the internal drive loss:
-$$\mathcal{L}_{homeo} = \sum_{m=1}^4 \omega_m \left( S_{t, m} - S^*_m \right)^2$$
+
+$$
+\mathcal{L}_{homeo} = \sum_{m=1}^4 \omega_m \left( S_{t, m} - S^*_m \right)^2
+$$
+
 where $S^*$ is the optimal setpoint vector.
 
 #### The Allostatic Energy Potential (Gate Pruning)
 To eliminate multi-gate cascade collapse, we define a unified scalar allostatic energy potential in logit space:
-$$E_{allo} = w_{surp} \cdot g_{surp} + w_{\beta} \cdot g_{\beta} - w_{drift} \cdot g_{drift} - w_{vac} \cdot \max(0, u - 0.50)$$
+
+$$
+E_{allo} = w_{surp} \cdot g_{surp} + w_{\beta} \cdot g_{\beta} - w_{drift} \cdot g_{drift} - w_{vac} \cdot \max(0, u - 0.50)
+$$
+
 The allostatic modulation coefficient $\Gamma_{allostatic}$ is obtained via temperature-scaled logistic sigmoid activation:
-$$\Gamma_{allostatic} = \sigma\left(\frac{E_{allo}}{\tau_{allo}}\right)$$
+
+$$
+\Gamma_{allostatic} = \sigma\left(\frac{E_{allo}}{\tau_{allo}}\right)
+$$
+
 With default calibration ($w_{surp}=1.2, w_{\beta}=1.0, w_{drift}=0.8, w_{vac}=1.5, \tau_{allo}=1.0$), $\Gamma_{allostatic}$ remains stably bounded within $[0.40, 0.95]$. The modified latent representation injected back into the Transformer stream is:
-$$\hat{h} = h + \tanh(\alpha) \cdot \Gamma_{allostatic} \cdot \Delta h_{raw}$$
+
+$$
+\hat{h} = h + \tanh(\alpha) \cdot \Gamma_{allostatic} \cdot \Delta h_{raw}
+$$
+
 This single-kernel formulation preserves smooth non-zero gradients $\frac{\partial \hat{h}}{\partial \Delta h_{raw}} \ge 0.40 \cdot \tanh(\alpha) > 0$, preventing vanishing activations.
 
 ### 2.3 Subjective Logic Epistemic Humility & Hyperbolic Arrogance Loss
 Under the Subjective Logic framework (Jøsang, 2016; Sensoy et al., 2018), multinomial evidence is modeled via a Dirichlet distribution over $K$ mutually exclusive categories with parameters $\alpha_k = e_k + 1$, where $e_k \ge 0$ is projected evidence. The total Dirichlet strength is $S = \sum_{k=1}^K \alpha_k$.
 
 The subjective belief mass $b_k$ and epistemic vacuity $u$ satisfy:
-$$\sum_{k=1}^K b_k + u = 1, \quad b_k = \frac{e_k}{S}, \quad u = \frac{K}{S}$$
+
+$$
+\sum_{k=1}^K b_k + u = 1, \quad b_k = \frac{e_k}{S}, \quad u = \frac{K}{S}
+$$
+
 To enforce epistemic modesty and perpetual curiosity, we introduce two mathematical constraints:
 1. **Bounded Confidence Ceiling**:
-   $$c_{bounded} = \min\left(0.95, \max_k b_k\right)$$
+   
+
+$$
+c_{bounded} = \min\left(0.95, \max_k b_k\right)
+$$
+
    This prevents the neural softmax from collapsing into degenerate certainty ($c \to 1.0$).
 2. **Asymmetric Hyperbolic Overconfidence Penalty**:
    When the model makes an incorrect prediction ($\mathbb{I}_{error} = 1$), the penalty scales quadratically in hyperbolic odds:
-   $$\mathcal{L}_{overconf} = \mathbb{I}_{error} \cdot \left(\frac{c_{bounded}}{1 - c_{bounded} + \epsilon}\right)^2$$
+   
+
+$$
+\mathcal{L}_{overconf} = \mathbb{I}_{error} \cdot \left(\frac{c_{bounded}}{1 - c_{bounded} + \epsilon}\right)^2
+$$
+
    - For an epistemically humble model ($c = 0.30$ under uncertainty):
-     $$\mathcal{L}_{overconf} \approx \left(\frac{0.30}{0.70}\right)^2 \approx 0.184$$
+     
+
+$$
+\mathcal{L}_{overconf} \approx \left(\frac{0.30}{0.70}\right)^2 \approx 0.184
+$$
+
    - For an arrogantly overconfident model claiming $c = 0.99$:
-     $$\mathcal{L}_{overconf} \approx \left(\frac{0.99}{0.01}\right)^2 = 9,801.0$$
+     
+
+$$
+\mathcal{L}_{overconf} \approx \left(\frac{0.99}{0.01}\right)^2 = 9,801.0
+$$
+
    This asymmetric curvature creates an insurmountable loss barrier against confident hallucinations.
 
 ### 2.4 Intrinsic Curiosity & Popperian Adversarial Self-Play
@@ -127,38 +188,92 @@ During quiescent (idle) states, the **Autonomous Background Daemon** activates. 
 
 Let $\phi(s_t)$ denote the feature embedding of memory slot $s_t$, and $a_t$ represent the internal transformation action:
 * **Inverse Model**: Predicts the action from consecutive states:
-  $$\hat{a}_t = g_{inv}(\phi(s_t), \phi(s_{t+1}))$$
-  $$\mathcal{L}_{inv} = \frac{1}{2} \|\hat{a}_t - a_t\|_2^2$$
+  
+
+$$
+\hat{a}_t = g_{inv}(\phi(s_t), \phi(s_{t+1}))
+$$
+
+  
+
+$$
+\mathcal{L}_{inv} = \frac{1}{2} \|\hat{a}_t - a_t\|_2^2
+$$
+
 * **Forward Model**: Predicts future feature representations given current state and action:
-  $$\hat{\phi}(s_{t+1}) = f_{fwd}(\phi(s_t), a_t)$$
-  $$\mathcal{L}_{fwd} = \frac{1}{2} \|\hat{\phi}(s_{t+1}) - \phi(s_{t+1})\|_2^2$$
+  
+
+$$
+\hat{\phi}(s_{t+1}) = f_{fwd}(\phi(s_t), a_t)
+$$
+
+  
+
+$$
+\mathcal{L}_{fwd} = \frac{1}{2} \|\hat{\phi}(s_{t+1}) - \phi(s_{t+1})\|_2^2
+$$
+
 * **Curiosity Reward**:
-  $$R_{curiosity} = \frac{\eta}{2} \|\hat{\phi}(s_{t+1}) - \phi(s_{t+1})\|_2^2$$
+  
+
+$$
+R_{curiosity} = \frac{\eta}{2} \|\hat{\phi}(s_{t+1}) - \phi(s_{t+1})\|_2^2
+$$
+
 Because $\phi$ is learned via the inverse model to encode *only* state features affected by cognitive actions, external irreducible noise yields zero feature prediction error, completely neutralizing the Noisy-TV effect.
 
 #### Popperian Red Team Protocol (Falsificationism)
 In accordance with Karl Popper's falsification criterion (Popper, 1959), scientific hypotheses cannot be verified conclusively by induction, but can only be corroborated through severe refutation attempts. For any two conflicting memory slots $(s_i, s_j)$ exhibiting latent contradiction ($\|s_i + s_j - s_{joint}\| > \tau$):
 1. **The Proposer ($\mathcal{N}_{prop}$)**: Synthesizes a candidate reconciling hypothesis:
-   $$h_{cand} = \mathcal{N}_{prop}(s_i, s_j)$$
+   
+
+$$
+h_{cand} = \mathcal{N}_{prop}(s_i, s_j)
+$$
+
 2. **The Red Team Falsifier ($\mathcal{N}_{fals}$)**: Generates an adversarial boundary counter-example designed to refute $h_{cand}$:
-   $$\psi_{counter} = \mathcal{N}_{fals}(h_{cand}, s_i)$$
+   
+
+$$
+\psi_{counter} = \mathcal{N}_{fals}(h_{cand}, s_i)
+$$
+
 3. **Deterministic Sandbox Verification**: The hypothesis and counter-example are compiled into an isolated sandbox running deterministic invariants (e.g. compile checks, logical consistency axioms $A \wedge \neg A \equiv \bot$). If $\psi_{counter}$ invalidates the hypothesis, $h_{cand}$ is discarded and memory confidence is degraded.
 
 ### 2.5 Orthogonal Nullspace Projection & Continual Plasticity
 When a synthesized belief $v_{new} \in \mathbb{R}^D$ survives Popperian verification, directly updating network weights via gradient descent causes catastrophic forgetting of prior knowledge domains (Kirkpatrick et al., 2017).
 
 Let $B = [b_1, b_2, \dots, b_M] \in \mathbb{R}^{D \times M}$ be the orthonormal basis matrix spanning existing episodic memory representations. The projection matrix onto the subspace spanned by $B$ is:
-$$P_B = B (B^T B)^{-1} B^T$$
+
+$$
+P_B = B (B^T B)^{-1} B^T
+$$
+
 The **Orthogonal Nullspace Projector** $P_{\perp}$ is defined as:
-$$P_{\perp} = I_D - B (B^T B)^{-1} B^T$$
+
+$$
+P_{\perp} = I_D - B (B^T B)^{-1} B^T
+$$
+
 The consolidated memory vector $v_{ortho}$ is computed as:
-$$v_{ortho} = P_{\perp} v_{new} = \left(I_D - B (B^T B)^{-1} B^T\right) v_{new}$$
+
+$$
+v_{ortho} = P_{\perp} v_{new} = \left(I_D - B (B^T B)^{-1} B^T\right) v_{new}
+$$
 
 #### Theorem 1 (Retroactive Interference Immunity)
 *For any prior memory representation $b_m \in \text{col}(B)$, the inner product with the newly consolidated representation $v_{ortho}$ is identically zero:*
-$$\langle b_m, v_{ortho} \rangle = b_m^T v_{ortho} = b_m^T \left(I_D - B(B^T B)^{-1} B^T\right) v_{new} = (b_m^T - b_m^T) v_{new} = 0$$
+
+$$
+\langle b_m, v_{ortho} \rangle = b_m^T v_{ortho} = b_m^T \left(I_D - B(B^T B)^{-1} B^T\right) v_{new} = (b_m^T - b_m^T) v_{new} = 0
+$$
+
 *Proof*: Since $b_m \in \text{col}(B)$, there exists a standard basis vector $e_m$ such that $b_m = B e_m$. Substituting yields:
-$$b_m^T P_{\perp} = e_m^T B^T (I_D - B(B^T B)^{-1} B^T) = e_m^T (B^T - (B^T B)(B^T B)^{-1} B^T) = e_m^T (B^T - B^T) = 0$$
+
+$$
+b_m^T P_{\perp} = e_m^T B^T (I_D - B(B^T B)^{-1} B^T) = e_m^T (B^T - (B^T B)(B^T B)^{-1} B^T) = e_m^T (B^T - B^T) = 0
+$$
+
 Hence, cosine similarity is identically zero ($\cos \theta = 0.000000$), guaranteeing that new knowledge consolidation causes zero representation collapse in prior attractor basins.
 
 ---
