@@ -552,16 +552,190 @@ class ConcurrentDualStreamSynthesizer(nn.Module):
         return h_fused, telemetry
 
 
+class OuterDynamicScratchDimension(nn.Module):
+    """
+    Outer Dynamic Scratch Dimension (HADL v5.9).
+
+    Creates an elastic side-channel working memory space H_scratch(t) in R^{B x S x d_act(t)}
+    alongside the model's fixed static token dimension D_static = 2048.
+    - Active width d_act(t) in [d_min, d_max] (quantized in Tensor Core blocks of 32)
+      is dynamically determined from initial model complexity counting (spike drive,
+      representation dispersion entropy, and consolidated learned memory slots).
+    - Allows cognitive subsystems (Latent Matrix, Toroidal Router, VGNI, Symbolic ALU)
+      to store and manipulate intermediate multi-step variables without colliding with
+      the frozen foundation model's static token representation.
+    """
+    def __init__(
+        self,
+        d_model: int = 2048,
+        d_min: int = 64,
+        d_max: int = 512,
+        block_size: int = 32,
+        slot_capacity: int = 64,
+    ):
+        super().__init__()
+        self.d_model = d_model
+        self.block_size = max(8, block_size)
+        self.d_max = min(d_max, max(64, d_model))
+        self.d_min = min(max(self.block_size, d_min), self.d_max)
+        self.slot_capacity = max(1, slot_capacity)
+
+        self.norm = nn.LayerNorm(d_model)
+        self.w_lift = nn.Linear(d_model, self.d_max, bias=False)
+        self.w_gate_bus = nn.Linear(self.d_max, self.d_max, bias=True)
+        self.w_project = nn.Linear(self.d_max, d_model, bias=False)
+
+        self.register_buffer("learned_expansion_slots", torch.tensor(0, dtype=torch.long))
+        self.last_active_dim: int = self.d_min
+        self.last_scratch_state: Optional[torch.Tensor] = None
+        self.last_telemetry: Dict[str, Any] = {}
+
+        self._init_weights()
+
+    def _init_weights(self):
+        with torch.no_grad():
+            for layer in [self.w_lift, self.w_gate_bus, self.w_project]:
+                w = torch.empty(layer.weight.shape, dtype=torch.float32, device="cpu")
+                nn.init.orthogonal_(w)
+                if layer is self.w_project:
+                    w.mul_(0.05)
+                elif layer is self.w_gate_bus:
+                    w.mul_(0.50)
+                layer.weight.data.copy_(w.to(device=layer.weight.device, dtype=layer.weight.dtype))
+                if getattr(layer, "bias", None) is not None:
+                    nn.init.zeros_(layer.bias)
+
+    def register_learned_slot(self, count: int = 1) -> int:
+        """Expands the persistent learned slot counter when new concepts are consolidated."""
+        with torch.no_grad():
+            self.learned_expansion_slots.add_(int(count))
+            return int(self.learned_expansion_slots.item())
+
+    def compute_dynamic_width(
+        self,
+        h_base: torch.Tensor,
+        u_drive: Optional[torch.Tensor] = None,
+        learned_slots: Optional[int] = None,
+    ) -> Tuple[int, Dict[str, Any]]:
+        """
+        Computes the active scratchpad dimension d_act(t) in [d_min, d_max]
+        quantized to multiples of block_size (32) from initial model complexity counting.
+        """
+        with torch.no_grad():
+            if u_drive is not None:
+                u_val = float(torch.clamp(u_drive.detach().float().mean(), 0.0, 2.0).item()) / 2.0
+            else:
+                u_val = 0.15
+
+            h_f = h_base.detach().float()
+            token_var = float(torch.var(h_f, dim=-1).mean().item())
+            token_rms_sq = float(torch.mean(h_f * h_f).item()) + 1e-6
+            dispersion = math.tanh(token_var / token_rms_sq)
+
+            # Sequence length complexity factor
+            seq_len = int(h_base.shape[1]) if h_base.dim() >= 2 else 1
+            seq_factor = math.tanh(seq_len / 64.0)
+
+            slots = int(learned_slots) if learned_slots is not None else int(self.learned_expansion_slots.item())
+            slot_ratio = math.tanh(max(0, slots) / float(self.slot_capacity))
+
+            complexity_score = min(
+                1.0,
+                max(0.0, 0.35 * u_val + 0.30 * dispersion + 0.15 * seq_factor + 0.20 * slot_ratio)
+            )
+            raw_dim = self.d_min + complexity_score * (self.d_max - self.d_min)
+            quantized_dim = int(round(raw_dim / self.block_size) * self.block_size)
+            d_act = max(self.d_min, min(self.d_max, quantized_dim))
+
+            self.last_active_dim = d_act
+            telem = {
+                "active_scratch_dim": d_act,
+                "max_scratch_dim": self.d_max,
+                "min_scratch_dim": self.d_min,
+                "scratch_complexity_score": round(complexity_score, 4),
+                "scratch_learned_slots": slots,
+                "scratch_utilization_ratio": round(d_act / float(self.d_max), 4),
+            }
+            self.last_telemetry = telem
+            return d_act, telem
+
+    def lift_to_scratch(
+        self,
+        h_static: torch.Tensor,
+        u_drive: Optional[torch.Tensor] = None,
+        learned_slots: Optional[int] = None,
+        d_act: Optional[int] = None,
+    ) -> Tuple[torch.Tensor, Dict[str, Any]]:
+        """
+        Lifts static representation h_static in R^{B x S x D_static} into the
+        active Outer Dynamic Scratch Dimension Z_scratch in R^{B x S x d_act(t)}.
+        """
+        if d_act is None:
+            d_act, telem = self.compute_dynamic_width(h_static, u_drive=u_drive, learned_slots=learned_slots)
+        else:
+            d_act = max(self.d_min, min(self.d_max, int(d_act)))
+            telem = {"active_scratch_dim": d_act, "max_scratch_dim": self.d_max}
+
+        target_dtype = self.w_lift.weight.dtype
+        h_norm = self.norm(h_static.to(dtype=target_dtype))
+        w_lift_slice = self.w_lift.weight[:d_act, :]  # [d_act, D_static]
+        z_raw = F.linear(h_norm, w_lift_slice)         # [B, S, d_act]
+
+        w_gate_slice = self.w_gate_bus.weight[:d_act, :d_act]
+        b_gate_slice = self.w_gate_bus.bias[:d_act] if self.w_gate_bus.bias is not None else None
+        gate = torch.sigmoid(F.linear(z_raw, w_gate_slice, b_gate_slice))
+        z_scratch = (gate * F.silu(z_raw)).to(dtype=h_static.dtype)
+
+        self.last_scratch_state = z_scratch.detach()
+        return z_scratch, telem
+
+    def write_subsystem_to_scratch(
+        self,
+        z_scratch: torch.Tensor,
+        h_subsystem: torch.Tensor,
+        weight: float = 0.25,
+    ) -> torch.Tensor:
+        """
+        Writes a cognitive subsystem's intermediate representation into the active
+        outer scratch dimension without polluting the static token dimension.
+        """
+        d_act = z_scratch.shape[-1]
+        target_dtype = self.w_lift.weight.dtype
+        h_norm = self.norm(h_subsystem.to(dtype=target_dtype))
+        w_lift_slice = self.w_lift.weight[:d_act, :]
+        z_sub = torch.tanh(F.linear(h_norm, w_lift_slice)).to(dtype=z_scratch.dtype)
+        z_updated = z_scratch + float(weight) * z_sub
+        self.last_scratch_state = z_updated.detach()
+        return z_updated
+
+    def project_from_scratch(
+        self,
+        z_scratch: torch.Tensor,
+        h_anchor: torch.Tensor,
+    ) -> torch.Tensor:
+        """
+        Projects the active outer scratchpad Z_scratch in R^{B x S x d_act(t)} back
+        to R^{B x S x D_static} strictly in the symplectic orthogonal nullspace of h_anchor.
+        """
+        d_act = z_scratch.shape[-1]
+        target_dtype = self.w_project.weight.dtype
+        w_proj_slice = self.w_project.weight[:, :d_act]  # [D_static, d_act]
+        delta_static = F.linear(z_scratch.to(dtype=target_dtype), w_proj_slice).to(dtype=h_anchor.dtype)
+        delta_ortho = ConcurrentDualStreamSynthesizer.orthogonal_symplectic_project(delta_static, h_anchor)
+        return delta_ortho
+
+
 class LatentThoughtMatrixEngine(nn.Module):
     """
-    Non-Token Multi-Part Latent Thought Matrix Engine (HADL v5.8).
+    Non-Token Multi-Part Latent Thought Matrix Engine (HADL v5.9).
 
     Lifts a 1D hidden representation h(t) in R^{B x S x D} into a structured
     2D Latent Thought Matrix M(t) in R^{B x S x R x D} (R = 4 cognitive sub-parts):
       - M_0: Invariant Factual & Syntactic Anchor (h_base)
       - M_1: Orthogonal Wild / Lateral Exploration Subspace (P_perp(M_0) Delta_wild)
       - M_2: Learned Epistemic Veracity & Counter-Myth Subspace (P_perp(M_0) Delta_veracity)
-             with sequence-pooled proposition readout s_veracity in [-1, +1]
+             with Closed-Form Mahalanobis Epistemic Attenuation and Skew-Symmetric
+             Bilinear Contradiction Detection (zero-latency OOD protection)
       - M_3: Banach Symbolic / Structural Deduction Subspace (P_perp(M_0) Delta_struct)
     """
     def __init__(
@@ -569,13 +743,15 @@ class LatentThoughtMatrixEngine(nn.Module):
         d_model: int = 2048,
         num_subparts: int = 4,
         bottleneck_dim: int = 128,
-        veracity_dim: int = 128
+        veracity_dim: int = 128,
+        mahalanobis_threshold: float = 1.50,
     ):
         super().__init__()
         self.d_model = d_model
         self.num_subparts = num_subparts
         self.bottleneck_dim = min(bottleneck_dim, max(32, d_model // 4))
         self.veracity_dim = min(veracity_dim, max(32, d_model // 4))
+        self.mahalanobis_threshold = mahalanobis_threshold
 
         self.norm = nn.LayerNorm(d_model)
 
@@ -590,10 +766,24 @@ class LatentThoughtMatrixEngine(nn.Module):
         self.veracity_up = nn.Linear(self.veracity_dim, d_model, bias=False)
         self.veracity_head = nn.Linear(self.veracity_dim, 1, bias=True)
 
+        # Closed-Form Mathematical Calibration (HADL v5.9):
+        # 1. Running diagonal second-moment buffers for Mahalanobis Epistemic Attenuation
+        self.register_buffer("veracity_ema_mean", torch.zeros(self.veracity_dim))
+        self.register_buffer("veracity_ema_var", torch.ones(self.veracity_dim))
+        self.register_buffer("veracity_ema_steps", torch.tensor(0, dtype=torch.long))
+
+        # 2. Skew-Symmetric Bilinear Contradiction Generator J = A - A^T (z^T J z == 0 identically)
+        self.veracity_skew_a = nn.Parameter(torch.zeros(self.veracity_dim, self.veracity_dim))
+        self.veracity_bilinear_scale = nn.Parameter(torch.tensor(0.35))
+
         # Subpart 3: Banach Symbolic / Structural Subspace
         self.struct_down = nn.Linear(d_model, self.bottleneck_dim, bias=False)
         self.struct_contract = nn.Linear(self.bottleneck_dim, self.bottleneck_dim, bias=False)
         self.struct_up = nn.Linear(self.bottleneck_dim, d_model, bias=False)
+
+        self.last_mahalanobis_dist: float = 0.0
+        self.last_epistemic_attenuation: float = 1.0
+        self.last_bilinear_contradiction: float = 0.0
 
         self._init_weights()
 
@@ -619,6 +809,28 @@ class LatentThoughtMatrixEngine(nn.Module):
             nn.init.zeros_(self.veracity_head.weight)
             nn.init.zeros_(self.veracity_head.bias)
 
+            # Initialize skew-symmetric generator with structured orthogonal pairs
+            skew_init = torch.empty(self.veracity_dim, self.veracity_dim, dtype=torch.float32, device="cpu")
+            nn.init.orthogonal_(skew_init)
+            skew_init.mul_(0.25)
+            self.veracity_skew_a.data.copy_(
+                skew_init.to(device=self.veracity_skew_a.device, dtype=self.veracity_skew_a.dtype)
+            )
+
+    def update_veracity_manifold_stats(self, z_prop: torch.Tensor, momentum: float = 0.10):
+        """Updates the in-distribution Mahalanobis manifold statistics (mean & variance)."""
+        with torch.no_grad():
+            z_f = z_prop.detach().float()
+            batch_mean = z_f.mean(dim=0)
+            batch_var = ((z_f - batch_mean.unsqueeze(0)) ** 2).mean(dim=0).clamp(min=1e-4)
+            if int(self.veracity_ema_steps.item()) == 0:
+                self.veracity_ema_mean.copy_(batch_mean.to(dtype=self.veracity_ema_mean.dtype))
+                self.veracity_ema_var.copy_(batch_var.to(dtype=self.veracity_ema_var.dtype))
+            else:
+                self.veracity_ema_mean.lerp_(batch_mean.to(dtype=self.veracity_ema_mean.dtype), momentum)
+                self.veracity_ema_var.lerp_(batch_var.to(dtype=self.veracity_ema_var.dtype), momentum)
+            self.veracity_ema_steps.add_(1)
+
     def compute_pooled_proposition(self, h_norm: torch.Tensor) -> torch.Tensor:
         """
         Computes a sequence-level semantic proposition vector in R^{B x D}
@@ -636,11 +848,15 @@ class LatentThoughtMatrixEngine(nn.Module):
 
     def evaluate_veracity_subspace(self, h_base: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
         """
-        Evaluates the Epistemic Veracity & Counter-Myth Subspace on h_base.
+        Evaluates the Epistemic Veracity & Counter-Myth Subspace on h_base with:
+          1. Closed-Form Mahalanobis Epistemic Attenuation u_epistemic in (0, 1]
+             to prevent Out-of-Distribution (OOD) false alarms.
+          2. Skew-Symmetric Bilinear Contradiction Detection c_bilinear = tanh(z_pre^T J z_post / sqrt(D_v))
+             where J = A - A^T guarantees z^T J z == 0 on self-consistent sequences.
 
         Returns:
             m2_ortho: [B, S, D] orthogonal veracity state
-            veracity_score: [B, 1] continuous veracity conflict score in [-1, +1]
+            veracity_score: [B, 1] calibrated continuous veracity conflict score in [-1, +1]
             z_prop: [B, D_v] latent veracity bottleneck representation
         """
         target_dtype = self.veracity_down.weight.dtype
@@ -649,9 +865,39 @@ class LatentThoughtMatrixEngine(nn.Module):
 
         z_prop = torch.tanh(self.veracity_mid(F.silu(self.veracity_down(h_prop))))  # [B, D_v]
         raw_logit = self.veracity_head(z_prop)  # [B, 1]
-        veracity_score = torch.tanh(raw_logit)  # [B, 1] in [-1, +1]
 
         z_seq = torch.tanh(self.veracity_mid(F.silu(self.veracity_down(h_norm))))   # [B, S, D_v]
+
+        # 1. Closed-Form Mahalanobis Epistemic Attenuation (O(D_v) = 128 ops, zero latency penalty)
+        mu_v = self.veracity_ema_mean.to(device=z_prop.device, dtype=target_dtype).unsqueeze(0)
+        var_v = self.veracity_ema_var.to(device=z_prop.device, dtype=target_dtype).unsqueeze(0).clamp(min=1e-5)
+        maha_dist_sq = torch.mean(((z_prop - mu_v) ** 2) / var_v, dim=-1, keepdim=True)  # [B, 1]
+        excess_ood = F.relu(maha_dist_sq - float(self.mahalanobis_threshold))
+        u_epistemic = torch.exp(-0.5 * excess_ood)  # [B, 1] in (0, 1]
+
+        # 2. Skew-Symmetric Bilinear Contradiction Operator J = A - A^T
+        B, S, _ = z_seq.shape
+        A = self.veracity_skew_a.to(device=z_seq.device, dtype=target_dtype)
+        J = A - A.transpose(0, 1)  # Strictly skew-symmetric: J^T == -J
+        if S >= 2:
+            mid_idx = max(1, S // 2)
+            z_pre = z_seq[:, :mid_idx, :].mean(dim=1)   # [B, D_v] premise segment
+            z_post = z_seq[:, mid_idx:, :].mean(dim=1)  # [B, D_v] conclusion segment
+        else:
+            z_pre = z_prop
+            z_post = z_prop  # For S=1, z_pre == z_post => z_pre^T J z_post == 0 identically!
+
+        jz_post = torch.matmul(z_post, J.transpose(0, 1))  # [B, D_v]
+        bilinear_raw = torch.sum(z_pre * jz_post, dim=-1, keepdim=True) / math.sqrt(self.veracity_dim)
+        c_bilinear = torch.tanh(bilinear_raw)  # [B, 1]
+        lam_j = torch.clamp(self.veracity_bilinear_scale, min=0.0, max=2.0).to(device=z_prop.device, dtype=target_dtype)
+
+        veracity_score = u_epistemic * torch.tanh(raw_logit + lam_j * c_bilinear)  # [B, 1] in [-1, +1]
+
+        self.last_mahalanobis_dist = float(maha_dist_sq.detach().mean().item())
+        self.last_epistemic_attenuation = float(u_epistemic.detach().mean().item())
+        self.last_bilinear_contradiction = float(c_bilinear.detach().mean().item())
+
         delta_v = self.veracity_up(z_seq).to(dtype=h_base.dtype)
         m2_ortho = ConcurrentDualStreamSynthesizer.orthogonal_symplectic_project(delta_v, h_base)
         return m2_ortho, veracity_score, z_prop
@@ -696,6 +942,9 @@ class LatentThoughtMatrixEngine(nn.Module):
             "latent_matrix_subparts": self.num_subparts,
             "veracity_conflict_score": round(v_score_val, 4),
             "epistemic_refutation_active": bool(v_score_val > 0.35),
+            "mahalanobis_ood_distance": round(self.last_mahalanobis_dist, 4),
+            "epistemic_attenuation": round(self.last_epistemic_attenuation, 4),
+            "bilinear_contradiction_score": round(self.last_bilinear_contradiction, 4),
             "subpart_norms": [
                 round(float(torch.norm(m0, dim=-1).mean().item()), 4),
                 round(float(torch.norm(m1, dim=-1).mean().item()), 4),
@@ -709,16 +958,18 @@ class LatentThoughtMatrixEngine(nn.Module):
 
 class CentralCognitiveRouter(nn.Module):
     """
-    Recurrent Toroidal Central Matrix Router ("Otak Berputar" — HADL v5.8).
+    Recurrent Toroidal Central Matrix Router ("Otak Berputar" — HADL v5.9).
 
     Connects all R=4 sub-parts of the Non-Token Latent Thought Matrix M in R^{B x S x R x D}
     and circulates information across them over C recurrent micro-cycles before synthesizing:
-      1. Invariant-preserving Layer-7 residual representation:
-           h_routed = M_0 + g_central * P_perp(M_0)(sum_{r=1}^{R-1} w_r M_r^{(C)})
+      1. Invariant-preserving Layer-7 residual representation bounded by Dynamic Order-Statistic
+         Consensus Bounding (Mean & Median of per-token minimum subpart ratios r_min):
+           h_routed = M_0 + scale_consensus * P_perp(M_0)(sum_{r=1}^{R-1} w_r M_r^{(C)})
          guaranteeing <h_routed - M_0, M_0> = 0 (100% inner-product preservation on factual anchors).
-      2. Non-Token Cognitive Disclosure Direction d_disclosure in S^{D-1} subset R^D and
-         Disclosure Gate g_disc in (0, 1), which interface with the foundation model's
-         frozen peripheral language codec (lm_head) without hardcoded keyword lists.
+      2. Outer Dynamic Scratch Dimension Z_scratch in R^{B x S x d_act(t)} for multi-system
+         operating memory alongside D_static = 2048.
+      3. Non-Token Cognitive Disclosure Direction d_disclosure in S^{D-1} subset R^D and
+         Disclosure Gate g_disc in (0, 1).
     """
     def __init__(
         self,
@@ -727,7 +978,14 @@ class CentralCognitiveRouter(nn.Module):
         router_dim: int = 64,
         disclosure_dim: int = 256,
         num_cycles: int = 2,
-        max_ortho_ratio: float = 0.015
+        max_ortho_ratio: float = 0.015,
+        enable_order_statistic_bound: bool = True,
+        eta_floor: float = 0.008,
+        eta_ceil: float = 0.065,
+        kappa_consensus: float = 0.35,
+        enable_outer_scratch: bool = True,
+        scratch_d_min: int = 64,
+        scratch_d_max: int = 512,
     ):
         super().__init__()
         self.d_model = d_model
@@ -736,11 +994,23 @@ class CentralCognitiveRouter(nn.Module):
         self.disclosure_dim = min(disclosure_dim, max(32, d_model // 4))
         self.num_cycles = num_cycles
         self.max_ortho_ratio = max_ortho_ratio
+        self.enable_order_statistic_bound = enable_order_statistic_bound
+        self.eta_floor = eta_floor
+        self.eta_ceil = eta_ceil
+        self.kappa_consensus = kappa_consensus
+        self.enable_outer_scratch = enable_outer_scratch
 
         self.q_proj = nn.Linear(d_model, self.router_dim, bias=False)
         self.k_proj = nn.Linear(d_model, self.router_dim, bias=False)
         self.v_proj = nn.Linear(d_model, self.router_dim, bias=False)
         self.out_proj = nn.Linear(self.router_dim, d_model, bias=False)
+
+        # Outer Dynamic Scratch Dimension (OS Working Memory alongside D_static)
+        self.outer_scratch = OuterDynamicScratchDimension(
+            d_model=d_model,
+            d_min=scratch_d_min,
+            d_max=scratch_d_max,
+        )
 
         # Learnable toroidal circulation bias encouraging cyclic interaction (0->1->2->3->0)
         torus_init = torch.zeros(num_subparts, num_subparts)
@@ -769,6 +1039,7 @@ class CentralCognitiveRouter(nn.Module):
         self.last_disclosure_gate: Optional[torch.Tensor] = None
         self.last_disclosure_gate_logit: Optional[torch.Tensor] = None
         self.last_circulated_matrix: Optional[torch.Tensor] = None
+        self.last_dynamic_eta: float = max_ortho_ratio
 
         self._init_weights()
 
@@ -796,6 +1067,68 @@ class CentralCognitiveRouter(nn.Module):
             nn.init.normal_(self.disclosure_gate_head.weight, std=0.01)
             nn.init.constant_(self.disclosure_gate_head.bias, -2.0)
 
+    def compute_order_statistic_bound(
+        self,
+        M_final: torch.Tensor,
+        m0: torch.Tensor,
+        u_mean: Optional[torch.Tensor] = None,
+    ) -> Tuple[torch.Tensor, Dict[str, Any]]:
+        """
+        Computes the Dynamic Order-Statistic Consensus Bound eta_dyn(b) in [eta_floor, eta_ceil]
+        from the Mean and Median of the per-token minimum exploratory subpart norm ratio r_min(b, s).
+
+        Mathematical property:
+          - Taking min_{r in 1..R-1} ||M_r(b,s)|| / ||M_0(b,s)|| filters out single-subpart noise spikes.
+          - Combining Mean_s(r_min) and Median_s(r_min) balances outlier immunity (median) with
+            global sequence activation sensitivity (mean), unlocking higher steering capacity
+            exclusively when all cognitive subparts achieve consensus.
+        """
+        B, S, R, D = M_final.shape
+        base_norm_tok = torch.norm(m0.float(), dim=-1) + 1e-6  # [B, S]
+        subpart_ratios = []
+        for r in range(1, R):
+            r_norm = torch.norm(M_final[:, :, r, :].float(), dim=-1)  # [B, S]
+            subpart_ratios.append(r_norm / base_norm_tok)
+
+        if not subpart_ratios:
+            eta_static = torch.full((B, 1, 1), self.max_ortho_ratio, device=M_final.device, dtype=M_final.dtype)
+            return eta_static, {
+                "dynamic_norm_bound": round(self.max_ortho_ratio, 5),
+                "r_min_mean": 0.0,
+                "r_min_median": 0.0,
+                "consensus_score": 0.0,
+            }
+
+        ratios_stack = torch.stack(subpart_ratios, dim=-1)  # [B, S, R-1]
+        r_min_tok = torch.min(ratios_stack, dim=-1).values  # [B, S] minimum across subparts
+
+        mu_min = torch.mean(r_min_tok, dim=-1, keepdim=True)               # [B, 1] Mean of minimums
+        med_min = torch.median(r_min_tok, dim=-1, keepdim=True).values     # [B, 1] Median of minimums
+
+        # Arithmetic-Geometric consensus synthesis of Mean and Median
+        consensus = 0.5 * (mu_min + med_min) + 0.5 * torch.sqrt(mu_min * med_min + 1e-12)  # [B, 1]
+
+        if u_mean is not None:
+            drive_factor = 1.0 + torch.clamp(u_mean.float().reshape(B, 1), min=0.0, max=2.0)
+        else:
+            drive_factor = 1.0
+
+        eta_dyn = torch.clamp(
+            self.eta_floor + self.kappa_consensus * consensus * drive_factor,
+            min=self.eta_floor,
+            max=self.eta_ceil,
+        )  # [B, 1]
+        eta_dyn_3d = eta_dyn.unsqueeze(-1).to(dtype=M_final.dtype)  # [B, 1, 1]
+        self.last_dynamic_eta = float(eta_dyn.detach().mean().item())
+
+        stat_telem = {
+            "dynamic_norm_bound": round(self.last_dynamic_eta, 5),
+            "r_min_mean": round(float(mu_min.detach().mean().item()), 5),
+            "r_min_median": round(float(med_min.detach().mean().item()), 5),
+            "consensus_score": round(float(consensus.detach().mean().item()), 5),
+        }
+        return eta_dyn_3d, stat_telem
+
     def project_disclosure_to_vocab(
         self,
         lm_head_or_weight: Union[nn.Module, torch.Tensor],
@@ -818,20 +1151,12 @@ class CentralCognitiveRouter(nn.Module):
         M: torch.Tensor,
         u_drive: Optional[torch.Tensor] = None,
         veracity_conflict_score: Union[float, torch.Tensor] = 0.0,
-        num_cycles: Optional[int] = None
+        num_cycles: Optional[int] = None,
+        learned_slots: Optional[int] = None,
     ) -> Tuple[torch.Tensor, Dict[str, Any]]:
         """
-        Executes recurrent toroidal routing across the R sub-parts of Latent Matrix M.
-
-        Args:
-            M: [B, S, R, D] Latent Thought Matrix where M[:, :, 0, :] is the base anchor
-            u_drive: optional [B, S, 1] pacemaker driving signal
-            veracity_conflict_score: scalar float or [B, 1] tensor in [-1, +1] from Epistemic Veracity Subspace
-            num_cycles: optional override for recurrent rotation cycles C
-
-        Returns:
-            h_routed: [B, S, D] invariant-preserving routed hidden state
-            telemetry: dictionary of Central Cognitive Router metrics
+        Executes recurrent toroidal routing across the R sub-parts of Latent Matrix M,
+        coupled with the Outer Dynamic Scratch Dimension and Order-Statistic Consensus Bound.
         """
         B, S, R, D = M.shape
         cycles = num_cycles if num_cycles is not None else self.num_cycles
@@ -842,6 +1167,14 @@ class CentralCognitiveRouter(nn.Module):
         scale_factor = 1.0 / math.sqrt(self.router_dim)
         alpha = torch.clamp(self.cycle_step_scale, min=0.05, max=0.50).to(dtype=target_dtype)
         b_torus = self.torus_bias.to(device=M.device, dtype=target_dtype).view(1, 1, R, R)
+
+        # Initialize Outer Dynamic Scratch Dimension bus alongside D_static
+        scratch_telem: Dict[str, Any] = {}
+        z_scratch: Optional[torch.Tensor] = None
+        if self.enable_outer_scratch:
+            z_scratch, scratch_telem = self.outer_scratch.lift_to_scratch(
+                m0, u_drive=u_drive, learned_slots=learned_slots
+            )
 
         # Recurrent Toroidal Circulation ("Otak Berputar")
         for _ in range(max(1, cycles)):
@@ -862,6 +1195,11 @@ class CentralCognitiveRouter(nn.Module):
                 m_r_ortho = ConcurrentDualStreamSynthesizer.orthogonal_symplectic_project(m_r_new, m0_t)
                 updated_subparts.append(m_r_ortho)
             M_curr = torch.stack(updated_subparts, dim=2)
+
+            if z_scratch is not None:
+                # Deposit circulated exploratory mean into Outer Dynamic Scratch Bus
+                exp_step = M_curr[:, :, 1:, :].mean(dim=2).to(dtype=m0.dtype)
+                z_scratch = self.outer_scratch.write_subsystem_to_scratch(z_scratch, exp_step, weight=0.20)
 
         # Sequence-level proposition pooling across all R circulated sub-parts
         M_norm = self.subpart_norm(M_curr)  # [B, S, R, D]
@@ -926,19 +1264,35 @@ class CentralCognitiveRouter(nn.Module):
         self.last_disclosure_gate_logit = disc_gate_logit
         self.last_circulated_matrix = M_curr
 
-        # Combine orthogonal exploratory sub-parts (r = 1..R-1) for Layer 7 residual stream
+        # Combine orthogonal exploratory sub-parts (r = 1..R-1) + Outer Dynamic Scratch projection
         M_final = M_curr.to(dtype=M.dtype)
         delta_combined = (
             w_exp[:, :, 1, :] * M_final[:, :, 1, :]
             + w_exp[:, :, 2, :] * M_final[:, :, 2, :]
             + w_exp[:, :, 3, :] * M_final[:, :, 3, :]
         )
+        if z_scratch is not None:
+            delta_scratch = self.outer_scratch.project_from_scratch(z_scratch, m0)
+            delta_combined = delta_combined + 0.25 * delta_scratch
+
         delta_ortho = ConcurrentDualStreamSynthesizer.orthogonal_symplectic_project(delta_combined, m0)
 
-        # Homeostatic relative norm bound so factual embeddings never drift
+        # Dynamic Order-Statistic Consensus Bound (Mean & Median of Subpart Minimums)
+        if self.enable_order_statistic_bound:
+            eta_bound, bound_telem = self.compute_order_statistic_bound(M_final, m0, u_mean=u_mean)
+        else:
+            eta_bound = torch.full((B, 1, 1), self.max_ortho_ratio, device=M.device, dtype=M.dtype)
+            self.last_dynamic_eta = self.max_ortho_ratio
+            bound_telem = {
+                "dynamic_norm_bound": round(self.max_ortho_ratio, 5),
+                "r_min_mean": 0.0,
+                "r_min_median": 0.0,
+                "consensus_score": 0.0,
+            }
+
         base_norm = torch.norm(m0, dim=-1, keepdim=True) + 1e-6
         delta_norm = torch.norm(delta_ortho, dim=-1, keepdim=True) + 1e-6
-        bound_scale = torch.clamp((self.max_ortho_ratio * base_norm) / delta_norm, max=1.0)
+        bound_scale = torch.clamp((eta_bound * base_norm) / delta_norm, max=1.0)
         delta_safe_ortho = bound_scale * delta_ortho
 
         h_routed = m0 + delta_safe_ortho
@@ -963,6 +1317,8 @@ class CentralCognitiveRouter(nn.Module):
             "orthogonal_inner_product_error": round(rel_ortho_err, 8),
             "inner_product_preservation_ratio": round(1.0 - rel_ortho_err, 6),
         }
+        telem.update(bound_telem)
+        telem.update(scratch_telem)
         return h_routed, telem
 
 
@@ -975,6 +1331,7 @@ __all__ = [
     "TourLeaderAttractor",
     "ConcurrentDualStreamSynthesizer",
     "DirectionalSafetyProjection",
+    "OuterDynamicScratchDimension",
     "LatentThoughtMatrixEngine",
     "CentralCognitiveRouter",
 ]

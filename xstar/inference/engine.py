@@ -85,6 +85,9 @@ class EngineConfig:
     enable_latent_matrix_v58: bool = True
     toroidal_cycles: int = 2
     low_cpu_mem_usage: bool = True
+    enable_outer_scratch_dim: bool = True
+    outer_scratch_max_dim: int = 512
+    enable_order_statistic_bound: bool = True
 
 
 @dataclass
@@ -126,6 +129,10 @@ class GenerationMetrics:
     latent_matrix_active: bool = False
     toroidal_cycles: int = 2
     veracity_conflict_score: float = 0.0
+    active_scratch_dim: int = 64
+    dynamic_norm_bound: float = 0.015
+    mahalanobis_ood_distance: float = 0.0
+    epistemic_attenuation: float = 1.0
 
 
 class CustomInferenceEngine:
@@ -264,8 +271,16 @@ class CustomInferenceEngine:
             )
             self.model.tokenizer = self.tokenizer
 
-            # Verify and ensure HADL v5.8 Rank-4 Latent Matrix and Toroidal Router are active
+            # Verify and ensure HADL v5.9 Rank-4 Latent Matrix, Outer Scratch & Toroidal Router are active
             if self.config.enable_latent_matrix_v58 and hasattr(self.model, "brain"):
+                if hasattr(self.model.brain, "central_router"):
+                    self.model.brain.central_router.enable_outer_scratch = self.config.enable_outer_scratch_dim
+                    self.model.brain.central_router.enable_order_statistic_bound = self.config.enable_order_statistic_bound
+                    if hasattr(self.model.brain.central_router, "outer_scratch"):
+                        self.model.brain.central_router.outer_scratch.d_max = min(
+                            self.config.outer_scratch_max_dim,
+                            self.model.brain.central_router.outer_scratch.w_lift.weight.shape[0]
+                        )
                 ckpt6 = Path(self.config.checkpoints_dir or "checkpoints") / "hadl_v58_latent_matrix_central_router.pt"
                 if ckpt6.exists() and not self.model.brain.loaded_checkpoints.get("latent_matrix_central_router", False):
                     try:
@@ -796,6 +811,7 @@ class CustomInferenceEngine:
         dual_telem = brain_telem.get("dual_stream_telemetry", {})
         img_telem = brain_telem.get("imagination_3d_telemetry", {})
         matrix_telem = brain_telem.get("latent_matrix_telemetry", {})
+        router_telem = brain_telem.get("central_router_telemetry", {})
         veracity_conflict = float(matrix_telem.get("veracity_conflict_score", brain_telem.get("last_veracity_conflict_score", 0.0)))
 
         metrics = GenerationMetrics(
@@ -832,9 +848,13 @@ class CustomInferenceEngine:
             is_blackwell=self.driver_report.is_blackwell if self.driver_report else False,
             tf32_active=bool(torch.backends.cuda.matmul.allow_tf32) if torch.cuda.is_available() else False,
             bfloat16_active=(self.torch_dtype == torch.bfloat16),
-            latent_matrix_active=bool(brain_telem.get("checkpoints_loaded", {}).get("latent_matrix_central_router", False)),
+            latent_matrix_active=bool(matrix_telem) or bool(brain_telem.get("checkpoints_loaded", {}).get("latent_matrix_central_router", False)),
             toroidal_cycles=self.config.toroidal_cycles,
             veracity_conflict_score=round(veracity_conflict, 4),
+            active_scratch_dim=int(router_telem.get("active_scratch_dim", 64)),
+            dynamic_norm_bound=round(float(router_telem.get("dynamic_norm_bound", 0.015)), 5),
+            mahalanobis_ood_distance=round(float(matrix_telem.get("mahalanobis_ood_distance", 0.0)), 4),
+            epistemic_attenuation=round(float(matrix_telem.get("epistemic_attenuation", 1.0)), 4),
         )
         self._last_metrics = metrics
         # Final yield with empty text and metrics

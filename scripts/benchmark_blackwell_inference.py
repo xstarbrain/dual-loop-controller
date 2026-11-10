@@ -101,6 +101,7 @@ def run_benchmark():
         print(f"  Output: \"{response_text[:120].strip()}...\"")
         print(f"  Telemetry -> TTFT: {metrics.ttft_ms:.1f}ms | TPS: {metrics.tokens_per_second:.1f} tok/s | VRAM: {metrics.vram_allocated_mb:.1f}MB")
         print(f"  Brain -> Spikes: {metrics.spikes_fired} (rate: {metrics.spike_firing_rate:.2f}) | Latent Active: {metrics.latent_matrix_active} | Veracity Score: {metrics.veracity_conflict_score:.4f}")
+        print(f"  HADL v5.9 -> Scratch Dim: {metrics.active_scratch_dim} | Dyn Eta Bound: {metrics.dynamic_norm_bound:.4f} | Maha OOD: {metrics.mahalanobis_ood_distance:.4f} | Epistemic Atten: {metrics.epistemic_attenuation:.4f}")
 
         results.append({
             "task": task,

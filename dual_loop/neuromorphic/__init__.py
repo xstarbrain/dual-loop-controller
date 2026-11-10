@@ -38,6 +38,7 @@ from .pacemaker_router import (
     TourLeaderAttractor,
     ConcurrentDualStreamSynthesizer,
     DirectionalSafetyProjection,
+    OuterDynamicScratchDimension,
     LatentThoughtMatrixEngine,
     CentralCognitiveRouter,
 )

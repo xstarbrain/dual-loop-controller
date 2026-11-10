@@ -1415,10 +1415,16 @@ class NeuromorphicSpikingBrain(nn.Module):
             matrix_telem["epistemic_refutation_active"] = bool(self.last_veracity_conflict_score > 0.35)
             v_conflict_arg = self.last_veracity_conflict_score
 
+        total_learned_slots = (
+            int(self.vgni.num_stored.item())
+            + int(getattr(self.eligibility_trace, "basis_count", torch.tensor(0)).item())
+            + int(self.central_router.outer_scratch.learned_expansion_slots.item())
+        )
         h_routed, central_telem = self.central_router(
             M_latent,
             u_drive=effective_u_drive,
-            veracity_conflict_score=v_conflict_arg
+            veracity_conflict_score=v_conflict_arg,
+            learned_slots=total_learned_slots,
         )
         if S > 1 or self.last_disclosure_vector is None:
             if getattr(self.central_router, "last_disclosure_vector", None) is not None:
@@ -1430,6 +1436,7 @@ class NeuromorphicSpikingBrain(nn.Module):
 
         h_syn_eff = h_3d_grounded if h_3d_grounded is not None else h_syn
         has_falsified = int(self.eligibility_trace.falsified_count.item()) > 0
+        dyn_eta = float(getattr(self.central_router, "last_dynamic_eta", 0.015))
 
         if not gate_open:
             # 100% Solid Baseline: Gate closed! Zero VGNI FLOPs, zero plastic leakage!
@@ -1449,7 +1456,7 @@ class NeuromorphicSpikingBrain(nn.Module):
                 delta_ortho = ConcurrentDualStreamSynthesizer.orthogonal_symplectic_project(raw_delta, h_layer7)
                 base_norm = torch.norm(h_layer7, dim=-1, keepdim=True) + 1e-6
                 delta_norm = torch.norm(delta_ortho, dim=-1, keepdim=True) + 1e-6
-                scale = torch.clamp((0.012 * base_norm) / delta_norm, max=1.0)
+                scale = torch.clamp((dyn_eta * base_norm) / delta_norm, max=1.0)
                 h_out = h_layer7 + scale * delta_ortho
 
             vocal_telem = {}
@@ -1482,6 +1489,10 @@ class NeuromorphicSpikingBrain(nn.Module):
                 "vocal_telemetry": vocal_telem,
                 "latent_matrix_telemetry": matrix_telem,
                 "central_router_telemetry": central_telem,
+                "active_scratch_dim": int(central_telem.get("active_scratch_dim", 0)),
+                "dynamic_norm_bound": round(dyn_eta, 5),
+                "mahalanobis_ood_distance": float(matrix_telem.get("mahalanobis_ood_distance", 0.0)),
+                "epistemic_attenuation": float(matrix_telem.get("epistemic_attenuation", 1.0)),
                 "veracity_conflict_score": round(self.last_veracity_conflict_score, 4),
                 "central_disclosure_gate": round(self.last_disclosure_gate, 4),
                 "closed_loop_deflection_norm": round(deflection_mag, 5),
@@ -1588,7 +1599,7 @@ class NeuromorphicSpikingBrain(nn.Module):
             delta_ortho = ConcurrentDualStreamSynthesizer.orthogonal_symplectic_project(raw_organ_delta, h_layer7)
             base_norm = torch.norm(h_layer7, dim=-1, keepdim=True) + 1e-6
             delta_norm = torch.norm(delta_ortho, dim=-1, keepdim=True) + 1e-6
-            scale = torch.clamp((0.015 * base_norm) / delta_norm, max=1.0)
+            scale = torch.clamp((dyn_eta * base_norm) / delta_norm, max=1.0)
             h_out = h_layer7 + scale * delta_ortho
 
         telem = {
@@ -1605,6 +1616,10 @@ class NeuromorphicSpikingBrain(nn.Module):
             "vocal_telemetry": vocal_telem,
             "latent_matrix_telemetry": matrix_telem,
             "central_router_telemetry": central_telem,
+            "active_scratch_dim": int(central_telem.get("active_scratch_dim", 0)),
+            "dynamic_norm_bound": round(dyn_eta, 5),
+            "mahalanobis_ood_distance": float(matrix_telem.get("mahalanobis_ood_distance", 0.0)),
+            "epistemic_attenuation": float(matrix_telem.get("epistemic_attenuation", 1.0)),
             "veracity_conflict_score": round(self.last_veracity_conflict_score, 4),
             "central_disclosure_gate": round(self.last_disclosure_gate, 4),
             "closed_loop_deflection_norm": round(deflection_mag, 5),
@@ -1627,7 +1642,8 @@ class NeuromorphicSpikingBrain(nn.Module):
         """
         Executes closed-loop Popperian-Cycle verification and signed synaptic consolidation:
         - c = +1 (Verified): Positive Hebbian consolidation into SynapticEligibilityTrace
-          protected by OrthogonalNullspaceProjector, plus OpenFreezeLiquidPlasticity LTP.
+          protected by OrthogonalNullspaceProjector, plus OpenFreezeLiquidPlasticity LTP,
+          and OuterDynamicScratchDimension learned slot expansion.
         - c = -1 (Falsified): Anti-Hebbian Orthogonal Deflation + Unitary Givens Rotation
           registration so subsequent passes steer away from the falsified trajectory.
         """
@@ -1672,7 +1688,7 @@ class NeuromorphicSpikingBrain(nn.Module):
         )
 
         if dopamine_sign > 0:
-            # Verified: consolidate into VGNI and clear transient falsified deflection buffer
+            # Verified: consolidate into VGNI, expand OuterDynamicScratchDimension, and clear falsified deflection
             try:
                 w_dev = self.vgni.concept_anchors.device
                 w_dtype = self.vgni.concept_anchors.dtype
@@ -1682,6 +1698,8 @@ class NeuromorphicSpikingBrain(nn.Module):
                 )
             except Exception:
                 pass
+            if hasattr(self, "central_router") and hasattr(self.central_router, "outer_scratch"):
+                self.central_router.outer_scratch.register_learned_slot(1)
             self.eligibility_trace.reset_falsified()
 
         return {
@@ -1689,6 +1707,9 @@ class NeuromorphicSpikingBrain(nn.Module):
             **null_telem,
             "banach_delta_norm": round(banach_delta_norm, 6),
             "liquid_delta_norm": round(liquid_delta_norm, 6),
+            "outer_scratch_learned_slots": int(self.central_router.outer_scratch.learned_expansion_slots.item())
+            if (hasattr(self, "central_router") and hasattr(self.central_router, "outer_scratch"))
+            else 0,
         }
 
     def synthesize_endogenous_voice(
@@ -1762,6 +1783,22 @@ class NeuromorphicSpikingBrain(nn.Module):
         layer_idx: int
     ) -> Tuple[torch.Tensor, Dict[str, Any]]:
         h_mod, reentry_telem = self.reentry_bus.execute_reentry(h_deep, self.vgni)
+        # Couple Outer Dynamic Scratch Dimension into deep re-entrant layers (L14, L21)
+        if hasattr(self, "central_router") and getattr(self.central_router, "enable_outer_scratch", False):
+            z_scr = self.central_router.outer_scratch.last_scratch_state
+            if z_scr is not None and z_scr.shape[0] == h_mod.shape[0] and z_scr.shape[1] == h_mod.shape[1]:
+                try:
+                    delta_scr = self.central_router.outer_scratch.project_from_scratch(
+                        z_scr.to(device=h_mod.device, dtype=h_mod.dtype), h_mod
+                    )
+                    base_n = torch.norm(h_mod, dim=-1, keepdim=True) + 1e-6
+                    scr_n = torch.norm(delta_scr, dim=-1, keepdim=True) + 1e-6
+                    eta_re = 0.50 * float(getattr(self.central_router, "last_dynamic_eta", 0.012))
+                    h_mod = h_mod + torch.clamp((eta_re * base_n) / scr_n, max=1.0) * delta_scr
+                    reentry_telem["outer_scratch_reentry_coupled"] = True
+                    reentry_telem["outer_scratch_active_dim"] = int(z_scr.shape[-1])
+                except Exception:
+                    pass
         return h_mod, reentry_telem
 
 
