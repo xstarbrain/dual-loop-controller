@@ -1406,13 +1406,23 @@ class NeuromorphicSpikingBrain(nn.Module):
         M_latent, matrix_telem = self.latent_matrix_engine(
             h_layer7, delta_wild_ext=delta_wild_ext, delta_struct_ext=delta_struct_ext
         )
-        # Lock proposition veracity conflict score on prompt prefill (S > 1) so single-token decoding retains it
+        # Lock proposition veracity & Mahalanobis/Bilinear telemetry on prompt prefill (S > 1)
         if S > 1 or abs(self.last_veracity_conflict_score) < 1e-6:
             self.last_veracity_conflict_score = float(matrix_telem["veracity_conflict_score"])
             v_conflict_arg = getattr(self.latent_matrix_engine, "last_veracity_scores", self.last_veracity_conflict_score)
+            self._prefill_matrix_telem = dict(matrix_telem)
+            if S > 1 and getattr(self.latent_matrix_engine, "last_veracity_z_prop", None) is not None:
+                self.latent_matrix_engine.update_veracity_manifold_stats(self.latent_matrix_engine.last_veracity_z_prop)
         else:
-            matrix_telem["veracity_conflict_score"] = round(self.last_veracity_conflict_score, 4)
-            matrix_telem["epistemic_refutation_active"] = bool(self.last_veracity_conflict_score > 0.35)
+            for k in (
+                "veracity_conflict_score",
+                "epistemic_refutation_active",
+                "mahalanobis_ood_distance",
+                "epistemic_attenuation",
+                "bilinear_contradiction_score",
+            ):
+                if hasattr(self, "_prefill_matrix_telem") and k in self._prefill_matrix_telem:
+                    matrix_telem[k] = self._prefill_matrix_telem[k]
             v_conflict_arg = self.last_veracity_conflict_score
 
         total_learned_slots = (
@@ -1431,12 +1441,22 @@ class NeuromorphicSpikingBrain(nn.Module):
                 self.last_disclosure_vector = self.central_router.last_disclosure_vector.detach()
             if getattr(self.central_router, "last_disclosure_gate", None) is not None:
                 self.last_disclosure_gate = float(self.central_router.last_disclosure_gate.mean().item())
+            self._prefill_central_telem = dict(central_telem)
         else:
             central_telem["disclosure_gate_mean"] = round(self.last_disclosure_gate, 4)
+            for k in (
+                "active_scratch_dim",
+                "dynamic_norm_bound",
+                "r_min_mean",
+                "r_min_median",
+                "consensus_score",
+            ):
+                if hasattr(self, "_prefill_central_telem") and k in self._prefill_central_telem:
+                    central_telem[k] = self._prefill_central_telem[k]
 
         h_syn_eff = h_3d_grounded if h_3d_grounded is not None else h_syn
         has_falsified = int(self.eligibility_trace.falsified_count.item()) > 0
-        dyn_eta = float(getattr(self.central_router, "last_dynamic_eta", 0.015))
+        dyn_eta = float(central_telem.get("dynamic_norm_bound", getattr(self.central_router, "last_dynamic_eta", 0.015)))
 
         if not gate_open:
             # 100% Solid Baseline: Gate closed! Zero VGNI FLOPs, zero plastic leakage!
