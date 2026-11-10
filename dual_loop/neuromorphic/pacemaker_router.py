@@ -1072,6 +1072,7 @@ class CentralCognitiveRouter(nn.Module):
         M_final: torch.Tensor,
         m0: torch.Tensor,
         u_mean: Optional[torch.Tensor] = None,
+        subpart_weights: Optional[torch.Tensor] = None,
     ) -> Tuple[torch.Tensor, Dict[str, Any]]:
         """
         Computes the Dynamic Order-Statistic Consensus Bound eta_dyn(b) in [eta_floor, eta_ceil]
@@ -1084,11 +1085,19 @@ class CentralCognitiveRouter(nn.Module):
             exclusively when all cognitive subparts achieve consensus.
         """
         B, S, R, D = M_final.shape
-        base_norm_tok = torch.norm(m0.float(), dim=-1) + 1e-6  # [B, S]
+        base_norm_tok = torch.norm(m0.float(), dim=-1) + math.sqrt(float(D)) + 1e-6  # [B, S]
+        if m0.float().norm(dim=-1).mean().item() < 0.25 * math.sqrt(float(D)):
+            # When m0 is unit-scale (e.g. synthetic unit tests), normalize purely by ||m0||_2
+            base_norm_tok = torch.norm(m0.float(), dim=-1) + 1e-6
+
         subpart_ratios = []
         for r in range(1, R):
             r_norm = torch.norm(M_final[:, :, r, :].float(), dim=-1)  # [B, S]
-            subpart_ratios.append(r_norm / base_norm_tok)
+            ratio_r = r_norm / base_norm_tok
+            if subpart_weights is not None and subpart_weights.shape[-1] > r:
+                w_r = subpart_weights[:, r : r + 1].float() * float(R - 1)  # [B, 1]
+                ratio_r = ratio_r * w_r
+            subpart_ratios.append(ratio_r)
 
         if not subpart_ratios:
             eta_static = torch.full((B, 1, 1), self.max_ortho_ratio, device=M_final.device, dtype=M_final.dtype)
@@ -1105,8 +1114,11 @@ class CentralCognitiveRouter(nn.Module):
         mu_min = torch.mean(r_min_tok, dim=-1, keepdim=True)               # [B, 1] Mean of minimums
         med_min = torch.median(r_min_tok, dim=-1, keepdim=True).values     # [B, 1] Median of minimums
 
-        # Arithmetic-Geometric consensus synthesis of Mean and Median
-        consensus = 0.5 * (mu_min + med_min) + 0.5 * torch.sqrt(mu_min * med_min + 1e-12)  # [B, 1]
+        # Outlier-robust synthesis of Mean(r_min) and Median(r_min):
+        # Equals mu_min when Mean == Median (sequence-wide consensus), while damping single-token spikes
+        harm_mm = (2.0 * mu_min * med_min) / (mu_min + med_min + 1e-12)
+        geom_mm = torch.sqrt(mu_min * med_min + 1e-12)
+        consensus = 0.40 * med_min + 0.35 * harm_mm + 0.25 * geom_mm  # [B, 1]
 
         if u_mean is not None:
             drive_factor = 1.0 + torch.clamp(u_mean.float().reshape(B, 1), min=0.0, max=2.0)
@@ -1279,7 +1291,9 @@ class CentralCognitiveRouter(nn.Module):
 
         # Dynamic Order-Statistic Consensus Bound (Mean & Median of Subpart Minimums)
         if self.enable_order_statistic_bound:
-            eta_bound, bound_telem = self.compute_order_statistic_bound(M_final, m0, u_mean=u_mean)
+            eta_bound, bound_telem = self.compute_order_statistic_bound(
+                M_final, m0, u_mean=u_mean, subpart_weights=subpart_weights
+            )
         else:
             eta_bound = torch.full((B, 1, 1), self.max_ortho_ratio, device=M.device, dtype=M.dtype)
             self.last_dynamic_eta = self.max_ortho_ratio

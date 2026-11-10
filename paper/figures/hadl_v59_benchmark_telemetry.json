@@ -1,0 +1,196 @@
+{
+  "stage1_outer_scratch_ablation": [
+    {
+      "regime": "R1_CalmReflex",
+      "seq_len": 4,
+      "learned_slots": 0,
+      "active_scratch_dim": 128,
+      "tensor_core_aligned_32": true,
+      "reentry_l14_coupled": true,
+      "inner_product_preservation": 0.999999,
+      "latency_ms": 25.273
+    },
+    {
+      "regime": "R2_Analytical",
+      "seq_len": 16,
+      "learned_slots": 16,
+      "active_scratch_dim": 288,
+      "tensor_core_aligned_32": true,
+      "reentry_l14_coupled": true,
+      "inner_product_preservation": 0.999998,
+      "latency_ms": 50.478
+    },
+    {
+      "regime": "R3_MultiSystem",
+      "seq_len": 48,
+      "learned_slots": 48,
+      "active_scratch_dim": 384,
+      "tensor_core_aligned_32": true,
+      "reentry_l14_coupled": true,
+      "inner_product_preservation": 0.999998,
+      "latency_ms": 140.743
+    },
+    {
+      "regime": "R4_MaxConsolidation",
+      "seq_len": 96,
+      "learned_slots": 160,
+      "active_scratch_dim": 480,
+      "tensor_core_aligned_32": true,
+      "reentry_l14_coupled": true,
+      "inner_product_preservation": 0.999998,
+      "latency_ms": 50.976
+    }
+  ],
+  "stage2_order_statistic_consensus_ablation": [
+    {
+      "scenario": "C1_CalmRoutine",
+      "static_v58_bound": 0.015,
+      "naive_mean_bound": 0.016,
+      "v59_consensus_bound": 0.01591,
+      "r_min_mean": 0.01977,
+      "r_min_median": 0.01977,
+      "consensus_score": 0.01977
+    },
+    {
+      "scenario": "C2_SingleSubpartNoise",
+      "static_v58_bound": 0.015,
+      "naive_mean_bound": 0.065,
+      "v59_consensus_bound": 0.01688,
+      "r_min_mean": 0.01585,
+      "r_min_median": 0.01585,
+      "consensus_score": 0.01585
+    },
+    {
+      "scenario": "C3_TokenGlitchOutlier",
+      "static_v58_bound": 0.015,
+      "naive_mean_bound": 0.065,
+      "v59_consensus_bound": 0.02251,
+      "r_min_mean": 0.13843,
+      "r_min_median": 0.01578,
+      "consensus_score": 0.02791
+    },
+    {
+      "scenario": "C4_MultiSubpartConsensus",
+      "static_v58_bound": 0.015,
+      "naive_mean_bound": 0.065,
+      "v59_consensus_bound": 0.065,
+      "r_min_mean": 0.55272,
+      "r_min_median": 0.55247,
+      "consensus_score": 0.55254
+    }
+  ],
+  "stage3_veracity_calibration_ablation": [
+    {
+      "category": "E1_SelfConsistentFactual",
+      "veracity_score": 0.0035,
+      "bilinear_contradiction": -0.0,
+      "mahalanobis_distance": 10.7,
+      "epistemic_attenuation": 0.0093,
+      "latency_us": 1210.0
+    },
+    {
+      "category": "E2_InDistContradiction",
+      "veracity_score": -0.254,
+      "bilinear_contradiction": -0.38977,
+      "mahalanobis_distance": 0.0,
+      "epistemic_attenuation": 1.0,
+      "latency_us": 1159.0
+    },
+    {
+      "category": "E3_MildDomainShift",
+      "veracity_score": -0.254,
+      "bilinear_contradiction": -0.38977,
+      "mahalanobis_distance": 0.0,
+      "epistemic_attenuation": 1.0,
+      "latency_us": 1276.5
+    },
+    {
+      "category": "E4_ExtremeOODCreative",
+      "veracity_score": -0.0081,
+      "bilinear_contradiction": 0.15227,
+      "mahalanobis_distance": 8.816,
+      "epistemic_attenuation": 0.0239,
+      "latency_us": 1275.2
+    }
+  ],
+  "stage4_live_rtx5060_inference": {
+    "hardware": {
+      "device_name": "NVIDIA GeForce RTX 5060 Laptop GPU",
+      "compute_capability": "(12, 0)",
+      "vram_total_gb": 7.933349609375,
+      "cuda_version": "13.0",
+      "pytorch_version": "2.14.0+cu130",
+      "load_time_s": 8.81
+    },
+    "tasks": [
+      {
+        "id": "T1_FastReflex",
+        "name": "System 1 Fast Reflex",
+        "output_tokens": 17,
+        "ttft_ms": 16535.29,
+        "tps": 1.03,
+        "vram_mb": 3844.77,
+        "spikes_fired": 1,
+        "spike_rate": 0.013,
+        "active_scratch_dim": 288,
+        "dynamic_norm_bound": 0.065,
+        "mahalanobis_ood_distance": 0.377,
+        "epistemic_attenuation": 1.0,
+        "veracity_conflict_score": -0.9219,
+        "latent_matrix_active": true,
+        "preview": "1. Orthogonal projection of a vector v onto a subspace S is the"
+      },
+      {
+        "id": "T2_CounterMyth",
+        "name": "System 2 Epistemic Veracity Refutation",
+        "output_tokens": 21,
+        "ttft_ms": 9764.32,
+        "tps": 2.15,
+        "vram_mb": 3844.77,
+        "spikes_fired": 0,
+        "spike_rate": 0.0,
+        "active_scratch_dim": 288,
+        "dynamic_norm_bound": 0.04583,
+        "mahalanobis_ood_distance": 0.2559,
+        "epistemic_attenuation": 1.0,
+        "veracity_conflict_score": 0.9375,
+        "latent_matrix_active": true,
+        "preview": "1. Claim Analysis: - Claim 1: \"Humans only use 10% of"
+      },
+      {
+        "id": "T3_SymbolicCode",
+        "name": "System 2 Symbolic Code Synthesis",
+        "output_tokens": 21,
+        "ttft_ms": 9480.16,
+        "tps": 2.21,
+        "vram_mb": 3844.77,
+        "spikes_fired": 0,
+        "spike_rate": 0.0,
+        "active_scratch_dim": 288,
+        "dynamic_norm_bound": 0.03346,
+        "mahalanobis_ood_distance": 0.3027,
+        "epistemic_attenuation": 1.0,
+        "veracity_conflict_score": -0.9023,
+        "latent_matrix_active": true,
+        "preview": "def skew_bilinear(z_pre, z_post, A): return np.dot(np.linalg.inv(A),"
+      },
+      {
+        "id": "T4_ComplexMultiSystem",
+        "name": "Multi-System Neuromorphic Synthesis",
+        "output_tokens": 21,
+        "ttft_ms": 9582.58,
+        "tps": 2.19,
+        "vram_mb": 3844.78,
+        "spikes_fired": 1,
+        "spike_rate": 0.012,
+        "active_scratch_dim": 320,
+        "dynamic_norm_bound": 0.04957,
+        "mahalanobis_ood_distance": 0.2061,
+        "epistemic_attenuation": 1.0,
+        "veracity_conflict_score": 0.875,
+        "latent_matrix_active": true,
+        "preview": "1. **Catastrophic Interference Mechanism**   - When a model predicts the next"
+      }
+    ]
+  }
+}
