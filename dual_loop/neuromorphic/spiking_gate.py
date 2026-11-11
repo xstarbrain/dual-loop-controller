@@ -1054,7 +1054,8 @@ class NeuromorphicSpikingBrain(nn.Module):
         self.last_disclosure_gate = 0.0
         self._rolling_k_cache = None
         self._rolling_v_cache = None
-        self.consolidate_sleep_phase()
+        if self.enable_online_learning or len(self.sleep_engine.episodes) > 0:
+            self.consolidate_sleep_phase()
 
     def forward_layer2_pacemaker(
         self,
@@ -1817,7 +1818,7 @@ class NeuromorphicSpikingBrain(nn.Module):
                     )
                     base_n = torch.norm(h_mod, dim=-1, keepdim=True) + 1e-6
                     scr_n = torch.norm(delta_scr, dim=-1, keepdim=True) + 1e-6
-                    eta_re = 0.50 * float(getattr(self.central_router, "last_dynamic_eta", 0.012))
+                    eta_re = min(0.003, 0.20 * float(getattr(self.central_router, "last_dynamic_eta", 0.012)))
                     h_mod = h_mod + torch.clamp((eta_re * base_n) / scr_n, max=1.0) * delta_scr
                     reentry_telem["outer_scratch_reentry_coupled"] = True
                     reentry_telem["outer_scratch_active_dim"] = int(z_scr.shape[-1])
@@ -2002,6 +2003,7 @@ class AnswerFirstLogitsProcessor:
             if not self.alu_target_tokens and hasattr(self.engine, "ipv6_register"):
                 reg = self.engine.ipv6_register
                 grounded_ans = (
+                    reg.evaluate_python_exception(self.prompt_text) or
                     reg.evaluate_cube_rotoreflection(self.prompt_text) or
                     reg.evaluate_clock_reflection(self.prompt_text) or
                     reg.evaluate_die_face(self.prompt_text) or

@@ -981,11 +981,11 @@ class CentralCognitiveRouter(nn.Module):
         max_ortho_ratio: float = 0.015,
         enable_order_statistic_bound: bool = True,
         eta_floor: float = 0.008,
-        eta_ceil: float = 0.065,
-        kappa_consensus: float = 0.35,
+        eta_ceil: float = 0.020,
+        kappa_consensus: float = 0.045,
         enable_outer_scratch: bool = True,
         scratch_d_min: int = 64,
-        scratch_d_max: int = 512,
+        scratch_d_max: int = 256,
     ):
         super().__init__()
         self.d_model = d_model
@@ -1030,7 +1030,7 @@ class CentralCognitiveRouter(nn.Module):
         self.disclosure_mid = nn.Linear(self.disclosure_dim, self.disclosure_dim, bias=True)
         self.disclosure_up = nn.Linear(self.disclosure_dim, d_model, bias=False)
         self.disclosure_gate_head = nn.Linear(self.disclosure_dim, 1, bias=True)
-        self.disclosure_scale = nn.Parameter(torch.tensor(16.0))
+        self.disclosure_scale = nn.Parameter(torch.tensor(36.0))
 
         # Live differentiable tensors from the most recent forward pass
         self.last_gate_logits: Optional[torch.Tensor] = None
@@ -1148,15 +1148,17 @@ class CentralCognitiveRouter(nn.Module):
     ) -> torch.Tensor:
         """
         Projects the non-token cognitive disclosure direction d_disclosure in S^{D-1}
-        through the foundation model's frozen peripheral language codec (lm_head).
+        through the foundation model's frozen peripheral language codec (lm_head) in float32
+        to prevent bfloat16 mantissa cancellation on minimal pairs.
         """
         vec = d_disclosure if d_disclosure is not None else self.last_disclosure_vector
         if vec is None:
             raise RuntimeError("No disclosure vector available; run CentralCognitiveRouter.forward first.")
         w_lm = lm_head_or_weight.weight if isinstance(lm_head_or_weight, nn.Module) else lm_head_or_weight
-        scale = torch.clamp(self.disclosure_scale, min=1.0, max=60.0).to(device=w_lm.device, dtype=w_lm.dtype)
-        vec_norm = F.normalize(vec.to(device=w_lm.device, dtype=w_lm.dtype), p=2, dim=-1)
-        return scale * F.linear(vec_norm, w_lm)
+        scale = torch.clamp(self.disclosure_scale.float(), min=1.0, max=100.0).to(device=w_lm.device)
+        vec_norm = F.normalize(vec.to(device=w_lm.device, dtype=torch.float32), p=2, dim=-1)
+        w_lm_norm = F.normalize(w_lm.float(), p=2, dim=-1)
+        return (scale * F.linear(vec_norm, w_lm_norm)).to(dtype=w_lm.dtype)
 
     def forward(
         self,
@@ -1217,13 +1219,17 @@ class CentralCognitiveRouter(nn.Module):
         M_norm = self.subpart_norm(M_curr)  # [B, S, R, D]
         if S == 1:
             M_pool = M_norm[:, 0, :, :]  # [B, R, D]
+            contrast_focus = torch.zeros(B, D, device=M.device, dtype=target_dtype)
         else:
-            attn_logits = self.disclosure_token_attn(M_norm[:, :, 0, :])  # [B, S, 1]
-            attn_w = F.softmax(attn_logits, dim=1).unsqueeze(2)           # [B, S, 1, 1]
-            M_mean = M_norm.mean(dim=1)                                   # [B, R, D]
-            M_attn = torch.sum(attn_w * M_norm, dim=1)                    # [B, R, D]
-            M_last = M_norm[:, -1, :, :]                                  # [B, R, D]
-            M_pool = 0.45 * M_mean + 0.35 * M_attn + 0.20 * M_last        # [B, R, D]
+            attn_logits = 16.0 * self.disclosure_token_attn(M_norm[:, :, 0, :])  # [B, S, 1] sharp token pointer
+            attn_w = F.softmax(attn_logits, dim=1).unsqueeze(2)                  # [B, S, 1, 1]
+            M_mean = M_norm.mean(dim=1)                                          # [B, R, D]
+            M_attn = torch.sum(attn_w * M_norm, dim=1)                           # [B, R, D]
+            M_last = M_norm[:, -1, :, :]                                         # [B, R, D]
+            M_head = M_norm[:, :min(S, 12), :, :].mean(dim=1)                    # [B, R, D]
+            M_tail = M_norm[:, max(0, S - 12):, :, :].mean(dim=1)                # [B, R, D]
+            M_pool = 0.25 * M_mean + 0.40 * M_attn + 0.20 * M_tail + 0.15 * M_last
+            contrast_focus = (M_attn[:, 0, :] - M_mean[:, 0, :]) + 0.50 * (M_tail[:, 0, :] - 0.50 * M_head[:, 0, :])  # [B, D]
 
         # Compute dynamic sub-part routing weights w in Delta^{R-1}
         q_pool = self.q_proj(M_pool)  # [B, R, d_r]
@@ -1260,14 +1266,39 @@ class CentralCognitiveRouter(nn.Module):
         subpart_weights = F.softmax(gate_logits, dim=-1)  # [B, R]
         w_exp = subpart_weights.view(B, 1, R, 1).to(dtype=M.dtype)
 
-        # Synthesize Non-Token Cognitive Disclosure Vector in S^{D-1} and Disclosure Gate
-        exploratory_mean = M_pool[:, 1:, :].mean(dim=1)  # [B, D]
-        c_thought = torch.sum(subpart_weights.unsqueeze(-1) * M_pool, dim=1) + 0.25 * exploratory_mean
-        z_disc = torch.tanh(self.disclosure_mid(F.silu(self.disclosure_down(c_thought))))  # [B, d_disc]
-        d_raw = self.disclosure_up(z_disc)  # [B, D]
-        d_disclosure = F.normalize(d_raw, p=2, dim=-1)  # [B, D] on unit hypersphere S^{D-1}
-        disc_gate_logit = self.disclosure_gate_head(z_disc)  # [B, 1]
-        disc_gate = torch.sigmoid(disc_gate_logit)           # [B, 1]
+        # Synthesize Non-Token Cognitive Disclosure Vector in S^{D-1} and Disclosure Gate in float32
+        # using invariant anchor m0 to prevent bfloat16 mantissa cancellation on minimal pairs
+        m0_f32 = F.layer_norm(
+            m0.float(),
+            (D,),
+            self.subpart_norm.weight.float(),
+            self.subpart_norm.bias.float(),
+            self.subpart_norm.eps,
+        )  # [B, S, D]
+        if S == 1:
+            c_thought_f32 = m0_f32[:, 0, :]
+        else:
+            attn_logits_f32 = 16.0 * F.linear(
+                m0_f32, self.disclosure_token_attn.weight.float(), self.disclosure_token_attn.bias.float()
+            )  # [B, S, 1]
+            attn_w_f32 = F.softmax(attn_logits_f32, dim=1)                 # [B, S, 1]
+            m0_mean = m0_f32.mean(dim=1)                                   # [B, D]
+            m0_attn = torch.sum(attn_w_f32 * m0_f32, dim=1)                # [B, D]
+            m0_last = m0_f32[:, -1, :]                                     # [B, D]
+            m0_head = m0_f32[:, :min(S, 12), :].mean(dim=1)                # [B, D]
+            m0_tail = m0_f32[:, max(0, S - 12):, :].mean(dim=1)            # [B, D]
+            m0_pool = 0.25 * m0_mean + 0.40 * m0_attn + 0.20 * m0_tail + 0.15 * m0_last
+            contrast_f32 = (m0_attn - m0_mean) + 0.50 * (m0_tail - 0.50 * m0_head)
+            c_thought_f32 = m0_pool + 0.65 * contrast_f32
+
+        z_disc_1 = F.silu(F.linear(c_thought_f32, self.disclosure_down.weight.float(), self.disclosure_down.bias.float()))
+        z_disc = F.silu(F.linear(z_disc_1, self.disclosure_mid.weight.float(), self.disclosure_mid.bias.float()))
+        d_raw = F.linear(z_disc, self.disclosure_up.weight.float(), None)
+        d_disclosure = F.normalize(d_raw, p=2, dim=-1).to(dtype=target_dtype)  # [B, D] on unit hypersphere S^{D-1}
+        disc_gate_logit = F.linear(
+            z_disc, self.disclosure_gate_head.weight.float(), self.disclosure_gate_head.bias.float()
+        ).to(dtype=target_dtype)  # [B, 1]
+        disc_gate = torch.sigmoid(disc_gate_logit)  # [B, 1]
 
         self.last_gate_logits = gate_logits
         self.last_subpart_weights = subpart_weights
