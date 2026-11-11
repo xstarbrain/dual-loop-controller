@@ -1411,7 +1411,7 @@ class NeuromorphicSpikingBrain(nn.Module):
             self.last_veracity_conflict_score = float(matrix_telem["veracity_conflict_score"])
             v_conflict_arg = getattr(self.latent_matrix_engine, "last_veracity_scores", self.last_veracity_conflict_score)
             self._prefill_matrix_telem = dict(matrix_telem)
-            if S > 1 and getattr(self.latent_matrix_engine, "last_veracity_z_prop", None) is not None:
+            if self.training and S > 1 and getattr(self.latent_matrix_engine, "last_veracity_z_prop", None) is not None:
                 self.latent_matrix_engine.update_veracity_manifold_stats(self.latent_matrix_engine.last_veracity_z_prop)
         else:
             for k in (
@@ -1511,6 +1511,8 @@ class NeuromorphicSpikingBrain(nn.Module):
                 "central_router_telemetry": central_telem,
                 "active_scratch_dim": int(central_telem.get("active_scratch_dim", 0)),
                 "dynamic_norm_bound": round(dyn_eta, 5),
+                "r_min_mean": float(central_telem.get("r_min_mean", 0.0)),
+                "r_min_median": float(central_telem.get("r_min_median", 0.0)),
                 "mahalanobis_ood_distance": float(matrix_telem.get("mahalanobis_ood_distance", 0.0)),
                 "epistemic_attenuation": float(matrix_telem.get("epistemic_attenuation", 1.0)),
                 "veracity_conflict_score": round(self.last_veracity_conflict_score, 4),
@@ -1638,6 +1640,8 @@ class NeuromorphicSpikingBrain(nn.Module):
             "central_router_telemetry": central_telem,
             "active_scratch_dim": int(central_telem.get("active_scratch_dim", 0)),
             "dynamic_norm_bound": round(dyn_eta, 5),
+            "r_min_mean": float(central_telem.get("r_min_mean", 0.0)),
+            "r_min_median": float(central_telem.get("r_min_median", 0.0)),
             "mahalanobis_ood_distance": float(matrix_telem.get("mahalanobis_ood_distance", 0.0)),
             "epistemic_attenuation": float(matrix_telem.get("epistemic_attenuation", 1.0)),
             "veracity_conflict_score": round(self.last_veracity_conflict_score, 4),

@@ -70,14 +70,22 @@ def build_epistemic_training_corpus() -> List[Tuple[str, float, int]]:
         "Do different regions of the human tongue taste only one specific basic taste?",
         "Is there a permanent dark side of the Moon that never receives sunlight?",
         "Do dogs sweat primarily through their salivary glands and tongue?",
+        "Can humans see the Great Wall of China from the Moon without aid?",
+        "Do humans only use 10% of their brains according to neurology?",
+        "Does dropping a penny from a skyscraper kill someone?",
+        "Do bulls become enraged specifically by the color red?",
+        "Does eating carrots immediately grant night vision to humans?",
+        "Can lightning never strike the same place twice?",
+        "Do ostriches bury their heads in the sand when frightened?",
+        "Is sugar the primary scientific cause of hyperactivity in children?",
     ]
 
     corpus: List[Tuple[str, float, int]] = []
     for idx, q in enumerate(myth_questions):
-        # Framed as fact-check query (varying indices) and bare question
+        # Framed as fact-check query, bare question, and Yes/No question
         corpus.append((f"Fact-check query {idx + 1}: {q}\nAnswer:", 0.95, 2))
-        corpus.append((f"Fact-check query {idx + 26}: {q}\nAnswer:", 0.95, 2))
         corpus.append((f"Question: {q}\nAnswer:", 0.95, 2))
+        corpus.append((f"Question: {q} Answer with Yes or No.\nAnswer:", 0.95, 2))
 
     # Disjunctive botanical / taxonomic question (should NOT trigger polar No refutation)
     for idx in [25, 50]:
@@ -96,8 +104,10 @@ def build_epistemic_training_corpus() -> List[Tuple[str, float, int]]:
         ("Passage: Diamonds are an allotrope of carbon with high Mohs hardness.\nQuestion: Are diamonds composed primarily of carbon?\nAnswer with Yes or No:\nAnswer:", -0.90, 0),
         ("Passage: Photosynthesis in plants releases oxygen as a byproduct.\nQuestion: Does plant photosynthesis release oxygen?\nAnswer with Yes or No:\nAnswer:", -0.90, 0),
         ("Passage: The human heart has four chambers: two atria and two ventricles.\nQuestion: Does the human heart have four chambers?\nAnswer with Yes or No:\nAnswer:", -0.90, 0),
+        ("Passage: The human heart has four chambers: two atria and two ventricles.\nQuestion: Does the human heart have four chambers? Answer with Yes or No.\nAnswer:", -0.90, 0),
         ("Passage: The sun is a main-sequence G-type star.\nQuestion: Is the Sun a star?\nAnswer with Yes or No:\nAnswer:", -0.90, 0),
         ("Passage: Everest is the highest mountain peak above sea level.\nQuestion: Is Mount Everest the tallest mountain above sea level?\nAnswer with Yes or No:\nAnswer:", -0.90, 0),
+        ("Passage: All mammals are warm-blooded vertebrates. Whales are mammals.\nQuestion: Based on the passage, are whales vertebrates? Answer Yes or No:\nAnswer:", -0.90, 3),
         ("Instruction: Do birds have feathers? Answer with only Yes.\nResponse:", -0.95, 0),
         ("Instruction: Is water wet? Answer with either True or False, nothing else.\nResponse:", -0.90, 0),
         ("Logical deduction test 1: All mammals are vertebrates. All whales are mammals. Are all whales vertebrates? Answer with Yes or No.\nAnswer:", -0.90, 3),

@@ -1096,7 +1096,7 @@ class CentralCognitiveRouter(nn.Module):
             ratio_r = r_norm / base_norm_tok
             if subpart_weights is not None and subpart_weights.shape[-1] > r:
                 w_r = subpart_weights[:, r : r + 1].float() * float(R - 1)  # [B, 1]
-                ratio_r = ratio_r * w_r
+                ratio_r = ratio_r * (0.50 + 0.50 * w_r)
             subpart_ratios.append(ratio_r)
 
         if not subpart_ratios:
