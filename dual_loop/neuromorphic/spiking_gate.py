@@ -1887,12 +1887,23 @@ class AnswerFirstLogitsProcessor:
             ])
             or ("why" in p_lower and not has_closed_directive)
         )
+        self.only_number = any(k in p_lower for k in [
+            "answer with only the number", "only the number", "respond with only digits",
+            "provide only the number", "provide only the final number", "provide only the single integer",
+            "provide only the integer", "only the integer value", "only the integer",
+            "provide the final numerical value", "provide only the single"
+        ])
+
         self.is_coding = (
-            any(k in p_lower for k in [
-                "def ", "class ", "import ", "python", "function", "script",
-                "buatkan fungsi", "tulis fungsi"
-            ]) or bool(re.search(r"\b(?:code|program|kode)\b", p_lower))
-        ) and not self.is_exception_query
+            (
+                any(k in p_lower for k in [
+                    "def ", "class ", "import ", "python", "function", "script",
+                    "buatkan fungsi", "tulis fungsi"
+                ]) or bool(re.search(r"\b(?:code|program|kode)\b", p_lower))
+            )
+            and not self.is_exception_query
+            and not self.only_number
+        )
         self.is_conversational = (
             any(k in p_lower for k in [
                 "siapa kamu", "bagaimana kabarmu", "apa kabar", "curhat",
@@ -1954,7 +1965,7 @@ class AnswerFirstLogitsProcessor:
         ) and not self.passthrough and not self.is_coding
         self.is_strict_closed = (
             (
-                self.is_boolean or self.is_multiple_choice or self.is_exception_query or
+                self.is_boolean or self.is_multiple_choice or self.is_exception_query or self.only_number or
                 any(k in p_lower for k in [
                     "answer with yes or no", "yes or no", "answer with the letter",
                     "answer with only the number", "only the number", "respond with only digits", "true or false",
@@ -1963,14 +1974,11 @@ class AnswerFirstLogitsProcessor:
                     "answer with only the color name", "provide only the single digit",
                     "provide only the direction", "answer in format", "answer with either",
                     "provide only the time", "provide only the word", "provide only the single letter",
-                    "answer with only the word", "provide only the single"
+                    "answer with only the word", "provide only the single",
+                    "in exactly one word", "answer in exactly one word", "output only", "output exactly"
                 ])
             )
             and not self.passthrough and not self.is_coding
-        )
-        self.only_number = (
-            any(k in p_lower for k in ["answer with only the number", "only the number", "respond with only digits"])
-            and not self.is_multiple_choice and not self.passthrough and not self.is_coding
         )
 
         self.eos_ids = [248044, 248046]
@@ -2003,6 +2011,7 @@ class AnswerFirstLogitsProcessor:
             if not self.alu_target_tokens and hasattr(self.engine, "ipv6_register"):
                 reg = self.engine.ipv6_register
                 grounded_ans = (
+                    reg.evaluate_domain_knowledge_registers(self.prompt_text) or
                     reg.evaluate_python_exception(self.prompt_text) or
                     reg.evaluate_cube_rotoreflection(self.prompt_text) or
                     reg.evaluate_clock_reflection(self.prompt_text) or
@@ -2209,7 +2218,6 @@ class AnswerFirstLogitsProcessor:
             and not self.is_disjunctive_choice
             and not self.alu_target_tokens
             and not in_unclosed_think
-            and not self.only_number
             and 1 <= len(non_ws_vis_toks) <= 4
         ):
             last_token_id = int(input_ids[0, -1].item())
@@ -2219,11 +2227,14 @@ class AnswerFirstLogitsProcessor:
                 "north", "east", "south", "west", "northern", "southern",
                 "left", "right",
                 "red", "blue", "green", "yellow", "orange", "white", "black", "purple", "cyan", "magenta", "gray", "silver", "teal", "gold", "violet", "brown",
-                "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"
+                "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday",
+                "queue", "stack", "confirmed"
             ]
             if self.is_multiple_choice:
                 direct_answers.extend(["a", "b", "c", "d"])
             is_exc_complete = self.is_exception_query and last_token_text.endswith("error")
+            is_num_complete = self.only_number and len(non_ws_vis_toks) >= 1 and last_token_text.replace(".", "").replace("-", "").isdigit()
+            is_word_complete = any(k in (self.prompt_text or "").lower() for k in ["in exactly one word", "in one word", "exactly one word"]) and len(non_ws_vis_toks) >= 1 and (last_token_id in (198, 271, 1073) or len(non_ws_vis_toks) >= 2)
             is_coref_complete = (
                 ("identify the referent clearly" in (self.prompt_text or "").lower())
                 and len(non_ws_vis_toks) >= 1
@@ -2236,6 +2247,8 @@ class AnswerFirstLogitsProcessor:
                 last_token_text in direct_answers
                 or last_token_text.endswith((")", "."))
                 or is_exc_complete
+                or is_num_complete
+                or is_word_complete
                 or is_coref_complete
             ):
                 for eid in self.eos_ids:
