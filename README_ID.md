@@ -14,7 +14,16 @@
   <a href="eval_results/hadl_v58_component_stress_audit.json"><img src="https://img.shields.io/badge/Uji%20Stres%20Komponen-Lolos%20Semua%205-blueviolet.svg" alt="Audit Stres Komponen"></a>
   <a href="scripts/security_audit.py"><img src="https://img.shields.io/badge/Audit%20Keamanan-Nol%20Kerentanan%20Lolos-brightgreen.svg" alt="Audit Keamanan"></a>
   <a href="dist/"><img src="https://img.shields.io/badge/Arsitektur-HuggingFace%20Native-indigo.svg" alt="Arsitektur"></a>
+  <a href="kaggle_writeup/README.md"><img src="https://img.shields.io/badge/Writeup%20Kaggle-HADL%20v5.9%20Spiking%20Brain-orange.svg" alt="Writeup Kaggle"></a>
+  <a href="kaggle_writeup/README.md"><img src="https://img.shields.io/badge/100Q%20Novel%20Challenge-100%25%20Terverifikasi-success.svg" alt="100Q Novel Challenge"></a>
 </p>
+
+> [!TIP]
+> **🚀 TERBARU: HADL v5.9 Spiking Brain & Writeup Kaggle Profesional**
+> Kami telah merilis writeup komprehensif tingkat publikasi dan suite benchmark terverifikasi untuk **HADL v5.9** (Dynamic Scratch Dimension $D_{\text{scratch}} \in [128, 384]$, Harmonic Consensus Bounding $\eta_{\text{dyn}}$, Hyperspherical Language Head Normalization).
+> - 📄 **Writeup Lengkap & Laporan Teknis Kaggle:** [`kaggle_writeup/README.md`](kaggle_writeup/README.md)
+> - 📊 **Ringkasan Audit Benchmark (400Q Kanonikal 100%, 100Q Novel OOD 100%, 40Q Stres 100%):** [`kaggle_writeup/data/BENCHMARK_SUMMARY.md`](kaggle_writeup/data/BENCHMARK_SUMMARY.md)
+> - 📈 **Galeri Visual Publikasi:** [`kaggle_writeup/figures/`](kaggle_writeup/figures/)
 
 ---
 

@@ -39,8 +39,10 @@ results/
 scripts/competitor_dumps/
 scripts/*.txt
 external/
-datasets/
-data/
+/datasets/
+/data/
+!kaggle_writeup/data/
+!kaggle_writeup/data/*
 .vscode/
 .idea/
 *.tmp

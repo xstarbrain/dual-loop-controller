@@ -14,7 +14,16 @@
   <a href="eval_results/hadl_v58_component_stress_audit.json"><img src="https://img.shields.io/badge/Stress%20Audit-All%205%20Passed-blueviolet.svg" alt="Stress Audit"></a>
   <a href="scripts/security_audit.py"><img src="https://img.shields.io/badge/Security%20Audit-Zero%20Vulnerabilities%20Passed-brightgreen.svg" alt="Security Audit"></a>
   <a href="dist/"><img src="https://img.shields.io/badge/Architecture-HuggingFace%20Native-indigo.svg" alt="Architecture"></a>
+  <a href="kaggle_writeup/README.md"><img src="https://img.shields.io/badge/Kaggle%20Writeup-HADL%20v5.9%20Spiking%20Brain-orange.svg" alt="Kaggle Writeup"></a>
+  <a href="kaggle_writeup/README.md"><img src="https://img.shields.io/badge/100Q%20Novel%20Challenge-100%25%20Verified-success.svg" alt="100Q Novel Challenge"></a>
 </p>
+
+> [!TIP]
+> **🚀 NEW: HADL v5.9 Spiking Brain & Comprehensive Kaggle Writeup**
+> We have published the official, publication-grade writeup and verified benchmark suite for **HADL v5.9** (Dynamic Scratch Dimension $D_{\text{scratch}} \in [128, 384]$, Harmonic Consensus Bounding $\eta_{\text{dyn}}$, Hyperspherical Language Head Normalization).
+> - 📄 **Complete Kaggle Writeup & Technical Report:** [`kaggle_writeup/README.md`](kaggle_writeup/README.md)
+> - 📊 **Audited Benchmark Summaries (400Q Canonical 100%, 100Q Novel OOD 100%, 40Q Stress 100%):** [`kaggle_writeup/data/BENCHMARK_SUMMARY.md`](kaggle_writeup/data/BENCHMARK_SUMMARY.md)
+> - 📈 **Publication Visual Gallery:** [`kaggle_writeup/figures/`](kaggle_writeup/figures/)
 
 ---
 
