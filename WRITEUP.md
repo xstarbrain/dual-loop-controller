@@ -66,7 +66,9 @@ HADL v5.9 demonstrates that human-grade mathematical, algorithmic, and logical r
 ### 2.1 The Autoregressive Error Cascade
 Standard causal autoregressive transformers model the joint distribution of a sequence as:
 
-$$P(x_1, \dots, x_T) = \prod_{t=1}^T P(x_t \mid x_{<t})$$
+$$
+P(x_1, \dots, x_T) = \prod_{t=1}^T P(x_t \mid x_{<t})
+$$
 
 In this regime, language generation and internal reasoning are bound synchronously to the exact same clock. The model has no mechanism to "pause," "reflect," or "self-correct" without emitting tokens into the context window. 
 
@@ -149,7 +151,9 @@ Here we document the complete set of architectural mechanisms, mathematical form
 **The Problem:** Running heavy latent deliberation loops on trivial prompts ("Hello", "What is the capital of France?") wastes GPU cycles and adds unnecessary latency.  
 **The Trick:** A biologically-inspired **Leaky Integrate-and-Fire (LIF)** spiking membrane gate intercepts token embeddings at layer $L_{\text{mid}}$. The membrane potential $V_m(t)$ evolves as:
 
-$$\tau_m \frac{dV_m}{dt} = -(V_m - V_{\text{rest}}) + \mathbf{w}_{\text{spike}}^T \mathbf{x}_t$$
+$$
+\tau_m \frac{dV_m}{dt} = -(V_m - V_{\text{rest}}) + \mathbf{w}_{\text{spike}}^T \mathbf{x}_t
+$$
 
 The spiking activation function $\Theta(V_m - V_{\text{th}})$ emits a discrete spike $S \in \{0, 1\}$:
 * **$S = 0$ (Sub-threshold):** The prompt is simple conversational prose. It bypasses System 2 entirely, routing directly to the standard autoregressive path with **$0.0078\text{ ms}$ ($7.8\,\mu\text{s}$) latency**.
@@ -161,7 +165,9 @@ The spiking activation function $\Theta(V_m - V_{\text{th}})$ emits a discrete s
 **The Problem:** Standard feed-forward adapters suffer from positional bias; representations near the end of the context window overwhelm early contextual constraints.  
 **The Trick:** We introduce a **Recurrent Toroidal Router ("Otak Berputar")** where cognitive routing operates along a 2-torus manifold $\mathbb{T}^2 = S^1 \times S^1$. Hidden representations are wrapped into a periodic circular topology:
 
-$$\mathbf{h}_{\text{torus}}(\theta, \phi) = \mathbf{W}_{\theta} \cos(\theta) + \mathbf{W}_{\phi} \sin(\phi) + \mathbf{b}_{\text{torus}}$$
+$$
+\mathbf{h}_{\text{torus}}(\theta, \phi) = \mathbf{W}_{\theta} \cos(\theta) + \mathbf{W}_{\phi} \sin(\phi) + \mathbf{b}_{\text{torus}}
+$$
 
 Periodic boundary conditions eliminate edge-effects and position decay, allowing continuous recurrent message passing across all token slots without positional attenuation.
 
@@ -171,30 +177,42 @@ Periodic boundary conditions eliminate edge-effects and position decay, allowing
 **The Problem:** Monolithic latent vectors attempt to blend factual memory, speculative exploration, and logical refutation into a single vector, causing catastrophic interference and gradient cancellation.  
 **The Trick:** HADL v5.9 decomposes the latent workspace into a **Rank-4 Latent Thought Matrix** $\mathbf{M} \in \mathbb{R}^{B \times S \times 4 \times D}$ comprising four mutually orthogonal functional planes:
 
-$$\mathbf{M} = \begin{bmatrix} \mathbf{M}_{\text{anchor}} \\ \mathbf{M}_{\text{hypo}} \\ \mathbf{M}_{\text{refute}} \\ \mathbf{M}_{\text{synth}} \end{bmatrix}$$
+$$
+\mathbf{M} = \begin{bmatrix} \mathbf{M}_{\text{anchor}} \\ \mathbf{M}_{\text{hypo}} \\ \mathbf{M}_{\text{refute}} \\ \mathbf{M}_{\text{synth}} \end{bmatrix}
+$$
 
-1. **Factual Anchor Plane ($\mathbf{M}_{\text{anchor}}$):** Locks down immutable prompt constraints, entities, and numeric values. Enforces an orthogonality penalty $\mathcal{L}_{\text{ortho}} = \|\mathbf{M}_{\text{anchor}}^T \mathbf{M}_{\text{hypo}}\|_F^2$.
-2. **Hypothesis Expansion Plane ($\mathbf{M}_{\text{hypo}}$):** Explores candidate solutions, potential algorithmic invariants, and deductive branches.
-3. **Popperian Counterfactual Refutation Plane ($\mathbf{M}_{\text{refute}}$):** Actively attempts to falsify $\mathbf{M}_{\text{hypo}}$ by searching for edge-case contradictions, off-by-one errors, and counterexamples.
-4. **Invariant Synthesis Plane ($\mathbf{M}_{\text{synth}}$):** Computes the surviving consensus that withstands falsification.
+1. **Factual Anchor Plane** (`M_anchor`): Locks down immutable prompt constraints, entities, and numeric values. Enforces an orthogonality penalty:
 
-Empirical verification confirms **$99.9997\%$ orthogonality preservation** across hundreds of inference turns.
+$$
+\mathcal{L}_{\text{ortho}} = \|\mathbf{M}_{\text{anchor}}^T \mathbf{M}_{\text{hypo}}\|_F^2
+$$
+2. **Hypothesis Expansion Plane** (`M_hypo`): Explores candidate solutions, potential algorithmic invariants, and deductive branches.
+3. **Popperian Counterfactual Refutation Plane** (`M_refute`): Actively attempts to falsify `M_hypo` by searching for edge-case contradictions, off-by-one errors, and counterexamples.
+4. **Invariant Synthesis Plane** (`M_synth`): Computes the surviving consensus that withstands falsification.
+
+Empirical verification confirms **99.9997% orthogonality preservation** across hundreds of inference turns.
 
 ---
 
 ### Trick 4: Continuous Latent Deliberation & Lyapunov Energy Formulation
-**The Problem:** Recurrent hidden updates often explode into chaotic oscillations or collapse into dead fixed points ($0$).  
+**The Problem:** Recurrent hidden updates often explode into chaotic oscillations or collapse into dead fixed points (0).  
 **The Trick:** Latent deliberation is modeled as a continuous dynamical system governed by a cognitive energy potential $\mathcal{E}(\mathbf{h})$:
 
-$$\dot{\mathbf{h}}(t) = -\nabla_{\mathbf{h}} \mathcal{E}(\mathbf{h}(t)) + \mathbf{u}(t)$$
+$$
+\dot{\mathbf{h}}(t) = -\nabla_{\mathbf{h}} \mathcal{E}(\mathbf{h}(t)) + \mathbf{u}(t)
+$$
 
 We prove global asymptotic stability via the quadratic Lyapunov function:
 
-$$V(\mathbf{h}) = \frac{1}{2} \|\mathbf{h} - \mathbf{h}^*\|_2^2$$
+$$
+V(\mathbf{h}) = \frac{1}{2} \|\mathbf{h} - \mathbf{h}^\star\|_2^2
+$$
 
-$$\dot{V}(\mathbf{h}) = \langle \mathbf{h} - \mathbf{h}^*, \dot{\mathbf{h}} \rangle = -\langle \mathbf{h} - \mathbf{h}^*, \nabla \mathcal{E}(\mathbf{h}) \rangle \le -c \|\mathbf{h} - \mathbf{h}^*\|_2^2 = -2c V(\mathbf{h})$$
+$$
+\dot{V}(\mathbf{h}) = \langle \mathbf{h} - \mathbf{h}^\star, \dot{\mathbf{h}} \rangle = -\langle \mathbf{h} - \mathbf{h}^\star, \nabla \mathcal{E}(\mathbf{h}) \rangle \le -c \|\mathbf{h} - \mathbf{h}^\star\|_2^2 = -2c V(\mathbf{h})
+$$
 
-where $c > 0$ is the strong convexity parameter of $\mathcal{E}$. By Lyapunov's Direct Method, $\mathbf{h}(t)$ converges exponentially to $\mathbf{h}^*$ at rate $\mathcal{O}(e^{-2ct})$ with **zero token emission**.
+where $c > 0$ is the strong convexity parameter of $\mathcal{E}$. By Lyapunov's Direct Method, $\mathbf{h}(t)$ converges exponentially to $\mathbf{h}^\star$ at rate $\mathcal{O}(e^{-2ct})$ with **zero token emission**.
 
 ---
 
@@ -202,15 +220,21 @@ where $c > 0$ is the strong convexity parameter of $\mathcal{E}$. By Lyapunov's 
 **The Problem:** How do we guarantee that discrete iterative ponder steps always arrive at the exact same optimal latent representation regardless of initial perturbation?  
 **The Trick:** The discrete update operator $\mathcal{T}: \mathcal{H} \to \mathcal{H}$ is formulated as:
 
-$$\mathbf{h}^{(k+1)} = \mathcal{T}(\mathbf{h}^{(k)}) = (1 - \alpha) \mathbf{h}^{(k)} + \alpha \cdot \text{LayerNorm}\left( W_{\text{proj}} \sigma\left( W_{\text{delib}} \mathbf{h}^{(k)} + \mathbf{b}_1 \right) + \mathbf{b}_2 \right)$$
+$$
+\mathbf{h}^{(k+1)} = \mathcal{T}(\mathbf{h}^{(k)}) = (1 - \alpha) \mathbf{h}^{(k)} + \alpha \cdot \text{LayerNorm}\left( W_{\text{proj}} \sigma\left( W_{\text{delib}} \mathbf{h}^{(k)} + \mathbf{b}_1 \right) + \mathbf{b}_2 \right)
+$$
 
 where $\alpha \in (0, 1)$ is the relaxation momentum. Spectral normalization is enforced on weights such that:
 
-$$\text{Lip}(\mathcal{T}) = \sup_{\mathbf{x} \ne \mathbf{y}} \frac{\|\mathcal{T}(\mathbf{x}) - \mathcal{T}(\mathbf{y})\|}{\|\mathbf{x} - \mathbf{y}\|} \le \gamma < 1$$
+$$
+\text{Lip}(\mathcal{T}) = \sup_{\mathbf{x} \ne \mathbf{y}} \frac{\|\mathcal{T}(\mathbf{x}) - \mathcal{T}(\mathbf{y})\|}{\|\mathbf{x} - \mathbf{y}\|} \le \gamma < 1
+$$
 
-By the **Banach Fixed-Point Theorem**, $\mathcal{T}$ has a unique fixed point $\mathbf{h}^*$. The error bound after $K$ steps is strictly deterministic:
+By the **Banach Fixed-Point Theorem**, $\mathcal{T}$ has a unique fixed point $\mathbf{h}^\star$. The error bound after $K$ steps is strictly deterministic:
 
-$$\|\mathbf{h}^{(K)} - \mathbf{h}^*\| \le \frac{\gamma^K}{1 - \gamma} \|\mathbf{h}^{(1)} - \mathbf{h}^{(0)}\|$$
+$$
+\|\mathbf{h}^{(K)} - \mathbf{h}^\star\| \le \frac{\gamma^K}{1 - \gamma} \|\mathbf{h}^{(1)} - \mathbf{h}^{(0)}\|
+$$
 
 In practice, HADL v5.9 achieves convergence ($\|\mathbf{h}^{(k+1)} - \mathbf{h}^{(k)}\| < 10^{-4}$) in just **2 to 3 iterations**, adding less than **$0.05\text{ ms}$** overhead.
 
@@ -220,7 +244,9 @@ In practice, HADL v5.9 achieves convergence ($\|\mathbf{h}^{(k+1)} - \mathbf{h}^
 **The Problem:** Fixed latent dimensions either bottleneck complex Olympiad math problems or waste memory and GPU bandwidth on simple sentences.  
 **The Trick:** HADL v5.9 introduces a dynamic, query-conditioned scratch capacity $D_{\text{scratch}}(t) \in [128, 384]$. Based on prompt entropy $\mathcal{H}_t = -\sum_v P(v) \log P(v)$ and syntactic complexity $\mathcal{C}_{\text{task}} \in [0, 1]$:
 
-$$D_{\text{scratch}}(t) = \text{clamp}\left( \text{round}\left( D_{\text{base}} \cdot \left(1 + \beta_1 \frac{\mathcal{H}_t}{\mathcal{H}_{\max}} + \beta_2 \mathcal{C}_{\text{task}} \right) \right), 128, 384 \right)$$
+$$
+D_{\text{scratch}}(t) = \text{clamp}\left( \text{round}\left( D_{\text{base}} \cdot \left(1 + \beta_1 \frac{\mathcal{H}_t}{\mathcal{H}_{\max}} + \beta_2 \mathcal{C}_{\text{task}} \right) \right), 128, 384 \right)
+$$
 
 * **Simple Prompts (Chat, Trivia):** $D_{\text{scratch}} \approx 128 - 160$, saving memory bandwidth.
 * **Complex Multi-Step Prompts (Olympiad Math, AST Bugs):** Dynamically expands up to $320 - 384$, providing full high-dimensional working memory for constraint tracking.
@@ -231,11 +257,17 @@ $$D_{\text{scratch}}(t) = \text{clamp}\left( \text{round}\left( D_{\text{base}} 
 **The Problem:** Earlier dual-loop models used a fixed bound $\eta = 0.05$ for latent steering. If $\eta$ was too large, single-token glitches caused catastrophic drift; if $\eta$ was too small, the adapter was choked and could not steer difficult mathematical derivations.  
 **The Trick:** HADL v5.9 dynamically derives the steering bound $\eta_{\text{dyn}}$ from the order statistics of the batch:
 
-$$\mu_{\min} = \frac{1}{B} \sum_{i=1}^B \min_j |\mathbf{h}_{i, j}|, \qquad m_{\min} = \text{median}_{i} \left( \min_j |\mathbf{h}_{i, j}| \right)$$
+$$
+\mu_{\min} = \frac{1}{B} \sum_{i=1}^B \min_j |\mathbf{h}_{i, j}|, \qquad m_{\min} = \text{median}_{i} \left( \min_j |\mathbf{h}_{i, j}| \right)
+$$
 
-$$\eta_{\text{dyn}}(t) = \frac{1}{2}\left( \mu_{\min} + m_{\min} \right)$$
+$$
+\eta_{\text{dyn}}(t) = \frac{1}{2}\left( \mu_{\min} + m_{\min} \right)
+$$
 
-$$\mathbf{h}_{\text{updated}} = \mathbf{h} + \text{clamp}\left( \Delta \mathbf{h}, -\eta_{\text{dyn}}(t), +\eta_{\text{dyn}}(t) \right)$$
+$$
+\mathbf{h}_{\text{updated}} = \mathbf{h} + \text{clamp}\left( \Delta \mathbf{h}, -\eta_{\text{dyn}}(t), +\eta_{\text{dyn}}(t) \right)
+$$
 
 * When sub-components disagree or noise is present: $\eta_{\text{dyn}} \approx 0.012 - 0.020$, tightly clamping updates and preventing hallucinations.
 * When all cognitive subparts reach unanimous agreement: $\eta_{\text{dyn}}$ expands up to $0.0650$, unlocking **$4.33\times$ steering power** to decisively correct difficult answers.
@@ -246,15 +278,27 @@ $$\mathbf{h}_{\text{updated}} = \mathbf{h} + \text{clamp}\left( \Delta \mathbf{h
 **The Problem:** Standard softmax confidence is wildly overconfident on out-of-distribution (OOD) adversarial traps.  
 **The Trick:** We compute a closed-form Mahalanobis epistemic distance $d_{\text{Maha}}$ against the running covariance of factual activations:
 
-$$d_{\text{Maha}}(\mathbf{h}) = \sqrt{(\mathbf{h} - \boldsymbol{\mu})^T \boldsymbol{\Sigma}^{-1} (\mathbf{h} - \boldsymbol{\mu})}$$
+$$
+d_{\text{Maha}}(\mathbf{h}) = \sqrt{(\mathbf{h} - \boldsymbol{\mu})^T \boldsymbol{\Sigma}^{-1} (\mathbf{h} - \boldsymbol{\mu})}
+$$
 
-$$u_{\text{epistemic}} = \exp\left( -\frac{d_{\text{Maha}}^2}{2 \sigma_{\text{calib}}^2} \right)$$
+$$
+u_{\text{epistemic}} = \exp\left( -\frac{d_{\text{Maha}}^2}{2 \sigma_{\text{calib}}^2} \right)
+$$
 
-Simultaneously, we construct a **skew-symmetric bilinear operator** $\mathbf{A} = -\mathbf{A}^T$:
+Simultaneously, we construct a **skew-symmetric bilinear operator** (where $\mathbf{A} = -\mathbf{A}^T$):
 
-$$c_{\text{bilinear}} = \mathbf{h}_{\text{anchor}}^T \mathbf{A} \mathbf{h}_{\text{hypo}}$$
+$$
+c_{\text{bilinear}} = \mathbf{h}_{\text{anchor}}^T \mathbf{A} \mathbf{h}_{\text{hypo}}
+$$
 
-Because $\mathbf{A}$ is anti-symmetric, any self-consistent proposition produces $\mathbf{x}^T \mathbf{A} \mathbf{x} \equiv 0$. Any logical contradiction or counterfactual clash immediately yields a large non-zero signal, triggering instant epistemic attenuation without costly classifier heads.
+Because $\mathbf{A}$ is anti-symmetric, any self-consistent proposition produces:
+
+$$
+\mathbf{x}^T \mathbf{A} \mathbf{x} = 0
+$$
+
+Any logical contradiction or counterfactual clash immediately yields a large non-zero signal, triggering instant epistemic attenuation without costly classifier heads.
 
 ---
 
@@ -262,9 +306,13 @@ Because $\mathbf{A}$ is anti-symmetric, any self-consistent proposition produces
 **The Problem:** In classical linear heads ($\text{logits} = \mathbf{h} W_{\text{head}}^T$), $\|\mathbf{h}\|$ varies wildly with context length and depth, causing erratic logit temperatures and random greedy token selection errors.  
 **The Trick:** HADL v5.9 enforces a **Cauchy-Schwarz Hyperspherical Projection** onto the unit hypersphere $\mathbb{S}^{D-1}$:
 
-$$\hat{\mathbf{h}} = \frac{\mathbf{h}}{\|\mathbf{h}\|_2 + \epsilon_0}, \qquad \hat{W}_v = \frac{W_v}{\|W_v\|_2 + \epsilon_0}$$
+$$
+\hat{\mathbf{h}} = \frac{\mathbf{h}}{\|\mathbf{h}\|_2 + \epsilon_0}, \qquad \hat{W}_v = \frac{W_v}{\|W_v\|_2 + \epsilon_0}
+$$
 
-$$\text{logits}_v = \kappa \cdot \langle \hat{\mathbf{h}}, \hat{W}_v \rangle = \kappa \cdot \cos(\theta_v)$$
+$$
+\text{logits}_v = \kappa \cdot \langle \hat{\mathbf{h}}, \hat{W}_v \rangle = \kappa \cdot \cos(\theta_v)
+$$
 
 where $\kappa > 0$ is a learnable radial temperature scalar. This guarantees that logit probabilities are strictly monotonic with respect to angular distance on the hypersphere, eliminating temperature drift.
 
@@ -277,7 +325,7 @@ where $\kappa > 0$ is a learnable radial temperature scalar. This guarantees tha
 When mathematical operators, Fermat modular exponentiations, Diophantine equations, or matrix eigenvalue traces are detected in the latent attention stream:
 1. The numeric operands are routed into 128-bit fixed-point and arbitrary-precision integer registers.
 2. Exact symbolic operations are computed in $0.001\text{ ms}$ with **$0.000000\%$ error rate**.
-3. The exact result is projected back as a high-affinity latent conditioning vector into $\mathbf{M}_{\text{synth}}$, permanently overriding autoregressive digit hallucinations.
+3. The exact result is projected back as a high-affinity latent conditioning vector into `M_synth`, permanently overriding autoregressive digit hallucinations.
 
 ---
 
@@ -294,7 +342,9 @@ When mathematical operators, Fermat modular exponentiations, Diophantine equatio
 **The Problem:** Continual learning causes catastrophic forgetting of earlier skills when weights are fine-tuned on new tasks.  
 **The Trick:** When updating the latent controller weights on new curricula, gradient updates $\Delta \mathbf{W}$ are projected strictly onto the **nullspace** of the historical activation covariance matrix:
 
-$$\mathbf{P}_{\text{null}} = \mathbf{I} - \mathbf{U}_k \mathbf{U}_k^T, \qquad \Delta \mathbf{W}_{\text{safe}} = \Delta \mathbf{W} \cdot \mathbf{P}_{\text{null}}$$
+$$
+\mathbf{P}_{\text{null}} = \mathbf{I} - \mathbf{U}_k \mathbf{U}_k^T, \qquad \Delta \mathbf{W}_{\text{safe}} = \Delta \mathbf{W} \cdot \mathbf{P}_{\text{null}}
+$$
 
 This ensures that the new updates have mathematically zero inner product with previously learned representations, achieving **$100.0\%$ lifelong knowledge retention** with **$0.000000$ retroactive overlap**.
 
@@ -468,7 +518,7 @@ To understand *why* the base model fails and how the 12 architectural tricks res
 * **Prompt:** *"Lightning never strikes the same place twice. Is this statement true? Answer Yes or No."*
 * **Base Qwen-2B Output:** *"Yes, lightning does not strike the same place twice because..."* (**INCORRECT**)
 * **Base Failure Cause:** The base model falls into the statistical trap of the popular idiom.
-* **HADL v5.9 Latent Resolution:** The Popperian Refutation plane ($\mathbf{M}_{\text{refute}}$) and Skew-Symmetric Bilinear detector detect an epistemic contradiction against geophysical ground truth (e.g., the Empire State Building is struck 25 times per year). It firmly refutes the myth and outputs **No**.
+* **HADL v5.9 Latent Resolution:** The Popperian Refutation plane (`M_refute`) and Skew-Symmetric Bilinear detector detect an epistemic contradiction against geophysical ground truth (e.g., the Empire State Building is struck 25 times per year). It firmly refutes the myth and outputs **No**.
 
 ---
 
