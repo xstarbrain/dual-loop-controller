@@ -38,7 +38,7 @@ Evaluated across 5 major cognitive pillars. Audited from `benchmark_400q_hadl_v5
 ### 2.2 Granular Benchmark-by-Benchmark Breakdown (All 20 Datasets)
 
 | # | Dataset / Benchmark | Cognitive Pillar | Base Acc | HADL v5.9 Acc | Absolute $\Delta$ | Mean Latency | Avg Scratch Dim | Avg Dyn Bound | Veracity Score |
-| :-: | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| :---: | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
 | 1 | **GSM8K** | Math & Quantitative | 75.0% | **100.0% (20/20)** | +25.0% | 0.428s | 320 | 0.0650 | -0.8518 |
 | 2 | **MATH** | Math & Quantitative | 15.0% | **100.0% (20/20)** | **+85.0%** | 0.252s | 320 | 0.0650 | -0.8451 |
 | 3 | **DROP** | Math & Quantitative | 70.0% | **100.0% (20/20)** | +30.0% | 0.282s | 320 | 0.0650 | -0.9229 |

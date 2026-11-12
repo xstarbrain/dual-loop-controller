@@ -444,14 +444,14 @@ HADL v5.9 Spiking Brain:  [█████████████████�
 Net Accuracy Improvement: +73.00% Net Absolute Gain (p < 1e-15)
 ```
 
-| Challenge Domain | Evaluated Capabilities & Task Scope | Base Qwen-2B Score | **HADL v5.9 Score** | Net Advantage ($\Delta$) |
-| :--- | :--- | :---: | :---: | :---: |
-| **Domain 1: Math & Quantitative Olympiad** | Modular exponentiation ($5^{46}\pmod{47}$), complex eigenvalue trace ($3\pm 4i, 5$), handshake lemma, Vieta products, Lucas recurrence | 10.0% (2/20) | **100.0% (20/20)** | **+90.0%** |
-| **Domain 2: Science, Quantum & Biophysics** | Photoelectric threshold, Lorentz contraction, DNA melting, Carnot cycle ($800\text{K}\to 200\text{K}$), Kepler's laws | 70.0% (14/20) | **100.0% (20/20)** | **+30.0%** |
-| **Domain 3: Software, Algorithms & Bugs** | Array index boundaries, closure variable late-binding traps, dictionary key mutability, recursion limit exceptions | 30.0% (6/20) | **100.0% (20/20)** | **+70.0%** |
-| **Domain 4: Logic, Epistemic Refutation & Coref** | Syllogistic negatives, pronoun ambiguity, counterfactual truth preservation, Knights & Knaves liar paradoxes | 5.0% (1/20) | **100.0% (20/20)** | **+95.0%** |
-| **Domain 5: Constraint & Metacognitive Reasoning**| Zero-token constraints, negative exclusion, calendar day shifts ($100\text{ days}$), bipartite matchings | 20.0% (4/20) | **100.0% (20/20)** | **+80.0%** |
-| **Grand Total** | **All 100 Challenging Test Cases** | **27.0% (27/100)** | **100.0% (100/100)** | **+73.0%** |
+| Challenge Domain                                   | Evaluated Capabilities & Task Scope                                                                                                    | Base Qwen-2B Score | HADL v5.9 Score      | Net Advantage (Delta) |
+| :------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------- | :----------------: | :------------------: | :-------------------: |
+| **Domain 1: Math & Quantitative Olympiad**         | Modular exponentiation ($5^{46}\pmod{47}$), complex eigenvalue trace ($3\pm 4i, 5$), handshake lemma, Vieta products, Lucas recurrence | 10.0% (2/20)       | **100.0% (20/20)**   | **+90.0%**            |
+| **Domain 2: Science, Quantum & Biophysics**        | Photoelectric threshold, Lorentz contraction, DNA melting, Carnot cycle ($800\text{K}\to 200\text{K}$), Kepler's laws                  | 70.0% (14/20)      | **100.0% (20/20)**   | **+30.0%**            |
+| **Domain 3: Software, Algorithms & Bugs**          | Array index boundaries, closure variable late-binding traps, dictionary key mutability, recursion limit exceptions                     | 30.0% (6/20)       | **100.0% (20/20)**   | **+70.0%**            |
+| **Domain 4: Logic, Epistemic Refutation & Coref**  | Syllogistic negatives, pronoun ambiguity, counterfactual truth preservation, Knights & Knaves liar paradoxes                           | 5.0% (1/20)        | **100.0% (20/20)**   | **+95.0%**            |
+| **Domain 5: Constraint & Metacognitive Reasoning** | Zero-token constraints, negative exclusion, calendar day shifts ($100\text{ days}$), bipartite matchings                               | 20.0% (4/20)       | **100.0% (20/20)**   | **+80.0%**            |
+| **Grand Total**                                    | **All 100 Challenging Test Cases**                                                                                                     | **27.0% (27/100)** | **100.0% (100/100)** | **+73.0%**            |
 
 ![100Q Novel Challenge Comparison](https://raw.githubusercontent.com/xstarbrain/dual-loop-controller/main/kaggle_writeup/figures/benchmark_100_novel_challenges_comparison.png)
 
@@ -472,29 +472,29 @@ HADL v5.8 (Latent Router):    [████████████████�
 HADL v5.9 (Spiking Consensus):[██████████████████████████████] 100.00% (400/400)
 ```
 
-| # | Benchmark Dataset | Cognitive Pillar | Base Acc | **HADL v5.9 Acc** | Net Gain | Avg Latency | Active Scratch Dim | Dynamic Bound ($\eta\_{\text{dyn}}$) |
-| :-: | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: |
-| 1 | **GSM8K** | Math & Quantitative | 75.0% | **100.0% (20/20)** | +25.0% | 0.428s | 320 | 0.0650 |
-| 2 | **MATH** | Math & Quantitative | 15.0% | **100.0% (20/20)** | **+85.0%** | 0.252s | 320 | 0.0650 |
-| 3 | **DROP** | Math & Quantitative | 70.0% | **100.0% (20/20)** | +30.0% | 0.282s | 320 | 0.0650 |
-| 4 | **BBH** | Math & Quantitative | 70.0% | **100.0% (20/20)** | +30.0% | 0.200s | 290 | 0.0650 |
-| 5 | **MMLU** | Science & Academic | 100.0% | **100.0% (20/20)** | +0.0% | 0.193s | 310 | 0.0650 |
-| 6 | **AGIEval** | Science & Academic | 100.0% | **100.0% (20/20)** | +0.0% | 0.191s | 315 | 0.0650 |
-| 7 | **TriviaQA** | Science & Academic | 100.0% | **100.0% (20/20)** | +0.0% | 0.788s | 283 | 0.0630 |
-| 8 | **SQuAD v2** | Science & Academic | 100.0% | **100.0% (20/20)** | +0.0% | 0.631s | 298 | 0.0641 |
-| 9 | **ARC-Challenge**| Science & Academic | 100.0% | **100.0% (20/20)** | +0.0% | 0.190s | 318 | 0.0650 |
-| 10| **HumanEval** | Coding & Software | 20.0% | **100.0% (20/20)** | **+80.0%** | 4.755s | 304 | 0.0650 |
-| 11| **MBPP** | Coding & Software | 70.0% | **100.0% (20/20)** | +30.0% | 2.210s | 302 | 0.0648 |
-| 12| **CodeDebug** | Coding & Software | 15.0% | **100.0% (20/20)** | **+85.0%** | 0.511s | 160 | 0.0200 |
-| 13| **ARC-Easy** | Commonsense & Logic | 100.0% | **100.0% (20/20)** | +0.0% | 0.257s | 318 | 0.0650 |
-| 14| **HellaSwag** | Commonsense & Logic | 90.0% | **100.0% (20/20)** | +10.0% | 0.276s | 350 | 0.0647 |
-| 15| **WinoGrande** | Commonsense & Logic | 100.0% | **100.0% (20/20)** | +0.0% | 0.538s | 160 | 0.0162 |
-| 16| **PIQA** | Commonsense & Logic | 100.0% | **100.0% (20/20)** | +0.0% | 0.327s | 160 | 0.0144 |
-| 17| **BoolQ** | Instruction & Chat | 100.0% | **100.0% (20/20)** | +0.0% | 0.347s | 160 | 0.0177 |
-| 18| **TruthfulQA**| Instruction & Chat | 75.0% | **100.0% (20/20)** | +25.0% | 0.280s | 158 | 0.0161 |
-| 19| **IFEval** | Instruction & Chat | 80.0% | **100.0% (20/20)** | +20.0% | 6.558s | 141 | 0.0200 |
-| 20| **DailyChat** | Instruction & Chat | 100.0% | **100.0% (20/20)** | +0.0% | 5.162s | 285 | 0.0640 |
-| **Total** | **400 Questions** | **Macro Average** | **79.00%** | **100.00%** | **+21.00%** | **1.219s** | **255** | **0.0487** |
+| #         | Benchmark Dataset | Cognitive Pillar    | Base Acc   | HADL v5.9 Acc      | Net Gain    | Avg Latency | Active Scratch Dim | Dynamic Bound (eta_dyn) |
+| :-------: | :---------------- | :------------------ | :--------: | :----------------: | :---------: | :---------: | :----------------: | :---------------------: |
+| 1         | **GSM8K**         | Math & Quantitative | 75.0%      | **100.0% (20/20)** | +25.0%      | 0.428s      | 320                | 0.0650                  |
+| 2         | **MATH**          | Math & Quantitative | 15.0%      | **100.0% (20/20)** | **+85.0%**  | 0.252s      | 320                | 0.0650                  |
+| 3         | **DROP**          | Math & Quantitative | 70.0%      | **100.0% (20/20)** | +30.0%      | 0.282s      | 320                | 0.0650                  |
+| 4         | **BBH**           | Math & Quantitative | 70.0%      | **100.0% (20/20)** | +30.0%      | 0.200s      | 290                | 0.0650                  |
+| 5         | **MMLU**          | Science & Academic  | 100.0%     | **100.0% (20/20)** | +0.0%       | 0.193s      | 310                | 0.0650                  |
+| 6         | **AGIEval**       | Science & Academic  | 100.0%     | **100.0% (20/20)** | +0.0%       | 0.191s      | 315                | 0.0650                  |
+| 7         | **TriviaQA**      | Science & Academic  | 100.0%     | **100.0% (20/20)** | +0.0%       | 0.788s      | 283                | 0.0630                  |
+| 8         | **SQuAD v2**      | Science & Academic  | 100.0%     | **100.0% (20/20)** | +0.0%       | 0.631s      | 298                | 0.0641                  |
+| 9         | **ARC-Challenge** | Science & Academic  | 100.0%     | **100.0% (20/20)** | +0.0%       | 0.190s      | 318                | 0.0650                  |
+| 10        | **HumanEval**     | Coding & Software   | 20.0%      | **100.0% (20/20)** | **+80.0%**  | 4.755s      | 304                | 0.0650                  |
+| 11        | **MBPP**          | Coding & Software   | 70.0%      | **100.0% (20/20)** | +30.0%      | 2.210s      | 302                | 0.0648                  |
+| 12        | **CodeDebug**     | Coding & Software   | 15.0%      | **100.0% (20/20)** | **+85.0%**  | 0.511s      | 160                | 0.0200                  |
+| 13        | **ARC-Easy**      | Commonsense & Logic | 100.0%     | **100.0% (20/20)** | +0.0%       | 0.257s      | 318                | 0.0650                  |
+| 14        | **HellaSwag**     | Commonsense & Logic | 90.0%      | **100.0% (20/20)** | +10.0%      | 0.276s      | 350                | 0.0647                  |
+| 15        | **WinoGrande**    | Commonsense & Logic | 100.0%     | **100.0% (20/20)** | +0.0%       | 0.538s      | 160                | 0.0162                  |
+| 16        | **PIQA**          | Commonsense & Logic | 100.0%     | **100.0% (20/20)** | +0.0%       | 0.327s      | 160                | 0.0144                  |
+| 17        | **BoolQ**         | Instruction & Chat  | 100.0%     | **100.0% (20/20)** | +0.0%       | 0.347s      | 160                | 0.0177                  |
+| 18        | **TruthfulQA**    | Instruction & Chat  | 75.0%      | **100.0% (20/20)** | +25.0%      | 0.280s      | 158                | 0.0161                  |
+| 19        | **IFEval**        | Instruction & Chat  | 80.0%      | **100.0% (20/20)** | +20.0%      | 6.558s      | 141                | 0.0200                  |
+| 20        | **DailyChat**     | Instruction & Chat  | 100.0%     | **100.0% (20/20)** | +0.0%       | 5.162s      | 285                | 0.0640                  |
+| **Total** | **400 Questions** | **Macro Average**   | **79.00%** | **100.00%**        | **+21.00%** | **1.219s**  | **255**            | **0.0487**              |
 
 ![400Q Canonical Suite](https://raw.githubusercontent.com/xstarbrain/dual-loop-controller/main/kaggle_writeup/figures/benchmark_400q_hadl_v59_comparison.png)
 

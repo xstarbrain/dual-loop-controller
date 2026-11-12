@@ -289,7 +289,7 @@ graph TD
 Evaluated 100% authentically on `Qwen/Qwen3.5-2B` ($D=2048$, Layer 11 hook). **Zero mock or synthetic data.**
 
 | # | Benchmark Task & Cognitive Domain | Candidate Space | Bench 1 (Raw Base Model) | Matrix Distractor Elimination (Bench 1 $\rightarrow$ 2) | Bench 2 (Dual-Loop + Matrix) | Final Outcome & Status |
-| :-: | :--- | :---: | :---: | :--- | :---: | :---: |
+| :---: | :--- | :---: | :---: | :--- | :---: | :---: |
 | 1 | **BBH-ColoredObjects** | 7 Choices | `[D] three` (40.7% - INCORRECT) | Options `[A, B, C, G]` pruned $\rightarrow$ Survivors: `[D, E, F]` | **`[F] five` (94.4% - CORRECT)** | **RESCUED (+1)** |
 | 2 | **ARC-Challenge** | 4 Choices | **`[B]` (67.9% - CORRECT)** | Option `[C]` pruned $\rightarrow$ Survivors: `[A, B, D]` | **`[B]` (58.2% - CORRECT)** | **PRESERVED CORRECT** |
 | 3 | **BBH-WebOfLies** | 2 Choices | `[B] No` (53.3% - INCORRECT) | Binary Dilemma (`[A, B]`) | **`[A] Yes` (75.2% - CORRECT)** | **RESCUED (+1)** |
@@ -412,7 +412,7 @@ Evaluated 100% authentically on `Qwen/Qwen3.5-2B` on CUDA GPU across all 20 reas
 ### 📋 Full Per-Benchmark Leaderboard Table ($N=200$)
 
 | # | Benchmark Task | Category & Domain | Base Model (Cold) | Dual-Loop Normal | **DL Reservoir v2.3 (Cold)** | Base x Wrong Log (M2) | DL Prev Baseline (M2) | **DL Reservoir v2.3 (M2)** |
-| :-: | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: |
+| :---: | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: |
 | 1 | **ARC-Easy** | Science & Facts | 80.0% | 90.0% | **90.0%** | 90.0% | 100.0% | **100.0%** |
 | 2 | **ARC-Challenge** | Science & Facts | 50.0% | 50.0% | **70.0%** | 70.0% | 60.0% | **80.0%** |
 | 3 | **OpenBookQA** | Science & Facts | 30.0% | 30.0% | **30.0%** | 60.0% | 50.0% | **60.0%** |
@@ -448,7 +448,7 @@ Evaluated 100% authentically on `Qwen/Qwen3.5-2B` on CUDA GPU across all 20 reas
 ![Comprehensive 20-Benchmark Scoreboard](authentic_20_benchmark_scoreboard.png)
 
 | # | Benchmark Dataset | Domain | Samples | Base Acc ($K=0$) | Dual-Loop ($K=2$) | Delta ($\Delta$) | Rescued / Degraded |
-| :-: | :--- | :--- | :---: | :---: | :---: | :---: | :---: |
+| :---: | :--- | :--- | :---: | :---: | :---: | :---: | :---: |
 | 1 | **ARC-Easy** | Elementary Science QA | 10 | 80.0% | 80.0% | 0.0% | 0 / 0 |
 | 2 | **ARC-Challenge** | Deep Scientific Deduction | 10 | 50.0% | 50.0% | 0.0% | 0 / 0 |
 | 3 | **OpenBookQA** | Multi-Hop Fact Chaining | 10 | 30.0% | 30.0% | 0.0% | 0 / 0 |
