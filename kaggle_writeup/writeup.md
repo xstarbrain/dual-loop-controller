@@ -2,12 +2,12 @@
 ### Continuous Latent Contraction & Spiking Consensus Brain for Zero-Bloat, 100% Reasoning Precision
 
 [![Hardware: NVIDIA RTX 5060](https://img.shields.io/badge/Hardware-NVIDIA%20RTX%205060%20Blackwell-green.svg)](https://www.nvidia.com)
-[![100Q Novel Challenge: 100%](https://img.shields.io/badge/100Q%20Novel%20OOD-100%25%20vs%2027%25%20Base-brightgreen.svg)](data/benchmark_100_novel_challenges_audit.json)
-[![400Q Canonical Suite: 100%](https://img.shields.io/badge/400Q%20Canonical-100%25%20vs%2079%25%20Base-brightgreen.svg)](data/benchmark_400q_hadl_v59_audit.json)
+[![100Q Novel Challenge: 100%](https://img.shields.io/badge/100Q%20Novel%20OOD-100%25%20vs%2027%25%20Base-brightgreen.svg)](https://github.com/xstarbrain/dual-loop-controller/blob/main/kaggle_writeup/data/benchmark_100_novel_challenges_audit.json)
+[![400Q Canonical Suite: 100%](https://img.shields.io/badge/400Q%20Canonical-100%25%20vs%2079%25%20Base-brightgreen.svg)](https://github.com/xstarbrain/dual-loop-controller/blob/main/kaggle_writeup/data/benchmark_400q_hadl_v59_audit.json)
 [![Precision: torch.bfloat16](https://img.shields.io/badge/Precision-Native%20bfloat16-blue.svg)](https://pytorch.org)
-[![License: MIT](https://img.shields.io/badge/License-MIT-orange.svg)](../LICENSE)
+[![License: MIT](https://img.shields.io/badge/License-MIT-orange.svg)](https://github.com/xstarbrain/dual-loop-controller/blob/main/LICENSE)
 
-![X-Star HADL v5.9 Card Thumbnail](card_thumbnail.png)
+![X-Star HADL v5.9 Card Thumbnail](https://raw.githubusercontent.com/xstarbrain/dual-loop-controller/main/card_thumbnail.png)
 
 **Authors**: Matthew Chen & The X-Star Intelligence Team  
 **Affiliation**: X-Star Autonomous AI & Neuromorphic Architecture Research  
@@ -28,8 +28,8 @@
    - [Trick 3: Rank-4 Latent Thought Matrix Decomposition](#trick-3-rank-4-latent-thought-matrix-decomposition)
    - [Trick 4: Continuous Latent Deliberation & Lyapunov Energy Formulation](#trick-4-continuous-latent-deliberation--lyapunov-energy-formulation)
    - [Trick 5: Banach Fixed-Point Contraction Mapping](#trick-5-banach-fixed-point-contraction-mapping)
-   - [Trick 6: Outer Dynamic Scratch Dimension Allocation ($D_{\text{scratch}} \in [128, 384]$)](#trick-6-outer-dynamic-scratch-dimension-allocation)
-   - [Trick 7: Order-Statistic Harmonic-Geometric Consensus Bounds ($\eta_{\text{dyn}}$)](#trick-7-order-statistic-harmonic-geometric-consensus-bounds)
+   - [Trick 6: Outer Dynamic Scratch Dimension Allocation ($D\_{\text{scratch}} \in [128, 384]$)](#trick-6-outer-dynamic-scratch-dimension-allocation)
+   - [Trick 7: Order-Statistic Harmonic-Geometric Consensus Bounds ($\eta\_{\text{dyn}}$)](#trick-7-order-statistic-harmonic-geometric-consensus-bounds)
    - [Trick 8: Closed-Form Mahalanobis Epistemic Distance & Skew-Symmetric Bilinear Calibration](#trick-8-closed-form-mahalanobis-epistemic-distance--skew-symmetric-bilinear-calibration)
    - [Trick 9: Hyperspherical Language Head Normalization ($\mathbb{S}^{D-1}$)](#trick-9-hyperspherical-language-head-normalization)
    - [Trick 10: Rigid IPv6 Deterministic Numeric Registers (DNR) & Cognitive ALU](#trick-10-rigid-ipv6-deterministic-numeric-registers-dnr--cognitive-alu)
@@ -67,12 +67,12 @@ HADL v5.9 demonstrates that human-grade mathematical, algorithmic, and logical r
 Standard causal autoregressive transformers model the joint distribution of a sequence as:
 
 $$
-P(x_1, \dots, x_T) = \prod_{t=1}^T P(x_t \mid x_{<t})
+P(x\_1, \dots, x\_T) = \prod\_{t=1}^T P(x\_t \mid x\_{<t})
 $$
 
 In this regime, language generation and internal reasoning are bound synchronously to the exact same clock. The model has no mechanism to "pause," "reflect," or "self-correct" without emitting tokens into the context window. 
 
-If token $x_k$ contains an arithmetic slip (e.g., calculating $74921 \times 8394 \approx 628,886,874$ off by thousands), that erroneous token becomes immutable conditioning context for all subsequent tokens $x_{k+1}, \dots, x_T$. The model cannot backtrack; it is forced to rationalize its own error, leading to inevitable hallucination drift.
+If token $x\_k$ contains an arithmetic slip (e.g., calculating $74921 \times 8394 \approx 628,886,874$ off by thousands), that erroneous token becomes immutable conditioning context for all subsequent tokens $x\_{k+1}, \dots, x\_T$. The model cannot backtrack; it is forced to rationalize its own error, leading to inevitable hallucination drift.
 
 ```
 Standard Autoregressive LLM:
@@ -149,13 +149,13 @@ Here we document the complete set of architectural mechanisms, mathematical form
 
 ### Trick 1: Neuromorphic LIF Spiking Admission Gate (Energy-Saving Bypass)
 **The Problem:** Running heavy latent deliberation loops on trivial prompts ("Hello", "What is the capital of France?") wastes GPU cycles and adds unnecessary latency.  
-**The Trick:** A biologically-inspired **Leaky Integrate-and-Fire (LIF)** spiking membrane gate intercepts token embeddings at layer $L_{\text{mid}}$. The membrane potential $V_m(t)$ evolves as:
+**The Trick:** A biologically-inspired **Leaky Integrate-and-Fire (LIF)** spiking membrane gate intercepts token embeddings at layer $L\_{\text{mid}}$. The membrane potential $V\_m(t)$ evolves as:
 
 $$
-\tau_m \frac{dV_m}{dt} = -(V_m - V_{\text{rest}}) + \mathbf{w}_{\text{spike}}^T \mathbf{x}_t
+\tau\_m \frac{dV\_m}{dt} = -(V\_m - V\_{\text{rest}}) + \mathbf{w}\_{\text{spike}}^T \mathbf{x}\_t
 $$
 
-The spiking activation function $\Theta(V_m - V_{\text{th}})$ emits a discrete spike $S \in \{0, 1\}$:
+The spiking activation function $\Theta(V\_m - V\_{\text{th}})$ emits a discrete spike $S \in \{0, 1\}$:
 * **$S = 0$ (Sub-threshold):** The prompt is simple conversational prose. It bypasses System 2 entirely, routing directly to the standard autoregressive path with **$0.0078\text{ ms}$ ($7.8\,\mu\text{s}$) latency**.
 * **$S = 1$ (Supra-threshold):** Triggered by syntactic density, mathematical symbols, or algorithmic tokens, redirecting activations to the Latent Thought Matrix. Over $70\%$ of daily queries bypass System 2, conserving substantial GPU power.
 
@@ -166,7 +166,7 @@ The spiking activation function $\Theta(V_m - V_{\text{th}})$ emits a discrete s
 **The Trick:** We introduce a **Recurrent Toroidal Router ("Otak Berputar")** where cognitive routing operates along a 2-torus manifold $\mathbb{T}^2 = S^1 \times S^1$. Hidden representations are wrapped into a periodic circular topology:
 
 $$
-\mathbf{h}_{\text{torus}}(\theta, \phi) = \mathbf{W}_{\theta} \cos(\theta) + \mathbf{W}_{\phi} \sin(\phi) + \mathbf{b}_{\text{torus}}
+\mathbf{h}\_{\text{torus}}(\theta, \phi) = \mathbf{W}\_{\theta} \cos(\theta) + \mathbf{W}\_{\phi} \sin(\phi) + \mathbf{b}\_{\text{torus}}
 $$
 
 Periodic boundary conditions eliminate edge-effects and position decay, allowing continuous recurrent message passing across all token slots without positional attenuation.
@@ -178,14 +178,16 @@ Periodic boundary conditions eliminate edge-effects and position decay, allowing
 **The Trick:** HADL v5.9 decomposes the latent workspace into a **Rank-4 Latent Thought Matrix** $\mathbf{M} \in \mathbb{R}^{B \times S \times 4 \times D}$ comprising four mutually orthogonal functional planes:
 
 $$
-\mathbf{M} = \begin{bmatrix} \mathbf{M}_{\text{anchor}} \\ \mathbf{M}_{\text{hypo}} \\ \mathbf{M}_{\text{refute}} \\ \mathbf{M}_{\text{synth}} \end{bmatrix}
+\mathbf{M} = \begin{bmatrix} \mathbf{M}\_{\text{anchor}} \\ \mathbf{M}\_{\text{hypo}} \\ \mathbf{M}\_{\text{refute}} \\ \mathbf{M}\_{\text{synth}} \end{bmatrix}
 $$
 
 1. **Factual Anchor Plane** (`M_anchor`): Locks down immutable prompt constraints, entities, and numeric values. Enforces an orthogonality penalty:
 
 $$
-\mathcal{L}_{\text{ortho}} = \|\mathbf{M}_{\text{anchor}}^T \mathbf{M}_{\text{hypo}}\|_F^2
+\mathcal{L}\_{\text{ortho}} = \|\mathbf{M}\_{\text{anchor}}^T \mathbf{M}\_{\text{hypo}}\|\_F^2
 $$
+
+
 2. **Hypothesis Expansion Plane** (`M_hypo`): Explores candidate solutions, potential algorithmic invariants, and deductive branches.
 3. **Popperian Counterfactual Refutation Plane** (`M_refute`): Actively attempts to falsify `M_hypo` by searching for edge-case contradictions, off-by-one errors, and counterexamples.
 4. **Invariant Synthesis Plane** (`M_synth`): Computes the surviving consensus that withstands falsification.
@@ -199,17 +201,17 @@ Empirical verification confirms **99.9997% orthogonality preservation** across h
 **The Trick:** Latent deliberation is modeled as a continuous dynamical system governed by a cognitive energy potential $\mathcal{E}(\mathbf{h})$:
 
 $$
-\dot{\mathbf{h}}(t) = -\nabla_{\mathbf{h}} \mathcal{E}(\mathbf{h}(t)) + \mathbf{u}(t)
+\dot{\mathbf{h}}(t) = -\nabla\_{\mathbf{h}} \mathcal{E}(\mathbf{h}(t)) + \mathbf{u}(t)
 $$
 
 We prove global asymptotic stability via the quadratic Lyapunov function:
 
 $$
-V(\mathbf{h}) = \frac{1}{2} \|\mathbf{h} - \mathbf{h}^\star\|_2^2
+V(\mathbf{h}) = \frac{1}{2} \|\mathbf{h} - \mathbf{h}^\star\|\_2^2
 $$
 
 $$
-\dot{V}(\mathbf{h}) = \langle \mathbf{h} - \mathbf{h}^\star, \dot{\mathbf{h}} \rangle = -\langle \mathbf{h} - \mathbf{h}^\star, \nabla \mathcal{E}(\mathbf{h}) \rangle \le -c \|\mathbf{h} - \mathbf{h}^\star\|_2^2 = -2c V(\mathbf{h})
+\dot{V}(\mathbf{h}) = \langle \mathbf{h} - \mathbf{h}^\star, \dot{\mathbf{h}} \rangle = -\langle \mathbf{h} - \mathbf{h}^\star, \nabla \mathcal{E}(\mathbf{h}) \rangle \le -c \|\mathbf{h} - \mathbf{h}^\star\|\_2^2 = -2c V(\mathbf{h})
 $$
 
 where $c > 0$ is the strong convexity parameter of $\mathcal{E}$. By Lyapunov's Direct Method, $\mathbf{h}(t)$ converges exponentially to $\mathbf{h}^\star$ at rate $\mathcal{O}(e^{-2ct})$ with **zero token emission**.
@@ -221,13 +223,13 @@ where $c > 0$ is the strong convexity parameter of $\mathcal{E}$. By Lyapunov's 
 **The Trick:** The discrete update operator $\mathcal{T}: \mathcal{H} \to \mathcal{H}$ is formulated as:
 
 $$
-\mathbf{h}^{(k+1)} = \mathcal{T}(\mathbf{h}^{(k)}) = (1 - \alpha) \mathbf{h}^{(k)} + \alpha \cdot \text{LayerNorm}\left( W_{\text{proj}} \sigma\left( W_{\text{delib}} \mathbf{h}^{(k)} + \mathbf{b}_1 \right) + \mathbf{b}_2 \right)
+\mathbf{h}^{(k+1)} = \mathcal{T}(\mathbf{h}^{(k)}) = (1 - \alpha) \mathbf{h}^{(k)} + \alpha \cdot \text{LayerNorm}\left( W\_{\text{proj}} \sigma\left( W\_{\text{delib}} \mathbf{h}^{(k)} + \mathbf{b}\_1 \right) + \mathbf{b}\_2 \right)
 $$
 
 where $\alpha \in (0, 1)$ is the relaxation momentum. Spectral normalization is enforced on weights such that:
 
 $$
-\text{Lip}(\mathcal{T}) = \sup_{\mathbf{x} \ne \mathbf{y}} \frac{\|\mathcal{T}(\mathbf{x}) - \mathcal{T}(\mathbf{y})\|}{\|\mathbf{x} - \mathbf{y}\|} \le \gamma < 1
+\text{Lip}(\mathcal{T}) = \sup\_{\mathbf{x} \ne \mathbf{y}} \frac{\|\mathcal{T}(\mathbf{x}) - \mathcal{T}(\mathbf{y})\|}{\|\mathbf{x} - \mathbf{y}\|} \le \gamma < 1
 $$
 
 By the **Banach Fixed-Point Theorem**, $\mathcal{T}$ has a unique fixed point $\mathbf{h}^\star$. The error bound after $K$ steps is strictly deterministic:
@@ -242,54 +244,54 @@ In practice, HADL v5.9 achieves convergence ($\|\mathbf{h}^{(k+1)} - \mathbf{h}^
 
 ### Trick 6: Outer Dynamic Scratch Dimension Allocation
 **The Problem:** Fixed latent dimensions either bottleneck complex Olympiad math problems or waste memory and GPU bandwidth on simple sentences.  
-**The Trick:** HADL v5.9 introduces a dynamic, query-conditioned scratch capacity $D_{\text{scratch}}(t) \in [128, 384]$. Based on prompt entropy $\mathcal{H}_t = -\sum_v P(v) \log P(v)$ and syntactic complexity $\mathcal{C}_{\text{task}} \in [0, 1]$:
+**The Trick:** HADL v5.9 introduces a dynamic, query-conditioned scratch capacity $D\_{\text{scratch}}(t) \in [128, 384]$. Based on prompt entropy $\mathcal{H}\_t = -\sum\_v P(v) \log P(v)$ and syntactic complexity $\mathcal{C}\_{\text{task}} \in [0, 1]$:
 
 $$
-D_{\text{scratch}}(t) = \text{clamp}\left( \text{round}\left( D_{\text{base}} \cdot \left(1 + \beta_1 \frac{\mathcal{H}_t}{\mathcal{H}_{\max}} + \beta_2 \mathcal{C}_{\text{task}} \right) \right), 128, 384 \right)
+D\_{\text{scratch}}(t) = \text{clamp}\left( \text{round}\left( D\_{\text{base}} \cdot \left(1 + \beta\_1 \frac{\mathcal{H}\_t}{\mathcal{H}\_{\max}} + \beta\_2 \mathcal{C}\_{\text{task}} \right) \right), 128, 384 \right)
 $$
 
-* **Simple Prompts (Chat, Trivia):** $D_{\text{scratch}} \approx 128 - 160$, saving memory bandwidth.
+* **Simple Prompts (Chat, Trivia):** $D\_{\text{scratch}} \approx 128 - 160$, saving memory bandwidth.
 * **Complex Multi-Step Prompts (Olympiad Math, AST Bugs):** Dynamically expands up to $320 - 384$, providing full high-dimensional working memory for constraint tracking.
 
 ---
 
 ### Trick 7: Order-Statistic Harmonic-Geometric Consensus Bounds
 **The Problem:** Earlier dual-loop models used a fixed bound $\eta = 0.05$ for latent steering. If $\eta$ was too large, single-token glitches caused catastrophic drift; if $\eta$ was too small, the adapter was choked and could not steer difficult mathematical derivations.  
-**The Trick:** HADL v5.9 dynamically derives the steering bound $\eta_{\text{dyn}}$ from the order statistics of the batch:
+**The Trick:** HADL v5.9 dynamically derives the steering bound $\eta\_{\text{dyn}}$ from the order statistics of the batch:
 
 $$
-\mu_{\min} = \frac{1}{B} \sum_{i=1}^B \min_j |\mathbf{h}_{i, j}|, \qquad m_{\min} = \text{median}_{i} \left( \min_j |\mathbf{h}_{i, j}| \right)
-$$
-
-$$
-\eta_{\text{dyn}}(t) = \frac{1}{2}\left( \mu_{\min} + m_{\min} \right)
+\mu\_{\min} = \frac{1}{B} \sum\_{i=1}^B \min\_j |\mathbf{h}\_{i, j}|, \qquad m\_{\min} = \text{median}\_{i} \left( \min\_j |\mathbf{h}\_{i, j}| \right)
 $$
 
 $$
-\mathbf{h}_{\text{updated}} = \mathbf{h} + \text{clamp}\left( \Delta \mathbf{h}, -\eta_{\text{dyn}}(t), +\eta_{\text{dyn}}(t) \right)
+\eta\_{\text{dyn}}(t) = \frac{1}{2}\left( \mu\_{\min} + m\_{\min} \right)
 $$
 
-* When sub-components disagree or noise is present: $\eta_{\text{dyn}} \approx 0.012 - 0.020$, tightly clamping updates and preventing hallucinations.
-* When all cognitive subparts reach unanimous agreement: $\eta_{\text{dyn}}$ expands up to $0.0650$, unlocking **$4.33\times$ steering power** to decisively correct difficult answers.
+$$
+\mathbf{h}\_{\text{updated}} = \mathbf{h} + \text{clamp}\left( \Delta \mathbf{h}, -\eta\_{\text{dyn}}(t), +\eta\_{\text{dyn}}(t) \right)
+$$
+
+* When sub-components disagree or noise is present: $\eta\_{\text{dyn}} \approx 0.012 - 0.020$, tightly clamping updates and preventing hallucinations.
+* When all cognitive subparts reach unanimous agreement: $\eta\_{\text{dyn}}$ expands up to $0.0650$, unlocking **$4.33\times$ steering power** to decisively correct difficult answers.
 
 ---
 
 ### Trick 8: Closed-Form Mahalanobis Distance & Skew-Symmetric Bilinear Calibration
 **The Problem:** Standard softmax confidence is wildly overconfident on out-of-distribution (OOD) adversarial traps.  
-**The Trick:** We compute a closed-form Mahalanobis epistemic distance $d_{\text{Maha}}$ against the running covariance of factual activations:
+**The Trick:** We compute a closed-form Mahalanobis epistemic distance $d\_{\text{Maha}}$ against the running covariance of factual activations:
 
 $$
-d_{\text{Maha}}(\mathbf{h}) = \sqrt{(\mathbf{h} - \boldsymbol{\mu})^T \boldsymbol{\Sigma}^{-1} (\mathbf{h} - \boldsymbol{\mu})}
+d\_{\text{Maha}}(\mathbf{h}) = \sqrt{(\mathbf{h} - \boldsymbol{\mu})^T \boldsymbol{\Sigma}^{-1} (\mathbf{h} - \boldsymbol{\mu})}
 $$
 
 $$
-u_{\text{epistemic}} = \exp\left( -\frac{d_{\text{Maha}}^2}{2 \sigma_{\text{calib}}^2} \right)
+u\_{\text{epistemic}} = \exp\left( -\frac{d\_{\text{Maha}}^2}{2 \sigma\_{\text{calib}}^2} \right)
 $$
 
 Simultaneously, we construct a **skew-symmetric bilinear operator** (where $\mathbf{A} = -\mathbf{A}^T$):
 
 $$
-c_{\text{bilinear}} = \mathbf{h}_{\text{anchor}}^T \mathbf{A} \mathbf{h}_{\text{hypo}}
+c\_{\text{bilinear}} = \mathbf{h}\_{\text{anchor}}^T \mathbf{A} \mathbf{h}\_{\text{hypo}}
 $$
 
 Because $\mathbf{A}$ is anti-symmetric, any self-consistent proposition produces:
@@ -303,15 +305,15 @@ Any logical contradiction or counterfactual clash immediately yields a large non
 ---
 
 ### Trick 9: Hyperspherical Language Head Normalization ($\mathbb{S}^{D-1}$)
-**The Problem:** In classical linear heads ($\text{logits} = \mathbf{h} W_{\text{head}}^T$), $\|\mathbf{h}\|$ varies wildly with context length and depth, causing erratic logit temperatures and random greedy token selection errors.  
+**The Problem:** In classical linear heads ($\text{logits} = \mathbf{h} W\_{\text{head}}^T$), $\|\mathbf{h}\|$ varies wildly with context length and depth, causing erratic logit temperatures and random greedy token selection errors.  
 **The Trick:** HADL v5.9 enforces a **Cauchy-Schwarz Hyperspherical Projection** onto the unit hypersphere $\mathbb{S}^{D-1}$:
 
 $$
-\hat{\mathbf{h}} = \frac{\mathbf{h}}{\|\mathbf{h}\|_2 + \epsilon_0}, \qquad \hat{W}_v = \frac{W_v}{\|W_v\|_2 + \epsilon_0}
+\hat{\mathbf{h}} = \frac{\mathbf{h}}{\|\mathbf{h}\|\_2 + \epsilon\_0}, \qquad \hat{W}\_v = \frac{W\_v}{\|W\_v\|\_2 + \epsilon\_0}
 $$
 
 $$
-\text{logits}_v = \kappa \cdot \langle \hat{\mathbf{h}}, \hat{W}_v \rangle = \kappa \cdot \cos(\theta_v)
+\text{logits}\_v = \kappa \cdot \langle \hat{\mathbf{h}}, \hat{W}\_v \rangle = \kappa \cdot \cos(\theta\_v)
 $$
 
 where $\kappa > 0$ is a learnable radial temperature scalar. This guarantees that logit probabilities are strictly monotonic with respect to angular distance on the hypersphere, eliminating temperature drift.
@@ -343,7 +345,7 @@ When mathematical operators, Fermat modular exponentiations, Diophantine equatio
 **The Trick:** When updating the latent controller weights on new curricula, gradient updates $\Delta \mathbf{W}$ are projected strictly onto the **nullspace** of the historical activation covariance matrix:
 
 $$
-\mathbf{P}_{\text{null}} = \mathbf{I} - \mathbf{U}_k \mathbf{U}_k^T, \qquad \Delta \mathbf{W}_{\text{safe}} = \Delta \mathbf{W} \cdot \mathbf{P}_{\text{null}}
+\mathbf{P}\_{\text{null}} = \mathbf{I} - \mathbf{U}\_k \mathbf{U}\_k^T, \qquad \Delta \mathbf{W}\_{\text{safe}} = \Delta \mathbf{W} \cdot \mathbf{P}\_{\text{null}}
 $$
 
 This ensures that the new updates have mathematically zero inner product with previously learned representations, achieving **$100.0\%$ lifelong knowledge retention** with **$0.000000$ retroactive overlap**.
@@ -432,7 +434,7 @@ All evaluations were executed on the physical **NVIDIA GeForce RTX 5060 Laptop G
 
 ### 6.1 100-Question Novel Out-of-Distribution Challenge Suite (100x5)
 
-Audited directly from [`data/benchmark_100_novel_challenges_audit.json`](data/benchmark_100_novel_challenges_audit.json).  
+Audited directly from [`https://github.com/xstarbrain/dual-loop-controller/blob/main/kaggle_writeup/data/benchmark_100_novel_challenges_audit.json`](https://github.com/xstarbrain/dual-loop-controller/blob/main/kaggle_writeup/data/benchmark_100_novel_challenges_audit.json).  
 This suite features 100 newly crafted, unseen problems specifically engineered with non-trivial parameters to defeat memorization.
 
 ```
@@ -451,13 +453,13 @@ Net Accuracy Improvement: +73.00% Net Absolute Gain (p < 1e-15)
 | **Domain 5: Constraint & Metacognitive Reasoning**| Zero-token constraints, negative exclusion, calendar day shifts ($100\text{ days}$), bipartite matchings | 20.0% (4/20) | **100.0% (20/20)** | **+80.0%** |
 | **Grand Total** | **All 100 Challenging Test Cases** | **27.0% (27/100)** | **100.0% (100/100)** | **+73.0%** |
 
-![100Q Novel Challenge Comparison](figures/benchmark_100_novel_challenges_comparison.png)
+![100Q Novel Challenge Comparison](https://raw.githubusercontent.com/xstarbrain/dual-loop-controller/main/kaggle_writeup/figures/benchmark_100_novel_challenges_comparison.png)
 
 ---
 
 ### 6.2 400-Question Canonical Multi-Pillar Academic Suite (20 Benchmarks)
 
-Audited from [`data/benchmark_400q_hadl_v59_audit.json`](data/benchmark_400q_hadl_v59_audit.json).  
+Audited from [`https://github.com/xstarbrain/dual-loop-controller/blob/main/kaggle_writeup/data/benchmark_400q_hadl_v59_audit.json`](https://github.com/xstarbrain/dual-loop-controller/blob/main/kaggle_writeup/data/benchmark_400q_hadl_v59_audit.json).  
 Spanning 20 established academic benchmark datasets with 20 questions each:
 
 ```
@@ -470,7 +472,7 @@ HADL v5.8 (Latent Router):    [████████████████�
 HADL v5.9 (Spiking Consensus):[██████████████████████████████] 100.00% (400/400)
 ```
 
-| # | Benchmark Dataset | Cognitive Pillar | Base Acc | **HADL v5.9 Acc** | Net Gain | Avg Latency | Active Scratch Dim | Dynamic Bound ($\eta_{\text{dyn}}$) |
+| # | Benchmark Dataset | Cognitive Pillar | Base Acc | **HADL v5.9 Acc** | Net Gain | Avg Latency | Active Scratch Dim | Dynamic Bound ($\eta\_{\text{dyn}}$) |
 | :-: | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: |
 | 1 | **GSM8K** | Math & Quantitative | 75.0% | **100.0% (20/20)** | +25.0% | 0.428s | 320 | 0.0650 |
 | 2 | **MATH** | Math & Quantitative | 15.0% | **100.0% (20/20)** | **+85.0%** | 0.252s | 320 | 0.0650 |
@@ -494,7 +496,7 @@ HADL v5.9 (Spiking Consensus):[████████████████�
 | 20| **DailyChat** | Instruction & Chat | 100.0% | **100.0% (20/20)** | +0.0% | 5.162s | 285 | 0.0640 |
 | **Total** | **400 Questions** | **Macro Average** | **79.00%** | **100.00%** | **+21.00%** | **1.219s** | **255** | **0.0487** |
 
-![400Q Canonical Suite](figures/benchmark_400q_hadl_v59_comparison.png)
+![400Q Canonical Suite](https://raw.githubusercontent.com/xstarbrain/dual-loop-controller/main/kaggle_writeup/figures/benchmark_400q_hadl_v59_comparison.png)
 
 ---
 
@@ -540,7 +542,7 @@ HARDWARE TELEMETRY & RUNTIME COMPARISON (NVIDIA GeForce RTX 5060 Laptop GPU, SM 
 ==================================================================================================
 ```
 
-![Architecture Blueprint](figures/hadl_v58_architecture_blueprint.png)
+![Architecture Blueprint](https://raw.githubusercontent.com/xstarbrain/dual-loop-controller/main/kaggle_writeup/figures/hadl_v58_architecture_blueprint.png)
 
 ---
 
